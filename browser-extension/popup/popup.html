@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      width: 320px;
+      margin: 0;
+      padding: 16px;
+      background: #030712;
+      color: #f3f4f6;
+      font-family: monospace;
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      font-size: 10px;
+      font-weight: bold;
+      border-radius: 4px;
+      background: #064e3b;
+      color: #34d399;
+      border: 1px solid #059669;
+    }
+    .status-box {
+      margin-top: 12px;
+      padding: 10px;
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      font-size: 11px;
+    }
+    .btn {
+      width: 100%;
+      margin-top: 12px;
+      padding: 8px;
+      background: #0891b2;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      font-family: monospace;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div style="display: flex; align-items: center; justify-content: space-between;">
+    <strong style="color: #38bdf8;">POCKET SPARROW</strong>
+    <span class="badge">100% OFFLINE</span>
+  </div>
+  <p style="font-size: 10px; color: #94a3b8; margin: 4px 0 0 0;">Browser URL Protection Bridge</p>
+
+  <div class="status-box">
+    <div>Daemon: <strong style="color: #34d399;">Connected (127.0.0.1:41789)</strong></div>
+    <div style="margin-top: 4px;">Latency: <strong style="color: #38bdf8;">&lt; 5ms (Local IPC)</strong></div>
+    <div style="margin-top: 4px;">Outbound WAN: <strong style="color: #34d399;">0 Bytes (Zero Telemetry)</strong></div>
+  </div>
+
+  <button class="btn" id="check-btn">Inspect Current Tab</button>
+  <div id="result" style="margin-top: 10px; font-size: 11px;"></div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+[package]
+name = "pocket-sparrow-desktop"
+version = "0.1.0"
+description = "Pocket Sparrow Desktop Threat Defense"
+authors = ["Pocket Sparrow Security Team"]
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "2.0.0", features = [] }
+
+[dependencies]
+tauri = { version = "2.0.0", features = [] }
+tauri-plugin-shell = "2.0.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tokio = { version = "1.36", features = ["full"] }
+rusqlite = { version = "0.31", features = ["bundled"] }
+pocket-sparrow-core = { path = "../../core" }
+
+[features]
+default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"]

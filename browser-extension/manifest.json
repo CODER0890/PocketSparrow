@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "Pocket Sparrow - On-Device Browser Guard",
+  "version": "0.1.0",
+  "description": "Real-time, 100% on-device phishing and link threat detection via local desktop daemon.",
+  "permissions": [
+    "webNavigation",
+    "storage",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "http://127.0.0.1/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "Pocket Sparrow Guard"
+  }
+}
