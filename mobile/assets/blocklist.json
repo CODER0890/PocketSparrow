@@ -1,0 +1,145 @@
+{
+  "high_risk_domains": [
+    "paypal-security-update.xyz",
+    "paypal-login-verify.top",
+    "paypal-account-center.club",
+    "paypal-resolution-center.info",
+    "appleid-verify-device.icu",
+    "apple-security-check.cf",
+    "apple-support-auth.live",
+    "appleid-icloud-login.ga",
+    "google-auth-login.tk",
+    "google-account-recovery.gq",
+    "google-security-notice.ml",
+    "netflix-billing-renew.ml",
+    "netflix-account-reactivate.xyz",
+    "netflix-member-verify.top",
+    "sbi-kyc-update.xyz",
+    "sbi-netbanking-alert.top",
+    "sbi-pan-verification.online",
+    "hdfc-netbanking-alert.club",
+    "hdfc-kyc-update-portal.xyz",
+    "icici-security-notice.top",
+    "axis-netbanking-portal.club",
+    "chase-verify-activity.work",
+    "chase-security-update.xyz",
+    "bankofamerica-login-verify.icu",
+    "wellsfargo-account-alert.top",
+    "amazon-security-alert.ga",
+    "amazon-order-verification.cf",
+    "amazon-prime-renewal.work",
+    "microsoft-account-reactivate.gq",
+    "microsoft-security-alert.live",
+    "office365-login-verify.xyz",
+    "outlook-web-update.top",
+    "free-giftcard-claim.buzz",
+    "claim-crypto-airdrop.xyz",
+    "claim-crypto-airdrop.buzz",
+    "binance-security-notice.top",
+    "binance-auth-verify.xyz",
+    "metamask-wallet-sync.club",
+    "trustwallet-recovery-phrase.xyz",
+    "meta-security-review.cc",
+    "facebook-copyright-infringement.cf",
+    "instagram-badge-verify.top",
+    "whatsapp-web-update.xyz",
+    "telegram-auth-portal.club",
+    "dhl-package-tracking-alert.top",
+    "fedex-delivery-pending.xyz",
+    "usps-redelivery-notice.work",
+    "fake-bank-login.com",
+    "secure-banking-portal-update.com",
+    "tax-refund-gov.work"
+  ],
+  "suspicious_tlds": [
+    "xyz",
+    "top",
+    "club",
+    "tk",
+    "ml",
+    "ga",
+    "cf",
+    "gq",
+    "work",
+    "date",
+    "racing",
+    "bid",
+    "icu",
+    "buzz",
+    "rest",
+    "surf",
+    "vip",
+    "fit",
+    "live",
+    "tokyo",
+    "stream",
+    "download",
+    "win",
+    "party",
+    "click"
+  ],
+  "url_shorteners": [
+    "bit.ly",
+    "tinyurl.com",
+    "t.co",
+    "is.gd",
+    "ow.ly",
+    "buff.ly",
+    "goo.gl",
+    "cutt.ly",
+    "rebrand.ly",
+    "shorturl.at",
+    "clck.ru",
+    "s.id"
+  ],
+  "protected_brands": [
+    {
+      "name": "paypal",
+      "legitimate_domains": ["paypal.com", "paypal.me"]
+    },
+    {
+      "name": "apple",
+      "legitimate_domains": ["apple.com", "icloud.com"]
+    },
+    {
+      "name": "google",
+      "legitimate_domains": ["google.com", "accounts.google.com"]
+    },
+    {
+      "name": "microsoft",
+      "legitimate_domains": ["microsoft.com", "live.com", "outlook.com", "office.com"]
+    },
+    {
+      "name": "netflix",
+      "legitimate_domains": ["netflix.com"]
+    },
+    {
+      "name": "amazon",
+      "legitimate_domains": ["amazon.com", "amazon.in", "amazon.co.uk"]
+    },
+    {
+      "name": "sbi",
+      "legitimate_domains": ["onlinesbi.sbi", "sbi.co.in"]
+    },
+    {
+      "name": "hdfc",
+      "legitimate_domains": ["hdfcbank.com"]
+    },
+    {
+      "name": "chase",
+      "legitimate_domains": ["chase.com"]
+    },
+    {
+      "name": "facebook",
+      "legitimate_domains": ["facebook.com", "meta.com"]
+    },
+    {
+      "name": "instagram",
+      "legitimate_domains": ["instagram.com"]
+    },
+    {
+      "name": "binance",
+      "legitimate_domains": ["binance.com"]
+    }
+  ]
+}

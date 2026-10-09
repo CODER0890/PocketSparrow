@@ -1,0 +1,136 @@
+{
+  "sample_phishing_urls": [
+    {
+      "id": "url-1",
+      "title": "Apple ID Cyrillic Homoglyph",
+      "url": "https://\u0430pple.com/login",
+      "description": "Uses Cyrillic 'а' (\\u0430) to visually spoof apple.com",
+      "expected_verdict": "blocked"
+    },
+    {
+      "id": "url-2",
+      "title": "PayPal Credential Harvester",
+      "url": "https://paypal-security-update.xyz/verify",
+      "description": "Brand mismatch combined with high-risk .xyz TLD",
+      "expected_verdict": "blocked"
+    },
+    {
+      "id": "url-3",
+      "title": "Direct IP-Based Phish",
+      "url": "http://192.168.1.100/secure-update/login.php",
+      "description": "Raw numeric IPv4 host to bypass domain name registration",
+      "expected_verdict": "blocked"
+    },
+    {
+      "id": "url-4",
+      "title": "Algorithmic DGA Domain (High Entropy)",
+      "url": "https://x892jklmsd78q123b.top/account-review",
+      "description": "Shannon entropy > 4.2 indicating automated domain generation algorithm",
+      "expected_verdict": "blocked"
+    },
+    {
+      "id": "url-5",
+      "title": "SBI NetBanking Fraud (.xyz)",
+      "url": "http://sbi-kyc-update.xyz/login",
+      "description": "SBI bank impersonation hosted on high-abuse .xyz registry",
+      "expected_verdict": "blocked"
+    },
+    {
+      "id": "url-6",
+      "title": "Subdomain Stacking Masquerade",
+      "url": "https://netflix.com.account-update.billing-renew.ml/login",
+      "description": "3+ levels of excessive subdomains concealing the true apex domain",
+      "expected_verdict": "blocked"
+    },
+    {
+      "id": "url-7",
+      "title": "URL Shortener Redirection Cloak",
+      "url": "https://bit.ly/fake-bank-promo",
+      "description": "Obfuscated shortener hiding untrusted redirection destination",
+      "expected_verdict": "caution"
+    },
+    {
+      "id": "url-8",
+      "title": "Crypto Airdrop Lure (.buzz)",
+      "url": "https://claim-crypto-airdrop.buzz/connect-wallet",
+      "description": "Suspicious TLD with financial credential harvesting lure",
+      "expected_verdict": "blocked"
+    },
+    {
+      "id": "url-9",
+      "title": "Userinfo @ Sign Obfuscation",
+      "url": "https://google.com@attacker-portal.net/signin",
+      "description": "Uses @ sign syntax to deceive user about the actual host server",
+      "expected_verdict": "blocked"
+    },
+    {
+      "id": "url-10",
+      "title": "Authentic Official Domain (Safe Baseline)",
+      "url": "https://google.com",
+      "description": "Authentic verified apex domain with standard entropy and syntax",
+      "expected_verdict": "safe"
+    }
+  ],
+  "sample_sms_scams": [
+    {
+      "id": "sms-1",
+      "title": "SBI Account Deactivation Scam",
+      "message": "URGENT: Your SBI account will be blocked today. Please verify your identity and update PAN card immediately at http://sbi-kyc-update.xyz",
+      "expected_verdict": "blocked"
+    },
+    {
+      "id": "sms-2",
+      "title": "Electricity Power Disconnection Scam",
+      "message": "Dear consumer, your electricity power will be disconnected tonight at 9:30 PM due to unpaid bill of ₹1,450. Call officer immediately or pay at bit.ly/power-pay",
+      "expected_verdict": "blocked"
+    },
+    {
+      "id": "sms-3",
+      "title": "Lottery / Cash Reward Bait",
+      "message": "CONGRATULATIONS! You have won cash prize ₹50,000 in customer lucky draw. Claim your lottery reward immediately at http://claim-crypto-airdrop.xyz",
+      "expected_verdict": "blocked"
+    },
+    {
+      "id": "sms-4",
+      "title": "HDFC Card Suspension Alert",
+      "message": "HDFC Alert: Your debit card has been suspended due to suspicious activity. Reactivate within 24 hours at http://hdfc-netbanking-alert.club or visit branch.",
+      "expected_verdict": "blocked"
+    },
+    {
+      "id": "sms-5",
+      "title": "PAN - Aadhaar Link Deadline",
+      "message": "Your bank account has been locked because PAN card is not linked. Complete your KYC immediately to avoid ₹10,000 penalty: http://paypal-security-update.xyz",
+      "expected_verdict": "blocked"
+    },
+    {
+      "id": "sms-6",
+      "title": "Amazon Gift Voucher Cashback",
+      "message": "You have received ₹2,500 cashback voucher from Amazon Pay! Click to claim before expiration tonight: http://free-giftcard-claim.buzz",
+      "expected_verdict": "blocked"
+    },
+    {
+      "id": "sms-7",
+      "title": "Netflix Subscription Expiry Urgency",
+      "message": "Urgent: Your Netflix subscription failed to renew and will be canceled within 12 hours. Update billing information now: https://netflix-billing-renew.ml",
+      "expected_verdict": "blocked"
+    },
+    {
+      "id": "sms-8",
+      "title": "Fake Income Tax Refund Notice",
+      "message": "Income Tax Department: Refund of ₹18,450 has been approved for your account. Verify your account details to initiate transfer: http://tax-refund-gov.work",
+      "expected_verdict": "blocked"
+    },
+    {
+      "id": "sms-9",
+      "title": "Job Offer / Telegram Part-time Scam",
+      "message": "Earn ₹3,000 to ₹8,000 daily working from home! Only 30 minutes daily reviewing videos. Immediate payouts. Join now: https://t.co/earn-quick",
+      "expected_verdict": "caution"
+    },
+    {
+      "id": "sms-10",
+      "title": "Benign Personal Message (Safe Baseline)",
+      "message": "Hey! Are you still joining us for dinner tonight at 7:30 PM? Let me know so I can reserve a table.",
+      "expected_verdict": "safe"
+    }
+  ]
+}

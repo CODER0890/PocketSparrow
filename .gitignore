@@ -36,3 +36,13 @@ venv/
 .DS_Store
 Thumbs.db
 desktop/src-tauri/gen/
+
+# Flutter & Dart
+.dart_tool/
+.flutter-plugins*
+**/ephemeral/
+mobile/.dart_tool/
+mobile/.flutter-plugins*
+mobile/android/.gradle/
+mobile/android/.kotlin/
+mobile/android/local.properties

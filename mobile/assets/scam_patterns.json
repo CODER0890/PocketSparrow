@@ -1,0 +1,162 @@
+{
+  "regex_patterns": [
+    {
+      "id": "bank_blocked",
+      "pattern": "(?:account|card|access)\\s+(?:will be|has been|is)\\s+(?:blocked|suspended|deactivated|frozen|locked)",
+      "category": "BANK_SPOOF",
+      "severity": 0.95,
+      "description": "Account or payment card suspension threat"
+    },
+    {
+      "id": "bank_name_spoof",
+      "pattern": "\\b(?:sbi|hdfc|icici|axis|kotak|pnb|canara|chase|wellsfargo|citi)\\b.*(?:alert|account|notice|netbanking)",
+      "category": "BANK_SPOOF",
+      "severity": 0.90,
+      "description": "Financial institution brand impersonation"
+    },
+    {
+      "id": "kyc_mandatory_update",
+      "pattern": "(?:complete|update|verify)\\s+(?:your\\s+)?(?:kyc|pan\\s+card|aadhaar|id)\\s+(?:immediately|now|today|urgently)",
+      "category": "KYC_FRAUD",
+      "severity": 0.90,
+      "description": "Coercive KYC or identity document demand"
+    },
+    {
+      "id": "pan_not_linked",
+      "pattern": "pan\\s+(?:card\\s+)?(?:not\\s+linked|unlinked|pending).*penalty",
+      "category": "KYC_FRAUD",
+      "severity": 0.85,
+      "description": "False regulatory penalty or unlinked document claim"
+    },
+    {
+      "id": "electricity_power_cut",
+      "pattern": "electricity\\s+(?:power\\s+)?(?:will be\\s+)?(?:disconnected|cut|suspended)\\s+(?:tonight|today|by)",
+      "category": "UTILITY_SCAM",
+      "severity": 0.95,
+      "description": "Fraudulent electricity power disconnection threat"
+    },
+    {
+      "id": "unpaid_utility_bill",
+      "pattern": "(?:unpaid\\s+bill|pending\\s+bill)\\s+(?:of\\s+)?(?:₹|\\$|rs\\.?)\\s*\\d+",
+      "category": "UTILITY_SCAM",
+      "severity": 0.80,
+      "description": "Fabricated unpaid utility fee or cutoff lure"
+    },
+    {
+      "id": "urgent_deadline",
+      "pattern": "\\b(?:within\\s+(?:24|12|6|2|48)\\s+hours|expires\\s+(?:today|tonight|in\\s+\\d+\\s+hours))\\b",
+      "category": "HIGH_URGENCY",
+      "severity": 0.75,
+      "description": "Artificial deadline designed to bypass rational judgment"
+    },
+    {
+      "id": "immediate_action_required",
+      "pattern": "\\b(?:immediate\\s+action\\s+required|act\\s+now|verify\\s+now|action\\s+required\\s+immediately)\\b",
+      "category": "HIGH_URGENCY",
+      "severity": 0.70,
+      "description": "Psychological pressure requiring immediate action"
+    },
+    {
+      "id": "lottery_prize_won",
+      "pattern": "\\b(?:congratulations|won\\s+(?:a\\s+)?(?:prize|lottery|reward|lucky\\s+draw))\\b.*(?:₹|\\$|rs\\.?)?\\s*\\d+",
+      "category": "FINANCIAL_LURE",
+      "severity": 0.90,
+      "description": "Fake lottery or contest reward claim"
+    },
+    {
+      "id": "cashback_credited",
+      "pattern": "(?:cashback|gift\\s+card|voucher|bonus)\\s+(?:of\\s+)?(?:₹|\\$|rs\\.?)?\\s*\\d+.*(?:credited|claim)",
+      "category": "FINANCIAL_LURE",
+      "severity": 0.80,
+      "description": "Unsolicited monetary cashback or credit voucher bait"
+    },
+    {
+      "id": "tax_refund_approved",
+      "pattern": "(?:tax\\s+refund|income\\s+tax\\s+refund).*approved.*(?:₹|\\$|rs\\.?)?\\s*\\d+",
+      "category": "FINANCIAL_LURE",
+      "severity": 0.90,
+      "description": "Spurious government income tax refund approval"
+    },
+    {
+      "id": "failed_package_delivery",
+      "pattern": "(?:package|delivery|parcel|shipment)\\s+(?:failed|pending|cannot\\s+be\\s+delivered).*update",
+      "category": "DELIVERY_SCAM",
+      "severity": 0.85,
+      "description": "Phishing lure posing as courier delivery redelivery"
+    },
+    {
+      "id": "crypto_airdrop_wallet",
+      "pattern": "(?:airdrop|claim\\s+tokens?|connect\\s+wallet|free\\s+crypto)",
+      "category": "CRYPTO_DRAINER",
+      "severity": 0.85,
+      "description": "Cryptocurrency wallet drainer solicitation"
+    },
+    {
+      "id": "subscription_expired",
+      "pattern": "(?:netflix|amazon\\s+prime|spotify|apple)\\s+subscription.*(?:expired|failed\\s+to\\s+renew|canceled)",
+      "category": "BRAND_SPOOF",
+      "severity": 0.85,
+      "description": "Streaming service billing renewal deception"
+    },
+    {
+      "id": "part_time_job_lure",
+      "pattern": "(?:earn|daily\\s+income)\\s+(?:₹|\\$|rs\\.?)?\\s*\\d+.*(?:working\\s+from\\s+home|part-time|reviewing)",
+      "category": "JOB_SCAM",
+      "severity": 0.75,
+      "description": "Work from home task scam or Telegram recruitment lure"
+    },
+    {
+      "id": "debit_credit_card_charge",
+      "pattern": "(?:charged|debited)\\s+(?:₹|\\$|rs\\.?)?\\s*\\d+.*(?:if\\s+not\\s+you|call|verify)",
+      "category": "FINANCIAL_LURE",
+      "severity": 0.85,
+      "description": "Reverse charge phishing bait to provoke panic calling"
+    },
+    {
+      "id": "netbanking_access_revoked",
+      "pattern": "netbanking\\s+(?:access|login)\\s+(?:blocked|disabled|restricted)",
+      "category": "BANK_SPOOF",
+      "severity": 0.90,
+      "description": "Online banking portal lockdown claim"
+    },
+    {
+      "id": "unauthorized_login_detected",
+      "pattern": "(?:unauthorized|suspicious)\\s+login\\s+(?:detected|attempt).*verify\\s+at",
+      "category": "CREDENTIAL_HARVEST",
+      "severity": 0.85,
+      "description": "False security warning directing to fraudulent sign-in"
+    },
+    {
+      "id": "sim_swap_telecom",
+      "pattern": "(?:sim\\s+card|esim)\\s+(?:will be\\s+)?(?:blocked|deactivated|deactivation)",
+      "category": "TELECOM_SCAM",
+      "severity": 0.85,
+      "description": "SIM card disconnection hoax seeking KYC data"
+    },
+    {
+      "id": "shortlink_financial_combo",
+      "pattern": "(?:₹|\\$|bank|kyc|block).*https?:\\/\\/(?:bit\\.ly|tinyurl\\.com|t\\.co|is\\.gd)\\/",
+      "category": "SHORTENER_COMBO",
+      "severity": 0.95,
+      "description": "Financial or account lure with obscured URL shortener"
+    }
+  ],
+  "urgency_keywords": [
+    "urgent", "urgently", "immediately", "immediate action", "verify now",
+    "action required", "account suspended", "blocked today", "will be blocked",
+    "within 24 hours", "suspended within", "expires today", "deactivated",
+    "act now", "time sensitive", "security alert", "warning", "final reminder"
+  ],
+  "payment_lures": [
+    "₹", "$", "refund", "prize", "winner", "cashback", "won", "lottery",
+    "bonus", "credited to your account", "claim reward", "free gift",
+    "kyc", "pan card", "aadhaar", "update kyc", "electricity bill",
+    "bill unpaid", "power disconnection"
+  ],
+  "fake_bank_phrases": [
+    "your account will be blocked", "your bank account has been locked",
+    "card deactivated", "debit card suspended", "sbi alert", "hdfc alert",
+    "icici alert", "axis alert", "netbanking access suspended",
+    "pan card not linked", "complete your kyc immediately"
+  ]
+}
