@@ -1,6 +1,6 @@
 use crate::db::{EncryptedDatabase, EncryptedLogRecord};
-use pocket_sparrow_core::engine::DetectionEngine;
-use pocket_sparrow_core::types::{ContentType, ThreatLevel};
+use pocket_sparrow::engine::DetectionEngine;
+use pocket_sparrow::types::{ContentType, ThreatLevel};
 use std::sync::Arc;
 use std::time::Duration;
 use tokio::time::sleep;

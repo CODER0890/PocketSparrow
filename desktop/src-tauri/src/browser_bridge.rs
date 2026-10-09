@@ -1,5 +1,5 @@
-use pocket_sparrow_core::engine::DetectionEngine;
-use pocket_sparrow_core::types::ContentType;
+use pocket_sparrow::engine::DetectionEngine;
+use pocket_sparrow::types::ContentType;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};

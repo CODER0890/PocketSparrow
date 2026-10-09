@@ -7,11 +7,13 @@ mod db;
 mod network_guard;
 mod process_monitor;
 
+extern crate pocket_sparrow as pocket_sparrow_core;
+
 use browser_bridge::BrowserBridge;
 use clipboard_monitor::ClipboardMonitor;
 use commands::{AppState, get_logs, get_processes, scan_payload};
 use db::EncryptedDatabase;
-use pocket_sparrow_core::engine::DetectionEngine;
+use pocket_sparrow::engine::DetectionEngine;
 use process_monitor::ProcessMonitor;
 use std::path::PathBuf;
 use std::sync::Arc;

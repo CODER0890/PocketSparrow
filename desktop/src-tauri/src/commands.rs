@@ -1,7 +1,7 @@
 use crate::db::{EncryptedDatabase, EncryptedLogRecord};
 use crate::process_monitor::{DesktopProcessInfo, ProcessMonitor};
-use pocket_sparrow_core::engine::DetectionEngine;
-use pocket_sparrow_core::types::ContentType;
+use pocket_sparrow::engine::DetectionEngine;
+use pocket_sparrow::types::{ContentType, TierTriggered};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use tauri::State;
@@ -54,8 +54,8 @@ pub async fn scan_payload(
     Ok(UiScanResult {
         verdict: result.threat_level.to_str().to_string(),
         tier_triggered: match result.tier_triggered {
-            pocket_sparrow_core::types::TierTriggered::Tier1Heuristic => "Tier1Heuristic".to_string(),
-            pocket_sparrow_core::types::TierTriggered::Tier2Transformer => "Tier2Transformer".to_string(),
+            TierTriggered::Tier1Heuristic => "Tier1Heuristic".to_string(),
+            TierTriggered::Tier2Transformer => "Tier2Transformer".to_string(),
         },
         confidence: result.confidence,
         latency_us: result.latency_us,
