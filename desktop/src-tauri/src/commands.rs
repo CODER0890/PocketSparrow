@@ -1,7 +1,7 @@
 use crate::db::{EncryptedDatabase, EncryptedLogRecord};
 use crate::process_monitor::{DesktopProcessInfo, ProcessMonitor};
 use pocket_sparrow_core::engine::DetectionEngine;
-use pocket_sparrow_core::types::{ContentType, ScanResult};
+use pocket_sparrow_core::types::ContentType;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use tauri::State;

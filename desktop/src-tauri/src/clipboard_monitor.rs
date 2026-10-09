@@ -21,7 +21,7 @@ impl ClipboardMonitor {
         let db = self.db.clone();
 
         tokio::spawn(async move {
-            let mut last_clipboard = String::new();
+            let last_clipboard = String::new();
 
             loop {
                 sleep(Duration::from_millis(1500)).await;

@@ -1,10 +1,12 @@
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::Arc;
 
+#[allow(dead_code)]
 pub struct NetworkGuard {
     outbound_wan_bytes: Arc<AtomicU64>,
 }
 
+#[allow(dead_code)]
 impl NetworkGuard {
     pub fn new() -> Self {
         Self {

@@ -34,3 +34,4 @@ venv/
 # OS artifacts
 .DS_Store
 Thumbs.db
+desktop/src-tauri/gen/

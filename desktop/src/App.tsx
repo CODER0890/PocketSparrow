@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Navbar } from "./components/Navbar";
 import { MetricsHUD } from "./components/MetricsHUD";
 import { ThreatAlertCard, ScanResultPayload } from "./components/ThreatAlertCard";
@@ -12,7 +12,7 @@ export const App: React.FC = () => {
   const [lastLatencyUs, setLastLatencyUs] = useState<number>(1280);
   const [totalScans, setTotalScans] = useState<number>(14);
   const [threatsBlocked, setThreatsBlocked] = useState<number>(8);
-  const [peakRamMb, setPeakRamMb] = useState<number>(48.2);
+  const [peakRamMb] = useState<number>(48.2);
   const [activeAlert, setActiveAlert] = useState<ScanResultPayload | null>(null);
 
   const [logs, setLogs] = useState<LogEntry[]>([
@@ -120,7 +120,7 @@ export const App: React.FC = () => {
   };
 
   const simulateScan = (
-    type: "Url" | "SmsText" | "QrPayload",
+    _type: "Url" | "SmsText" | "QrPayload",
     payload: string
   ): ScanResultPayload => {
     const lower = payload.toLowerCase();

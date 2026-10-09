@@ -15,7 +15,7 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 tokio = { version = "1.36", features = ["full"] }
 rusqlite = { version = "0.31", features = ["bundled"] }
-pocket-sparrow-core = { path = "../../core" }
+pocket_sparrow_core = { package = "pocket-sparrow-core", path = "../../core" }
 
 [features]
 default = ["custom-protocol"]

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { ScanResultPayload } from "./ThreatAlertCard";
 
 export interface LogEntry {
   id: string;
