@@ -11,7 +11,7 @@ extern crate pocket_sparrow as pocket_sparrow_core;
 
 use browser_bridge::BrowserBridge;
 use clipboard_monitor::ClipboardMonitor;
-use commands::{AppState, get_logs, get_processes, scan_payload};
+use commands::{AppState, get_logs, get_processes, scan_payload, terminate_process};
 use db::EncryptedDatabase;
 use pocket_sparrow::engine::DetectionEngine;
 use process_monitor::ProcessMonitor;
@@ -55,7 +55,8 @@ async fn main() {
         .invoke_handler(tauri::generate_handler![
             scan_payload,
             get_logs,
-            get_processes
+            get_processes,
+            terminate_process
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

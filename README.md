@@ -335,21 +335,21 @@ mindmap
 <tbody>
 <tr>
   <td rowspan="3"><b>Core Engine</b></td>
-  <td align="center">🦀</td>
+  <td align="center"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/rust/rust-original.svg" width="22" height="22" alt="Rust" /></td>
   <td><b>Rust</b></td>
   <td align="center"><code>1.75+</code></td>
   <td>Safe memory engine, Shannon entropy, static trie, tokenizer</td>
   <td align="center"><code>&lt; 2 MB</code></td>
 </tr>
 <tr>
-  <td align="center">⚡</td>
+  <td align="center"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg" width="22" height="22" alt="C++17" /></td>
   <td><b>C++17</b></td>
   <td align="center"><code>C++17</code></td>
   <td>Deterministic zero-copy heuristics, Canonical C FFI bindings</td>
   <td align="center"><code>&lt; 1.5 MB</code></td>
 </tr>
 <tr>
-  <td align="center">🛠️</td>
+  <td align="center"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cmake/cmake-original.svg" width="22" height="22" alt="CMake &amp; Cargo" /></td>
   <td><b>CMake &amp; Cargo</b></td>
   <td align="center"><code>3.20+</code></td>
   <td>Cross-compilation for Android NDK and Desktop platforms</td>
@@ -357,21 +357,21 @@ mindmap
 </tr>
 <tr>
   <td rowspan="3"><b>Machine Learning</b></td>
-  <td align="center">🧠</td>
+  <td align="center"><img src="https://cdn.simpleicons.org/huggingface" width="22" height="22" alt="MobileBERT INT8" /></td>
   <td><b>MobileBERT INT8</b></td>
   <td align="center"><code>INT8 PTQ</code></td>
   <td>Compact transformer fine-tuned on phishing/smishing corpuses</td>
   <td align="center"><code>32.0 MB</code></td>
 </tr>
 <tr>
-  <td align="center">⚙️</td>
+  <td align="center"><img src="https://cdn.simpleicons.org/onnx" width="22" height="22" alt="ONNX Runtime" /></td>
   <td><b>ONNX Runtime</b></td>
   <td align="center"><code>1.17+</code></td>
   <td>Hardware-accelerated CPU inference on Desktop</td>
   <td align="center"><code>0.22 ms P99</code></td>
 </tr>
 <tr>
-  <td align="center">📱</td>
+  <td align="center"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tensorflow/tensorflow-original.svg" width="22" height="22" alt="TensorFlow Lite" /></td>
   <td><b>TensorFlow Lite</b></td>
   <td align="center"><code>2.14+</code></td>
   <td>Hardware-accelerated NNAPI / GPU delegates on Android</td>
@@ -379,21 +379,21 @@ mindmap
 </tr>
 <tr>
   <td rowspan="3"><b>Desktop App</b></td>
-  <td align="center">🌐</td>
+  <td align="center"><img src="https://cdn.simpleicons.org/tauri" width="22" height="22" alt="Tauri 2.0" /></td>
   <td><b>Tauri 2.0</b></td>
   <td align="center"><code>2.0+</code></td>
   <td>Lightweight native desktop shell and loopback bridge daemon</td>
   <td align="center"><code>14.88 MB RSS</code></td>
 </tr>
 <tr>
-  <td align="center">⚛️</td>
+  <td align="center"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" width="22" height="22" alt="React 18" /></td>
   <td><b>React 18 + TS</b></td>
   <td align="center"><code>18.2+</code></td>
   <td>Enterprise B2B cybersecurity dashboard and payload workbench</td>
   <td align="center"><code>30 KB CSS</code></td>
 </tr>
 <tr>
-  <td align="center">🧩</td>
+  <td align="center"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/chrome/chrome-original.svg" width="22" height="22" alt="Chrome MV3" /></td>
   <td><b>Manifest V3</b></td>
   <td align="center"><code>MV3</code></td>
   <td>Pre-navigation link hook querying local socket in &lt;5ms</td>
@@ -401,14 +401,14 @@ mindmap
 </tr>
 <tr>
   <td rowspan="2"><b>Android App</b></td>
-  <td align="center">🤖</td>
+  <td align="center"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/kotlin/kotlin-original.svg" width="22" height="22" alt="Kotlin" /></td>
   <td><b>Kotlin + Compose</b></td>
   <td align="center"><code>1.9+</code></td>
   <td>Modern declarative native Android interface &amp; interceptors</td>
   <td align="center"><code>Native APK</code></td>
 </tr>
 <tr>
-  <td align="center">📷</td>
+  <td align="center"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/android/android-original.svg" width="22" height="22" alt="Android CameraX" /></td>
   <td><b>CameraX + ZXing</b></td>
   <td align="center"><code>1.3+</code></td>
   <td>Real-time offline frame analyzer for Quishing defense</td>
@@ -416,14 +416,14 @@ mindmap
 </tr>
 <tr>
   <td rowspan="2"><b>Security &amp; Vault</b></td>
-  <td align="center">🔒</td>
+  <td align="center"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/sqlite/sqlite-original.svg" width="22" height="22" alt="SQLCipher" /></td>
   <td><b>SQLCipher</b></td>
   <td align="center"><code>4.5+</code></td>
   <td>AES-256 encrypted local forensic audit log ledger</td>
   <td align="center"><code>Zero Remote Sync</code></td>
 </tr>
 <tr>
-  <td align="center">🚫</td>
+  <td align="center"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linux/linux-original.svg" width="22" height="22" alt="OS Air-Gap Isolation" /></td>
   <td><b>Zero-Internet Spec</b></td>
   <td align="center"><code>OS-Level</code></td>
   <td>Hardware-enforced airgap: <code>INTERNET</code> permission omitted</td>

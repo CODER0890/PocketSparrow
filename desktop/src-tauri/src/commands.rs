@@ -74,3 +74,9 @@ pub async fn get_logs(state: State<'_, AppState>) -> Result<Vec<EncryptedLogReco
 pub async fn get_processes(state: State<'_, AppState>) -> Result<Vec<DesktopProcessInfo>, String> {
     Ok(state.process_monitor.scan_processes())
 }
+
+#[tauri::command]
+pub async fn terminate_process(pid: u32, state: State<'_, AppState>) -> Result<bool, String> {
+    state.process_monitor.terminate_process(pid)
+}
+
