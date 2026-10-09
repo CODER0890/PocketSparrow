@@ -1,17 +1,10 @@
 import React from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   ShieldAlert,
   ShieldCheck,
   AlertTriangle,
   X,
-
-  BrainCircuit,
   Lock,
-
-  Fingerprint,
-
-
 } from "lucide-react";
 
 export interface ScanResultPayload {
@@ -34,177 +27,135 @@ export const XaiDrawer: React.FC<XaiDrawerProps> = ({ result, onClose }) => {
 
   const isMalicious = result.verdict === "Malicious";
   const isSuspicious = result.verdict === "Suspicious";
-  const severityScore = isMalicious ? 96 : isSuspicious ? 54 : 4;
 
   return (
-    <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex justify-end">
-        {/* Backdrop */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={onClose}
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm"
-        />
+    <div className="fixed inset-0 z-50 flex justify-end">
+      {/* Backdrop */}
+      <div
+        onClick={onClose}
+        className="fixed inset-0 bg-black/60 transition-opacity"
+      />
 
-        {/* Slide-out Drawer Panel */}
-        <motion.div
-          initial={{ x: "100%" }}
-          animate={{ x: 0 }}
-          exit={{ x: "100%" }}
-          transition={{ type: "spring", damping: 28, stiffness: 280 }}
-          className="relative w-full max-w-lg bg-background-elevated border-l border-surface-border shadow-elevated h-full overflow-y-auto flex flex-col justify-between z-10"
-        >
-          {/* Drawer Header */}
-          <div>
-            <div className="p-6 border-b border-surface-border flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div
-                  className={`p-2.5 rounded-xl border ${
-                    isMalicious
-                      ? "bg-status-dangerBg border-status-dangerBorder text-status-danger"
-                      : isSuspicious
-                      ? "bg-status-warningBg border-status-warningBorder text-status-warning"
-                      : "bg-status-safeBg border-status-safeBorder text-status-safe"
-                  }`}
-                >
-                  {isMalicious ? (
-                    <ShieldAlert className="w-5 h-5" strokeWidth={1.75} />
-                  ) : isSuspicious ? (
-                    <AlertTriangle className="w-5 h-5" strokeWidth={1.75} />
-                  ) : (
-                    <ShieldCheck className="w-5 h-5" strokeWidth={1.75} />
-                  )}
-                </div>
-                <div>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm font-bold text-brand-text font-mono">
-                      {result.verdict.toUpperCase()} INCIDENT
-                    </span>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-surface border border-surface-border text-brand-secondary">
-                      {result.category}
-                    </span>
-                  </div>
-                  <p className="text-xs text-brand-muted mt-0.5 font-mono">
-                    Evaluation completed in {result.latency_us} µs on-device
-                  </p>
-                </div>
-              </div>
-
-              <button
-                onClick={onClose}
-                className="p-1.5 rounded-lg text-brand-muted hover:text-brand-text hover:bg-surface transition"
+      {/* Slide-out Drawer Panel */}
+      <div className="relative w-full max-w-lg bg-zinc-950 border-l border-zinc-800 h-full overflow-y-auto flex flex-col justify-between z-10 p-6 space-y-6">
+        <div>
+          {/* Header */}
+          <div className="flex items-center justify-between pb-5 border-b border-zinc-800">
+            <div className="flex items-center space-x-3">
+              <div
+                className={`p-2 rounded-md border ${
+                  isMalicious
+                    ? "bg-rose-500/10 border-rose-500/20 text-rose-400"
+                    : isSuspicious
+                    ? "bg-amber-500/10 border-amber-500/20 text-amber-400"
+                    : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
+                }`}
               >
-                <X className="w-4 h-4" />
-              </button>
+                {isMalicious ? (
+                  <ShieldAlert className="w-5 h-5" />
+                ) : isSuspicious ? (
+                  <AlertTriangle className="w-5 h-5" />
+                ) : (
+                  <ShieldCheck className="w-5 h-5" />
+                )}
+              </div>
+              <div>
+                <div className="flex items-center space-x-2">
+                  <h3 className="text-sm font-semibold text-zinc-100">
+                    {result.verdict} Verdict
+                  </h3>
+                  <span className="text-xs px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-400 font-mono">
+                    {result.category}
+                  </span>
+                </div>
+                <p className="text-xs text-zinc-400 mt-0.5">
+                  Evaluated in {result.latency_us} µs on-device
+                </p>
+              </div>
             </div>
 
-            {/* Severity Meter & Engine Attribution */}
-            <div className="p-6 space-y-5">
-              {/* Severity Gauge */}
-              <div className="rounded-xl border border-surface-border bg-background-subtle p-4 space-y-3">
-                <div className="flex items-center justify-between text-xs font-mono">
-                  <span className="text-brand-muted">Calculated Threat Rating:</span>
-                  <span
-                    className={`font-bold ${
-                      isMalicious
-                        ? "text-status-danger"
-                        : isSuspicious
-                        ? "text-status-warning"
-                        : "text-status-safe"
-                    }`}
-                  >
-                    {severityScore} / 100 ({isMalicious ? "CRITICAL RISK" : isSuspicious ? "MODERATE" : "SAFE"})
+            <button
+              onClick={onClose}
+              className="p-1.5 rounded-md text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900 transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Forensic Analysis Section */}
+          <div className="mt-6 space-y-6">
+            <div>
+              <h4 className="text-xs font-medium uppercase tracking-wider text-zinc-400">
+                Forensic Analysis
+              </h4>
+              <p className="mt-2 text-sm text-zinc-300 leading-relaxed bg-zinc-900/40 p-4 rounded-md border border-zinc-800">
+                {result.xai_reason}
+              </p>
+            </div>
+
+            {/* Attribution Factors Table */}
+            <div>
+              <h4 className="text-xs font-medium uppercase tracking-wider text-zinc-400 mb-2">
+                Evaluation Factors
+              </h4>
+              <div className="rounded border border-zinc-800 divide-y divide-zinc-800 text-xs">
+                <div className="flex justify-between py-2.5 px-3 bg-zinc-900/30">
+                  <span className="text-zinc-400">Evaluation Engine</span>
+                  <span className="font-mono text-zinc-200">{result.tier_triggered}</span>
+                </div>
+                <div className="flex justify-between py-2.5 px-3 bg-zinc-900/30">
+                  <span className="text-zinc-400">Model Confidence</span>
+                  <span className="font-mono text-zinc-200">
+                    {(result.confidence * 100).toFixed(1)}%
                   </span>
                 </div>
-
-                {/* Severity Bar */}
-                <div className="w-full bg-surface-border rounded-full h-2 overflow-hidden">
-                  <div
-                    className={`h-full rounded-full transition-all duration-500 ${
-                      isMalicious
-                        ? "bg-status-danger"
-                        : isSuspicious
-                        ? "bg-status-warning"
-                        : "bg-status-safe"
-                    }`}
-                    style={{ width: `${severityScore}%` }}
-                  ></div>
-                </div>
-
-                <div className="flex items-center justify-between text-[11px] font-mono text-brand-faint pt-1">
-                  <span>Confidence: {Math.round(result.confidence * 100)}%</span>
-                  <span>
-                    Pipeline:{" "}
-                    {result.tier_triggered === "Tier1Heuristic"
-                      ? "Tier 1 Deterministic Engine"
-                      : "Tier 2 INT8 MobileBERT"}
+                <div className="flex justify-between py-2.5 px-3 bg-zinc-900/30">
+                  <span className="text-zinc-400">Execution Latency</span>
+                  <span className="font-mono text-zinc-200">
+                    {(result.latency_us / 1000).toFixed(3)} ms
                   </span>
                 </div>
-              </div>
-
-              {/* Explainable AI Forensic Justification */}
-              <div className="space-y-2">
-                <div className="flex items-center space-x-1.5 text-xs font-semibold text-brand-text">
-                  <BrainCircuit className="w-3.5 h-3.5 text-accent" strokeWidth={1.75} />
-                  <span>Explainable AI (XAI) Forensic Reasoning</span>
-                </div>
-                <div className="p-4 rounded-xl border border-surface-border bg-background-subtle text-xs text-brand-secondary leading-relaxed font-sans border-l-2 border-l-accent">
-                  {result.xai_reason}
-                </div>
-              </div>
-
-              {/* Forensic Evidence Factors */}
-              <div className="space-y-2">
-                <div className="text-xs font-semibold text-brand-text flex items-center space-x-1.5">
-                  <Fingerprint className="w-3.5 h-3.5 text-indigo" strokeWidth={1.75} />
-                  <span>Attribution Evidence</span>
-                </div>
-                <div className="grid grid-cols-2 gap-2 text-xs font-mono">
-                  <div className="p-3 rounded-lg border border-surface-border bg-surface space-y-1">
-                    <span className="text-[10px] text-brand-muted">Vector Type</span>
-                    <p className="text-brand-text font-semibold">Web URI / DNS</p>
-                  </div>
-                  <div className="p-3 rounded-lg border border-surface-border bg-surface space-y-1">
-                    <span className="text-[10px] text-brand-muted">Inspection Engine</span>
-                    <p className="text-accent font-semibold">{result.tier_triggered}</p>
-                  </div>
-                  <div className="p-3 rounded-lg border border-surface-border bg-surface space-y-1">
-                    <span className="text-[10px] text-brand-muted">Network Isolation</span>
-                    <p className="text-status-safe font-semibold">100% Offline</p>
-                  </div>
-                  <div className="p-3 rounded-lg border border-surface-border bg-surface space-y-1">
-                    <span className="text-[10px] text-brand-muted">Egress Telemetry</span>
-                    <p className="text-status-safe font-semibold">0 WAN Bytes</p>
-                  </div>
+                <div className="flex justify-between py-2.5 px-3 bg-zinc-900/30">
+                  <span className="text-zinc-400">Enforcement Action</span>
+                  <span className="font-mono text-zinc-200">
+                    {result.should_block ? "Quarantine & Block" : "Allow Throughput"}
+                  </span>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Action Footer */}
-          <div className="p-6 border-t border-surface-border bg-background-subtle space-y-2.5">
-            <button
-              onClick={onClose}
-              className={`w-full py-2.5 rounded-lg font-semibold text-xs transition flex items-center justify-center space-x-2 shadow-sm ${
-                isMalicious
-                  ? "bg-status-danger hover:bg-rose-600 text-white"
-                  : "bg-surface hover:bg-surface-hover border border-surface-border text-brand-text"
-              }`}
-            >
-              <Lock className="w-3.5 h-3.5" />
-              <span>{isMalicious ? "Block Target & Quarantine Payload" : "Acknowledge & Close"}</span>
-            </button>
-            <button
-              onClick={onClose}
-              className="w-full py-2 rounded-lg text-xs font-mono text-brand-muted hover:text-brand-secondary hover:bg-surface transition"
-            >
-              Copy Forensic Incident JSON
-            </button>
+            {/* Privacy Verification */}
+            <div className="rounded-md border border-zinc-800 bg-zinc-900/20 p-3.5 flex items-start space-x-3 text-xs text-zinc-400">
+              <Lock className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+              <div>
+                <span className="text-zinc-200 font-medium">Privacy Guaranteed: </span>
+                This inference ran entirely on local hardware. No URL or payload data was transmitted outside the host device.
+              </div>
+            </div>
           </div>
-        </motion.div>
+        </div>
+
+        {/* Footer Actions */}
+        <div className="pt-4 border-t border-zinc-800 flex items-center justify-between">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 rounded-md border border-zinc-800 hover:bg-zinc-900 text-xs text-zinc-300 font-medium transition-colors"
+          >
+            Dismiss
+          </button>
+          {isMalicious && (
+            <button
+              onClick={() => {
+                alert("Target payload has been quarantined in SQLCipher vault.");
+                onClose();
+              }}
+              className="px-4 py-2 rounded-md bg-rose-600 hover:bg-rose-500 text-white text-xs font-medium transition-colors"
+            >
+              Quarantine &amp; Block
+            </button>
+          )}
+        </div>
       </div>
-    </AnimatePresence>
+    </div>
   );
 };

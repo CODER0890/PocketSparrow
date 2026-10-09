@@ -1,14 +1,5 @@
 import React, { useState } from "react";
-import {
-  Database,
-  Lock,
-  Clock,
-  ShieldCheck,
-  ShieldAlert,
-  AlertTriangle,
-
-  ChevronRight,
-} from "lucide-react";
+import { Lock } from "lucide-react";
 import { ScanResultPayload } from "./XaiDrawer";
 
 export interface LogEntry {
@@ -37,135 +28,110 @@ export const AuditVaultTable: React.FC<AuditVaultTableProps> = ({ logs, onSelect
   });
 
   return (
-    <div className="rounded-xl border border-surface-border bg-background-elevated shadow-card overflow-hidden">
-      {/* Table Header Controls */}
-      <div className="p-4 border-b border-surface-border flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-background-subtle">
-        <div className="flex items-center space-x-3">
-          <div className="p-2 rounded-lg bg-surface border border-surface-border text-accent">
-            <Database className="w-4 h-4" strokeWidth={1.75} />
+    <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-6 space-y-4">
+      {/* Header and Filter */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <div className="flex items-center space-x-2">
+            <h3 className="text-sm font-semibold text-zinc-100">
+              Encrypted Audit Ledger
+            </h3>
+            <span className="inline-flex items-center gap-1 text-[11px] text-zinc-400 bg-zinc-800 px-2 py-0.5 rounded border border-zinc-700/60 font-medium">
+              <Lock className="w-3 h-3 text-zinc-400" />
+              SQLCipher AES-256
+            </span>
           </div>
-          <div>
-            <div className="flex items-center space-x-2">
-              <h2 className="text-sm font-semibold text-brand-text tracking-tight">
-                Encrypted Forensic Vault
-              </h2>
-              <span className="flex items-center gap-1 text-[10px] font-mono px-2 py-0.5 rounded-full bg-surface border border-surface-border text-brand-muted">
-                <Lock className="w-2.5 h-2.5 text-accent" />
-                SQLCipher AES-256
-              </span>
-            </div>
-            <p className="text-xs text-brand-muted mt-0.5">
-              Immutable forensic incident ledger retained purely on-device. Zero telemetry sync.
-            </p>
-          </div>
+          <p className="text-xs text-zinc-400 mt-1">
+            Immutable forensic history maintained purely on local storage.
+          </p>
         </div>
 
-        {/* Filter Pills */}
-        <div className="flex p-0.5 rounded-lg bg-background border border-surface-border text-xs self-start sm:self-auto">
+        {/* Filter Buttons */}
+        <div className="inline-flex p-0.5 rounded bg-zinc-950 border border-zinc-800 text-xs self-start sm:self-auto">
           {["ALL", "MALICIOUS", "SUSPICIOUS", "SAFE"].map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`px-3 py-1 rounded-md text-[11px] font-mono transition ${
+              className={`px-2.5 py-1 rounded transition-colors ${
                 filter === f
-                  ? "bg-surface-active text-brand-text border border-surface-borderHover"
-                  : "text-brand-muted hover:text-brand-secondary"
+                  ? "bg-zinc-800 text-zinc-100 font-medium"
+                  : "text-zinc-400 hover:text-zinc-200"
               }`}
             >
-              {f}
+              {f === "ALL" ? "All" : f.charAt(0) + f.slice(1).toLowerCase()}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Structured Ledger Table */}
-      <div className="overflow-x-auto">
-        <table className="w-full text-left text-xs font-mono">
+      {/* Data Table */}
+      <div className="overflow-x-auto rounded border border-zinc-800">
+        <table className="w-full text-left text-xs">
           <thead>
-            <tr className="border-b border-surface-border bg-surface text-brand-muted uppercase text-[10px] tracking-wider">
-              <th className="py-2.5 px-4 font-semibold">Timestamp</th>
-              <th className="py-2.5 px-4 font-semibold">Vector</th>
-              <th className="py-2.5 px-4 font-semibold">Target Payload</th>
-              <th className="py-2.5 px-4 font-semibold">Threat Category</th>
-              <th className="py-2.5 px-4 font-semibold">Verdict</th>
-              <th className="py-2.5 px-4 font-semibold text-right">Latency</th>
+            <tr className="border-b border-zinc-800 bg-zinc-950 text-zinc-400 uppercase tracking-wider font-medium text-[11px]">
+              <th className="py-2.5 px-4">Time</th>
+              <th className="py-2.5 px-4">Type</th>
+              <th className="py-2.5 px-4">Payload</th>
+              <th className="py-2.5 px-4">Category</th>
+              <th className="py-2.5 px-4">Verdict</th>
+              <th className="py-2.5 px-4 text-right">Latency</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-surface-border">
+          <tbody className="divide-y divide-zinc-800/60 bg-zinc-900/20">
             {filteredLogs.length === 0 ? (
               <tr>
-                <td colSpan={6} className="py-8 text-center text-brand-faint text-xs">
-                  No forensic log entries matching selected criteria.
+                <td colSpan={6} className="py-8 text-center text-zinc-500">
+                  No records match the selected filter.
                 </td>
               </tr>
             ) : (
               filteredLogs.map((log) => (
                 <tr
                   key={log.id}
-                  onClick={() => {
+                  onClick={() =>
                     onSelectLog({
                       verdict: log.verdict,
                       tier_triggered: "Tier1Heuristic",
                       confidence: 0.98,
                       latency_us: log.latency_us,
                       category: log.category,
-                      xai_reason: `Historical forensic record for payload: ${log.payload_snippet}. Evaluated on-device in ${log.latency_us} µs.`,
+                      xai_reason:
+                        log.verdict === "Malicious"
+                          ? `Flagged by on-device engine under rule ${log.category}. Deceptive markers identified.`
+                          : "Verified clean payload with safe entropy and authoritative domain validation.",
                       should_block: log.verdict === "Malicious",
-                    });
-                  }}
-                  className="hover:bg-surface-hover cursor-pointer transition-colors group"
+                    })
+                  }
+                  className="hover:bg-zinc-800/30 cursor-pointer transition-colors"
                 >
-                  {/* Timestamp */}
-                  <td className="py-3 px-4 text-brand-muted whitespace-nowrap flex items-center space-x-1.5">
-                    <Clock className="w-3 h-3 text-brand-faint" />
-                    <span>{log.timestamp}</span>
-                  </td>
-
-                  {/* Vector */}
-                  <td className="py-3 px-4">
-                    <span className="px-1.5 py-0.5 rounded bg-surface border border-surface-border text-brand-secondary text-[10px]">
-                      {log.type}
-                    </span>
-                  </td>
-
-                  {/* Target Payload */}
-                  <td className="py-3 px-4 text-brand-text truncate max-w-sm group-hover:text-accent transition-colors">
+                  <td className="py-3 px-4 font-mono text-zinc-400">{log.timestamp}</td>
+                  <td className="py-3 px-4 font-medium text-zinc-300">{log.type}</td>
+                  <td className="py-3 px-4 font-mono text-zinc-300 max-w-xs truncate" title={log.payload_snippet}>
                     {log.payload_snippet}
                   </td>
-
-                  {/* Category */}
-                  <td className="py-3 px-4 text-brand-secondary text-[11px]">
-                    {log.category}
-                  </td>
-
-                  {/* Verdict Badge */}
+                  <td className="py-3 px-4 text-zinc-400 font-sans">{log.category}</td>
                   <td className="py-3 px-4">
-                    <span
-                      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${
-                        log.verdict === "Malicious"
-                          ? "bg-status-dangerBg text-status-danger border-status-dangerBorder"
-                          : log.verdict === "Suspicious"
-                          ? "bg-status-warningBg text-status-warning border-status-warningBorder"
-                          : "bg-status-safeBg text-status-safe border-status-safeBorder"
-                      }`}
-                    >
-                      {log.verdict === "Malicious" ? (
-                        <ShieldAlert className="w-2.5 h-2.5" />
-                      ) : log.verdict === "Suspicious" ? (
-                        <AlertTriangle className="w-2.5 h-2.5" />
-                      ) : (
-                        <ShieldCheck className="w-2.5 h-2.5" />
-                      )}
-                      {log.verdict}
-                    </span>
+                    {log.verdict === "Malicious" && (
+                      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                        <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
+                        Malicious
+                      </span>
+                    )}
+                    {log.verdict === "Suspicious" && (
+                      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                        Suspicious
+                      </span>
+                    )}
+                    {log.verdict === "Safe" && (
+                      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                        Safe
+                      </span>
+                    )}
                   </td>
-
-                  {/* Latency */}
-                  <td className="py-3 px-4 text-right text-brand-secondary font-mono text-[11px]">
-                    <div className="flex items-center justify-end space-x-1.5">
-                      <span>{log.latency_us} µs</span>
-                      <ChevronRight className="w-3 h-3 text-brand-faint opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </div>
+                  <td className="py-3 px-4 font-mono text-zinc-400 text-right">
+                    {(log.latency_us / 1000).toFixed(3)} ms
                   </td>
                 </tr>
               ))

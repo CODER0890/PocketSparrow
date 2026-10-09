@@ -178,7 +178,7 @@ export const App: React.FC = () => {
     ) {
       return {
         verdict: "Malicious",
-        tier_triggered: lower.includes("wire") ? "Tier1Heuristic" : "Tier1Heuristic",
+        tier_triggered: "Tier1Heuristic",
         confidence: 0.98,
         latency_us: Math.round((performance.now() - t0) * 1000) + 18,
         category: lower.includes("wire")
@@ -205,8 +205,8 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen bg-background text-brand-text font-sans antialiased overflow-hidden">
-      {/* 1. Persistent Left Navigation Sidebar */}
+    <div className="flex h-screen bg-zinc-950 text-zinc-100 font-sans antialiased overflow-hidden">
+      {/* 1. Left Navigation Sidebar */}
       <Sidebar
         activeTab={activeTab}
         onSelectTab={setActiveTab}
@@ -214,9 +214,9 @@ export const App: React.FC = () => {
         wanBytes={wanBytes}
       />
 
-      {/* 2. Main Application Workspace Area */}
+      {/* 2. Main Workspace */}
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
-        {/* Top Header Bar */}
+        {/* Top Header */}
         <TopBar
           activeTab={activeTab}
           latencyUs={lastLatencyUs}
@@ -224,11 +224,11 @@ export const App: React.FC = () => {
           onOpenInspector={() => setActiveTab("inspector")}
         />
 
-        {/* Scrollable Main Grid Content */}
-        <main className="flex-1 overflow-y-auto p-6 space-y-6">
+        {/* Main Content Area */}
+        <main className="flex-1 overflow-y-auto p-8 space-y-8">
           {activeTab === "dashboard" && (
-            <>
-              {/* Top Row: 12-Column High-Level Metrics */}
+            <div className="space-y-8 max-w-7xl mx-auto">
+              {/* Row 1: High-Level Metrics (4-Column Grid) */}
               <MetricsGrid
                 totalScans={totalScans}
                 threatsBlocked={threatsBlocked}
@@ -237,11 +237,11 @@ export const App: React.FC = () => {
                 wanBytes={wanBytes}
               />
 
-              {/* Middle Row: Live Threat Inspector Terminal */}
+              {/* Row 2: Live Payload Inspector */}
               <ThreatInspector onScan={handleScan} />
 
-              {/* Bottom Row: Detailed Tables Grid */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Row 3: Process Auditor & Forensic Vault Tables */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <ProcessAuditorTable
                   processes={processes}
                   onRefresh={() => setProcesses((prev) => [...prev])}
@@ -251,11 +251,11 @@ export const App: React.FC = () => {
                   onSelectLog={(result) => setActiveAlert(result)}
                 />
               </div>
-            </>
+            </div>
           )}
 
           {activeTab === "inspector" && (
-            <div className="space-y-6 max-w-5xl">
+            <div className="space-y-8 max-w-5xl mx-auto">
               <ThreatInspector onScan={handleScan} />
               <AuditVaultTable
                 logs={logs}
@@ -265,7 +265,7 @@ export const App: React.FC = () => {
           )}
 
           {activeTab === "processes" && (
-            <div className="space-y-6 max-w-5xl">
+            <div className="space-y-8 max-w-5xl mx-auto">
               <ProcessAuditorTable
                 processes={processes}
                 onRefresh={() => setProcesses((prev) => [...prev])}
@@ -274,7 +274,7 @@ export const App: React.FC = () => {
           )}
 
           {activeTab === "logs" && (
-            <div className="space-y-6 max-w-5xl">
+            <div className="space-y-8 max-w-5xl mx-auto">
               <AuditVaultTable
                 logs={logs}
                 onSelectLog={(result) => setActiveAlert(result)}
@@ -283,54 +283,54 @@ export const App: React.FC = () => {
           )}
 
           {activeTab === "settings" && (
-            <div className="space-y-6 max-w-3xl">
-              <div className="rounded-xl border border-surface-border bg-background-elevated p-6 shadow-card space-y-5">
+            <div className="space-y-6 max-w-3xl mx-auto">
+              <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-6 space-y-5">
                 <div className="flex items-center space-x-3">
-                  <div className="p-2.5 rounded-lg bg-surface border border-surface-border text-accent">
-                    <Sliders className="w-5 h-5" />
+                  <div className="p-2 rounded-md bg-zinc-900 border border-zinc-800 text-zinc-300">
+                    <Sliders className="w-4 h-4" />
                   </div>
                   <div>
-                    <h2 className="text-base font-semibold text-brand-text">
-                      On-Device Engine Configuration
+                    <h2 className="text-sm font-semibold text-zinc-100">
+                      Engine Configuration
                     </h2>
-                    <p className="text-xs text-brand-muted mt-0.5">
+                    <p className="text-xs text-zinc-400 mt-0.5">
                       Adjust runtime thresholds for local heuristic models and INT8 delegates.
                     </p>
                   </div>
                 </div>
 
-                <div className="space-y-4 pt-3 border-t border-surface-border text-xs font-mono">
+                <div className="space-y-4 pt-4 border-t border-zinc-800 text-xs">
                   {/* Shannon Entropy Threshold */}
-                  <div className="flex items-center justify-between p-3.5 rounded-lg bg-surface border border-surface-border">
+                  <div className="flex items-center justify-between p-4 rounded-md bg-zinc-950 border border-zinc-800">
                     <div>
-                      <div className="font-semibold text-brand-text">Shannon Entropy Threshold</div>
-                      <div className="text-[11px] text-brand-muted">
+                      <div className="font-medium text-zinc-200">Shannon Entropy Threshold</div>
+                      <div className="text-xs text-zinc-400 mt-0.5">
                         Flags algorithmic randomness in DGA subdomains (Default: 4.5)
                       </div>
                     </div>
-                    <div className="flex items-center space-x-2">
+                    <div>
                       <input
                         type="number"
                         step="0.1"
                         value={entropyThreshold}
                         onChange={(e) => setEntropyThreshold(parseFloat(e.target.value) || 4.5)}
-                        className="w-16 p-1 rounded bg-background border border-surface-border text-center text-accent"
+                        className="w-16 p-1.5 rounded bg-zinc-900 border border-zinc-800 text-center text-zinc-100 font-mono focus:outline-none focus:border-zinc-700"
                       />
                     </div>
                   </div>
 
                   {/* INT8 Execution Delegate */}
-                  <div className="flex items-center justify-between p-3.5 rounded-lg bg-surface border border-surface-border">
+                  <div className="flex items-center justify-between p-4 rounded-md bg-zinc-950 border border-zinc-800">
                     <div>
-                      <div className="font-semibold text-brand-text">Transformer INT8 Delegate</div>
-                      <div className="text-[11px] text-brand-muted">
+                      <div className="font-medium text-zinc-200">Transformer INT8 Delegate</div>
+                      <div className="text-xs text-zinc-400 mt-0.5">
                         Hardware acceleration provider for MobileBERT
                       </div>
                     </div>
                     <select
                       value={activeDelegate}
                       onChange={(e) => setActiveDelegate(e.target.value)}
-                      className="p-1.5 rounded bg-background border border-surface-border text-brand-text text-xs font-mono"
+                      className="p-1.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-200 text-xs focus:outline-none focus:border-zinc-700"
                     >
                       <option>CPU (x86_64 INT8 AVX2)</option>
                       <option>Android NNAPI Delegate</option>
@@ -338,15 +338,15 @@ export const App: React.FC = () => {
                     </select>
                   </div>
 
-                  {/* Encrypted DB Path */}
-                  <div className="flex items-center justify-between p-3.5 rounded-lg bg-surface border border-surface-border">
+                  {/* Encrypted Vault Path */}
+                  <div className="flex items-center justify-between p-4 rounded-md bg-zinc-950 border border-zinc-800">
                     <div>
-                      <div className="font-semibold text-brand-text">Encrypted Vault Storage</div>
-                      <div className="text-[11px] text-brand-muted">
+                      <div className="font-medium text-zinc-200">Encrypted Vault Storage</div>
+                      <div className="text-xs text-zinc-400 mt-0.5">
                         AES-256 SQLCipher local database path
                       </div>
                     </div>
-                    <span className="text-[11px] text-brand-muted">
+                    <span className="text-xs font-mono text-zinc-400">
                       ~/.pocket_sparrow/vault.db
                     </span>
                   </div>
@@ -357,7 +357,7 @@ export const App: React.FC = () => {
         </main>
       </div>
 
-      {/* 3. Explainable AI Forensic Slide-out Drawer */}
+      {/* 3. Forensic Detail Slide-Out Sheet */}
       <XaiDrawer result={activeAlert} onClose={() => setActiveAlert(null)} />
     </div>
   );

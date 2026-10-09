@@ -1,15 +1,5 @@
 import React, { useState } from "react";
-import {
-  Cpu,
-  Terminal,
-  AlertTriangle,
-  CheckCircle2,
-  RotateCcw,
-
-  Eye,
-  Ban,
-
-} from "lucide-react";
+import { RotateCcw } from "lucide-react";
 
 export interface ProcessAuditItem {
   pid: number;
@@ -37,157 +27,112 @@ export const ProcessAuditorTable: React.FC<ProcessAuditorTableProps> = ({
   });
 
   return (
-    <div className="rounded-xl border border-surface-border bg-background-elevated shadow-card overflow-hidden">
-      {/* Table Header Controls */}
-      <div className="p-4 border-b border-surface-border flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-background-subtle">
-        <div className="flex items-center space-x-3">
-          <div className="p-2 rounded-lg bg-surface border border-surface-border text-indigo">
-            <Cpu className="w-4 h-4" strokeWidth={1.75} />
-          </div>
-          <div>
-            <div className="flex items-center space-x-2">
-              <h2 className="text-sm font-semibold text-brand-text tracking-tight">
-                Process Behavior Auditor
-              </h2>
-              <span
-                className={`text-[10px] font-mono px-2 py-0.5 rounded-full border ${
-                  suspiciousCount > 0
-                    ? "bg-status-dangerBg text-status-danger border-status-dangerBorder font-semibold"
-                    : "bg-status-safeBg text-status-safe border-status-safeBorder font-semibold"
-                }`}
-              >
-                {suspiciousCount > 0 ? `${suspiciousCount} Suspicious Tasks` : "0 Vulnerabilities"}
+    <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-6 space-y-4">
+      {/* Header and Filter */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <div className="flex items-center space-x-2">
+            <h3 className="text-sm font-semibold text-zinc-100">
+              Active Process Audit
+            </h3>
+            {suspiciousCount > 0 ? (
+              <span className="inline-flex items-center gap-1.5 text-xs text-rose-400 bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded font-medium">
+                <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
+                {suspiciousCount} Alert
               </span>
-            </div>
-            <p className="text-xs text-brand-muted mt-0.5">
-              Continuous inspection of running executables, reverse shell signatures, and privilege abuse.
-            </p>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 text-xs text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded font-medium">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                All Clear
+              </span>
+            )}
           </div>
+          <p className="text-xs text-zinc-400 mt-1">
+            Real-time inspection of running processes for reverse shell and privilege anomalies.
+          </p>
         </div>
 
         <div className="flex items-center space-x-2 self-start sm:self-auto">
-          <div className="flex p-0.5 rounded-lg bg-background border border-surface-border text-xs">
+          <div className="inline-flex p-0.5 rounded bg-zinc-950 border border-zinc-800 text-xs">
             <button
               onClick={() => setFilter("ALL")}
-              className={`px-2.5 py-1 rounded-md text-xs font-mono transition ${
+              className={`px-2.5 py-1 rounded transition-colors ${
                 filter === "ALL"
-                  ? "bg-surface-active text-brand-text"
-                  : "text-brand-muted hover:text-brand-secondary"
+                  ? "bg-zinc-800 text-zinc-100 font-medium"
+                  : "text-zinc-400 hover:text-zinc-200"
               }`}
             >
               All ({processes.length})
             </button>
             <button
               onClick={() => setFilter("SUSPICIOUS")}
-              className={`px-2.5 py-1 rounded-md text-xs font-mono transition ${
+              className={`px-2.5 py-1 rounded transition-colors ${
                 filter === "SUSPICIOUS"
-                  ? "bg-surface-active text-brand-text"
-                  : "text-brand-muted hover:text-brand-secondary"
+                  ? "bg-zinc-800 text-zinc-100 font-medium"
+                  : "text-zinc-400 hover:text-zinc-200"
               }`}
             >
-              Risky ({suspiciousCount})
+              Alerts ({suspiciousCount})
             </button>
           </div>
 
           <button
             onClick={onRefresh}
-            className="flex items-center space-x-1 px-3 py-1.5 rounded-lg bg-surface hover:bg-surface-hover border border-surface-border text-brand-secondary hover:text-brand-text text-xs transition"
+            className="p-1.5 rounded border border-zinc-800 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 transition-colors"
+            title="Rescan processes"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            <span className="hidden md:inline">Rescan</span>
           </button>
         </div>
       </div>
 
-      {/* Structured Data Table */}
-      <div className="overflow-x-auto">
-        <table className="w-full text-left text-xs font-mono">
+      {/* Data Table */}
+      <div className="overflow-x-auto rounded border border-zinc-800">
+        <table className="w-full text-left text-xs">
           <thead>
-            <tr className="border-b border-surface-border bg-surface text-brand-muted uppercase text-[10px] tracking-wider">
-              <th className="py-2.5 px-4 font-semibold">Process Name</th>
-              <th className="py-2.5 px-4 font-semibold">PID</th>
-              <th className="py-2.5 px-4 font-semibold">Binary Path</th>
-              <th className="py-2.5 px-4 font-semibold">Audit Verdict</th>
-              <th className="py-2.5 px-4 font-semibold text-right">Actions</th>
+            <tr className="border-b border-zinc-800 bg-zinc-950 text-zinc-400 uppercase tracking-wider font-medium text-[11px]">
+              <th className="py-2.5 px-4">PID</th>
+              <th className="py-2.5 px-4">Process Name</th>
+              <th className="py-2.5 px-4">Path</th>
+              <th className="py-2.5 px-4">Status</th>
+              <th className="py-2.5 px-4 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-surface-border">
-            {displayedProcesses.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="py-8 text-center text-brand-faint text-xs">
-                  No active processes match the selected filter.
+          <tbody className="divide-y divide-zinc-800/60 bg-zinc-900/20">
+            {displayedProcesses.map((proc) => (
+              <tr key={proc.pid} className="hover:bg-zinc-800/30 transition-colors">
+                <td className="py-3 px-4 font-mono text-zinc-400">{proc.pid}</td>
+                <td className="py-3 px-4 font-medium text-zinc-200">{proc.name}</td>
+                <td className="py-3 px-4 font-mono text-zinc-400 max-w-xs truncate" title={proc.path}>
+                  {proc.path}
+                </td>
+                <td className="py-3 px-4">
+                  {proc.is_suspicious ? (
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                      <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
+                      Suspicious
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                      Verified
+                    </span>
+                  )}
+                </td>
+                <td className="py-3 px-4 text-right">
+                  {proc.is_suspicious ? (
+                    <button
+                      onClick={() => alert(`Quarantining PID ${proc.pid}`)}
+                      className="px-2.5 py-1 rounded bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 text-xs font-medium transition-colors"
+                    >
+                      Terminate
+                    </button>
+                  ) : (
+                    <span className="text-zinc-600 text-xs font-mono">—</span>
+                  )}
                 </td>
               </tr>
-            ) : (
-              displayedProcesses.map((proc) => (
-                <tr
-                  key={proc.pid}
-                  className="hover:bg-surface-hover transition-colors group"
-                >
-                  {/* Process Name */}
-                  <td className="py-3 px-4 text-brand-text font-semibold flex items-center space-x-2">
-                    <Terminal className="w-3.5 h-3.5 text-brand-muted" />
-                    <span>{proc.name}</span>
-                  </td>
-
-                  {/* PID */}
-                  <td className="py-3 px-4 text-brand-muted">{proc.pid}</td>
-
-                  {/* Path */}
-                  <td className="py-3 px-4 text-brand-secondary truncate max-w-xs text-[11px]">
-                    {proc.path}
-                    {proc.threat_detail && (
-                      <div className="text-[10px] text-status-danger mt-0.5 truncate font-sans">
-                        {proc.threat_detail}
-                      </div>
-                    )}
-                  </td>
-
-                  {/* Verdict Badge */}
-                  <td className="py-3 px-4">
-                    <span
-                      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${
-                        proc.is_suspicious
-                          ? "bg-status-dangerBg text-status-danger border-status-dangerBorder"
-                          : "bg-status-safeBg text-status-safe border-status-safeBorder"
-                      }`}
-                    >
-                      {proc.is_suspicious ? (
-                        <>
-                          <AlertTriangle className="w-2.5 h-2.5" />
-                          Critical Risk
-                        </>
-                      ) : (
-                        <>
-                          <CheckCircle2 className="w-2.5 h-2.5" />
-                          Verified Benign
-                        </>
-                      )}
-                    </span>
-                  </td>
-
-                  {/* Actions */}
-                  <td className="py-3 px-4 text-right">
-                    <div className="flex items-center justify-end space-x-1 opacity-80 group-hover:opacity-100 transition-opacity">
-                      <button
-                        title="Sandbox Audit"
-                        className="p-1 rounded text-brand-muted hover:text-accent hover:bg-surface transition"
-                      >
-                        <Eye className="w-3.5 h-3.5" />
-                      </button>
-                      {proc.is_suspicious && (
-                        <button
-                          title="Terminate Task"
-                          className="p-1 rounded text-status-danger hover:bg-status-dangerBg transition"
-                        >
-                          <Ban className="w-3.5 h-3.5" />
-                        </button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
+            ))}
           </tbody>
         </table>
       </div>
