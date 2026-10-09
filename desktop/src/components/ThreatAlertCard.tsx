@@ -1,4 +1,5 @@
 import React from "react";
+import { AlertOctagon, AlertTriangle, CheckCircle, Zap, BrainCircuit, X } from "lucide-react";
 
 export interface ScanResultPayload {
   verdict: "Safe" | "Suspicious" | "Malicious";
@@ -24,98 +25,93 @@ export const ThreatAlertCard: React.FC<ThreatAlertCardProps> = ({ result, onDism
 
   return (
     <div
-      className={`rounded-xl border p-5 transition-all ${
+      className={`rounded-2xl border p-5 transition-all shadow-2xl relative overflow-hidden backdrop-blur-md animate-in fade-in slide-in-from-top-4 duration-300 ${
         isMalicious
-          ? "bg-rose-950/40 border-rose-600/80 glow-danger"
+          ? "bg-rose-950/40 border-rose-500/80 shadow-rose-950/50"
           : isSuspicious
-          ? "bg-amber-950/40 border-amber-600/80"
-          : "bg-emerald-950/30 border-emerald-700/60"
+          ? "bg-amber-950/40 border-amber-500/80 shadow-amber-950/50"
+          : "bg-emerald-950/40 border-emerald-500/70 shadow-emerald-950/50"
       }`}
     >
       <div className="flex items-start justify-between">
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-3.5">
           <div
-            className={`h-8 w-8 rounded-full flex items-center justify-center font-bold text-sm ${
+            className={`h-11 w-11 rounded-xl flex items-center justify-center font-bold shadow-lg ${
               isMalicious
-                ? "bg-rose-500 text-white"
+                ? "bg-rose-600/30 border border-rose-500 text-rose-300 shadow-rose-600/20"
                 : isSuspicious
-                ? "bg-amber-500 text-black"
-                : "bg-emerald-500 text-white"
+                ? "bg-amber-600/30 border border-amber-500 text-amber-300 shadow-amber-600/20"
+                : "bg-emerald-600/30 border border-emerald-500 text-emerald-300 shadow-emerald-600/20"
             }`}
           >
-            {isMalicious ? "!" : isSuspicious ? "?" : "✓"}
+            {isMalicious ? (
+              <AlertOctagon className="w-6 h-6 text-rose-400 animate-bounce" />
+            ) : isSuspicious ? (
+              <AlertTriangle className="w-6 h-6 text-amber-400" />
+            ) : (
+              <CheckCircle className="w-6 h-6 text-emerald-400" />
+            )}
           </div>
           <div>
             <div className="flex items-center space-x-2">
               <span
-                className={`text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded ${
+                className={`text-xs font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${
                   isMalicious
-                    ? "bg-rose-900/80 text-rose-200 border border-rose-700"
+                    ? "bg-rose-900/80 text-rose-200 border-rose-500"
                     : isSuspicious
-                    ? "bg-amber-900/80 text-amber-200 border border-amber-700"
-                    : "bg-emerald-900/80 text-emerald-200 border border-emerald-700"
+                    ? "bg-amber-900/80 text-amber-200 border-amber-500"
+                    : "bg-emerald-900/80 text-emerald-200 border-emerald-500"
                 }`}
               >
-                {result.verdict.toUpperCase()} THREAT
+                {result.verdict.toUpperCase()} VERDICT
               </span>
-              <span className="text-xs text-slate-400">
-                Category: <strong className="text-white">{result.category}</strong>
-              </span>
-              <span className="text-xs text-slate-400">
-                Confidence: <strong className="text-cyan-400">{confPct}%</strong>
+              <span className="text-xs px-2 py-0.5 rounded-md bg-slate-900/80 border border-slate-700 text-slate-300 font-mono">
+                {result.category}
               </span>
             </div>
-            <h3 className="text-base font-bold text-white mt-1">
-              {isMalicious
-                ? "Malicious Threat Intercepted & Blocked"
-                : isSuspicious
-                ? "Suspicious Content Flagged for Review"
-                : "Content Passed All On-Device Checks"}
-            </h3>
+            <p className="text-xs text-slate-300 font-mono mt-1">
+              Confidence: <span className="font-bold text-white">{confPct}%</span> • SLA Latency:{" "}
+              <span className="font-bold text-cyan-300">{result.latency_us} µs</span>
+            </p>
           </div>
         </div>
 
         {onDismiss && (
           <button
             onClick={onDismiss}
-            className="text-slate-400 hover:text-white text-xs px-2 py-1 rounded bg-slate-800/60 hover:bg-slate-700"
+            className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
           >
-            Dismiss
+            <X className="w-4 h-4" />
           </button>
         )}
       </div>
 
-      {/* Plain-English XAI Rationale */}
-      <div className="mt-4 pt-3 border-t border-slate-800/80">
-        <div className="text-xs text-slate-400 font-semibold mb-1">
-          EXPLAINABLE AI (XAI) DIAGNOSIS:
+      {/* Forensic XAI Explanation Box */}
+      <div className="mt-4 p-4 rounded-xl bg-slate-950/80 border border-slate-800/90 shadow-inner">
+        <div className="flex items-center space-x-2 text-xs font-semibold text-slate-300 mb-1.5 font-mono">
+          <BrainCircuit className="w-3.5 h-3.5 text-cyan-400" />
+          <span>Explainable AI (XAI) Forensic Breakdown:</span>
         </div>
-        <p className="text-sm text-slate-200 leading-relaxed font-sans">
+        <p className="text-xs text-slate-200 leading-relaxed font-sans pl-5 border-l-2 border-cyan-500/60 my-2">
           {result.xai_reason}
         </p>
-      </div>
-
-      {/* Engine Metrics Tag */}
-      <div className="mt-3 flex items-center justify-between text-[11px] text-slate-400 bg-slate-950/60 px-3 py-1.5 rounded-lg border border-slate-800/60">
-        <div className="flex items-center space-x-3">
-          <span>
-            Engine:{" "}
-            <strong className="text-cyan-400">
+        <div className="flex items-center justify-between text-[11px] text-slate-400 pt-2 border-t border-slate-900 font-mono">
+          <span className="flex items-center gap-1.5">
+            <Zap className="w-3 h-3 text-cyan-400" />
+            Pipeline:{" "}
+            <span className="text-slate-300">
               {result.tier_triggered === "Tier1Heuristic"
-                ? "Tier 1 Heuristic (<5ms)"
-                : "Tier 2 INT8 Transformer (<40ms)"}
-            </strong>
+                ? "Tier 1 Deterministic Engine"
+                : "Tier 2 INT8 MobileBERT"}
+            </span>
           </span>
-          <span>•</span>
-          <span>
-            Latency: <strong className="text-white">{(result.latency_us / 1000).toFixed(2)} ms</strong>
+          <span
+            className={`font-semibold ${
+              result.should_block ? "text-rose-400" : "text-emerald-400"
+            }`}
+          >
+            {result.should_block ? "ACTION: BLOCKED ON-DEVICE" : "ACTION: PASSED (SAFE)"}
           </span>
-        </div>
-        <div>
-          Action:{" "}
-          <strong className={result.should_block ? "text-rose-400" : "text-emerald-400"}>
-            {result.should_block ? "IMMEDIATE BLOCK RECOMMENDED" : "ALLOW PROCEED"}
-          </strong>
         </div>
       </div>
     </div>

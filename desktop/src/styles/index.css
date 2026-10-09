@@ -1,40 +1,61 @@
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-:root {
-  color-scheme: dark;
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-[#030712] text-slate-100 antialiased font-mono;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+  }
 }
 
-body {
-  margin: 0;
-  padding: 0;
-  background-color: #030712;
-  color: #f3f4f6;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  overflow-x: hidden;
-}
-
-/* Custom scrollbars */
+/* Custom Cyber Scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0b0f19;
+  background: #030712;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1f2937;
-  border-radius: 3px;
+  background: #1e293b;
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #374151;
+  background: #06b6d4;
 }
 
-.glow-border {
-  box-shadow: 0 0 15px rgba(6, 182, 212, 0.15);
+/* Cyber Glow Accents */
+.cyber-glow-cyan {
+  box-shadow: 0 0 25px rgba(6, 182, 212, 0.25);
+}
+.cyber-glow-emerald {
+  box-shadow: 0 0 25px rgba(16, 185, 129, 0.25);
+}
+.cyber-glow-rose {
+  box-shadow: 0 0 25px rgba(244, 63, 94, 0.3);
+}
+.cyber-card {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(51, 65, 85, 0.6);
+}
+.cyber-card:hover {
+  border-color: rgba(56, 189, 248, 0.5);
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.15);
 }
 
-.glow-danger {
-  box-shadow: 0 0 20px rgba(239, 68, 68, 0.25);
+/* Cyber Pulse Animation */
+@keyframes cyber-pulse {
+  0%, 100% { opacity: 1; filter: drop-shadow(0 0 8px rgba(6, 182, 212, 0.6)); }
+  50% { opacity: 0.6; filter: drop-shadow(0 0 2px rgba(6, 182, 212, 0.2)); }
+}
+.animate-cyber-pulse {
+  animation: cyber-pulse 2.5s infinite ease-in-out;
 }
