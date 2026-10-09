@@ -24,21 +24,25 @@ import com.pocketsparrow.ui.theme.*
 fun ApkAuditScreen(
     onTriggerAudit: (permissions: Array<String>) -> Unit
 ) {
-    // Test Case C: Dummy Banking Trojan permission set
-    val sampleTrojan = arrayOf(
+    // Malicious permission vectors for security auditing
+    val bankingTrojanVector = arrayOf(
         "android.permission.RECEIVE_SMS",
         "android.permission.INTERNET",
         "android.permission.SYSTEM_ALERT_WINDOW"
     )
 
-    // Test Case C: Dummy Dropper permission set
-    val sampleDropper = arrayOf(
+    val dropperVector = arrayOf(
         "android.permission.REQUEST_INSTALL_PACKAGES",
         "android.permission.INTERNET"
     )
 
-    // Benign Control set
-    val sampleClean = arrayOf(
+    val accessibilityVector = arrayOf(
+        "android.permission.BIND_ACCESSIBILITY_SERVICE",
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.INTERNET"
+    )
+
+    val cleanControlVector = arrayOf(
         "android.permission.INTERNET",
         "android.permission.ACCESS_NETWORK_STATE"
     )
@@ -66,7 +70,7 @@ fun ApkAuditScreen(
 
         item {
             Text(
-                text = "Simulate Sideloaded APK Audits (Test Case C):",
+                text = "Permission Profile Inspection Vectors:",
                 color = CyberCyan,
                 fontWeight = FontWeight.Bold,
                 fontSize = 13.sp,
@@ -77,31 +81,41 @@ fun ApkAuditScreen(
         // Interactive audit trigger cards
         item {
             AuditTriggerCard(
-                title = "FakeBankUpdate.apk (Banking Trojan)",
-                permissions = sampleTrojan,
-                expectedRisk = "98% Risk • Blocked",
+                title = "Banking Trojan Profile (SMS Intercept + Overlay)",
+                permissions = bankingTrojanVector,
+                expectedRisk = "High Risk Signature",
                 accent = CyberRose,
-                onAudit = { onTriggerAudit(sampleTrojan) }
+                onAudit = { onTriggerAudit(bankingTrojanVector) }
             )
         }
 
         item {
             AuditTriggerCard(
-                title = "GameInstaller_Mod.apk (Sideloaded Dropper)",
-                permissions = sampleDropper,
-                expectedRisk = "85% Risk • Blocked",
+                title = "Accessibility Hijacker Profile (Input Hooking)",
+                permissions = accessibilityVector,
+                expectedRisk = "Critical Risk Signature",
                 accent = CyberRose,
-                onAudit = { onTriggerAudit(sampleDropper) }
+                onAudit = { onTriggerAudit(accessibilityVector) }
             )
         }
 
         item {
             AuditTriggerCard(
-                title = "WeatherWidget.apk (Standard App)",
-                permissions = sampleClean,
-                expectedRisk = "Low Risk • Safe",
+                title = "Silent Dropper Profile (Package Installer)",
+                permissions = dropperVector,
+                expectedRisk = "Elevated Risk Signature",
+                accent = CyberRose,
+                onAudit = { onTriggerAudit(dropperVector) }
+            )
+        }
+
+        item {
+            AuditTriggerCard(
+                title = "Standard Utility Profile (Baseline)",
+                permissions = cleanControlVector,
+                expectedRisk = "Benign Baseline",
                 accent = CyberEmerald,
-                onAudit = { onTriggerAudit(sampleClean) }
+                onAudit = { onTriggerAudit(cleanControlVector) }
             )
         }
     }

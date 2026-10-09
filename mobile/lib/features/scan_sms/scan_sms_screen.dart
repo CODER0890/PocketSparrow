@@ -246,20 +246,20 @@ class _ScanSmsScreenState extends State<ScanSmsScreen> {
             ),
             const SizedBox(height: AppSpacing.sm),
 
-            ..._manualTestScenarios.map((demo) {
+            ..._manualTestScenarios.map((scenario) {
               return Padding(
                 padding: const EdgeInsets.only(bottom: AppSpacing.sm),
                 child: AppListTile(
-                  title: demo['title']!,
-                  subtitle: demo['body']!,
+                  title: scenario['title']!,
+                  subtitle: scenario['body']!,
                   leadingIcon: LucideIcons.message_square,
                   trailing: TextButton(
                     onPressed: () {
-                      _smsController.text = demo['body']!;
-                      _analyze(demo['body']!);
+                      _smsController.text = scenario['body']!;
+                      _analyze(scenario['body']!);
                     },
                     child: Text(
-                      'Load',
+                      'Test',
                       style: AppTextStyles.labelLarge.copyWith(
                         color: AppColors.primary,
                         fontWeight: FontWeight.w600,

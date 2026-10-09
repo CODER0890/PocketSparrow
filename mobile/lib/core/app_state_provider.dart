@@ -14,7 +14,6 @@ class AppStateProvider extends ChangeNotifier {
   bool _isProtectionActive = true;
   bool _isClipboardMonitoring = true;
   bool _isHapticsEnabled = true;
-  bool _isDemoMode = false;
   bool _isAirplaneModeSimulated = true;
   bool _isScanning = false;
 
@@ -33,7 +32,6 @@ class AppStateProvider extends ChangeNotifier {
   bool get isProtectionActive => _isProtectionActive;
   bool get isClipboardMonitoring => _isClipboardMonitoring;
   bool get isHapticsEnabled => _isHapticsEnabled;
-  bool get isDemoMode => _isDemoMode;
   bool get isAirplaneModeSimulated => _isAirplaneModeSimulated;
   bool get isScanning => _isScanning;
   List<ThreatResult> get recentThreats => _recentThreats;
@@ -52,15 +50,7 @@ class AppStateProvider extends ChangeNotifier {
     _isProtectionActive = prefs.getBool('isProtectionActive') ?? true;
     _isClipboardMonitoring = prefs.getBool('isClipboardMonitoring') ?? true;
     _isHapticsEnabled = prefs.getBool('isHapticsEnabled') ?? true;
-    _isDemoMode = prefs.getBool('isDemoMode') ?? false;
     _isAirplaneModeSimulated = prefs.getBool('isAirplaneModeSimulated') ?? true;
-
-    try {
-      // Preload demo data only if explicitly in demo mode
-      if (_isDemoMode) {
-        await _db.preloadDemoData();
-      }
-    } catch (_) {}
 
     if (_isClipboardMonitoring && _isProtectionActive) {
       _clipboardService.startMonitoring();
@@ -169,17 +159,6 @@ class AppStateProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> toggleDemoMode(bool val) async {
-    _isDemoMode = val;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isDemoMode', val);
-    if (val) {
-      await _db.preloadDemoData();
-      await refreshData();
-    }
-    notifyListeners();
-  }
-
   Future<void> toggleAirplaneModeSimulated(bool val) async {
     _isAirplaneModeSimulated = val;
     final prefs = await SharedPreferences.getInstance();
@@ -195,10 +174,8 @@ class AppStateProvider extends ChangeNotifier {
   }
 
   Future<void> resetToProductionState() async {
-    _isDemoMode = false;
     _isAirplaneModeSimulated = false;
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isDemoMode', false);
     await prefs.setBool('isAirplaneModeSimulated', false);
     await clearAllLogs();
   }

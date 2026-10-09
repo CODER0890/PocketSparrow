@@ -5,6 +5,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.*
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -13,6 +14,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ContentPaste
+import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,6 +27,8 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -38,7 +44,20 @@ fun DashboardScreen(
     recentLogs: List<ScanLogEntity>,
     onTriggerScan: (contentType: Int, payload: String) -> Unit
 ) {
-    var inputPayload by remember { mutableStateOf("https://g00gle-security-check.cfd/auth/verify?id=9281") }
+    val context = LocalContext.current
+    val clipboardManager = LocalClipboardManager.current
+    val isAirplaneMode = remember {
+        try {
+            android.provider.Settings.Global.getInt(
+                context.contentResolver,
+                android.provider.Settings.Global.AIRPLANE_MODE_ON, 0
+            ) != 0
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    var inputPayload by remember { mutableStateOf("") }
     var selectedType by remember { mutableIntStateOf(NativeBridge.CONTENT_TYPE_URL) }
     var isInputFocused by remember { mutableStateOf(false) }
     var isScanning by remember { mutableStateOf(false) }
@@ -139,7 +158,7 @@ fun DashboardScreen(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Airgap Status Banner
+        // Airgap Status Banner (Dynamic Hardware State)
         item {
             Row(
                 modifier = Modifier
@@ -154,12 +173,12 @@ fun DashboardScreen(
                     Box(
                         modifier = Modifier
                             .size(8.dp)
-                            .background(CyberEmerald, RoundedCornerShape(4.dp))
+                            .background(if (isAirplaneMode) CyberEmerald else CyberCyan, RoundedCornerShape(4.dp))
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "AIRPLANE MODE READY (100% On-Device)",
-                        color = CyberEmerald,
+                        text = if (isAirplaneMode) "AIRPLANE MODE ACTIVE (Zero RF Radiation)" else "AIRGAP GUARANTEE (100% On-Device)",
+                        color = if (isAirplaneMode) CyberEmerald else CyberCyan,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
                         fontFamily = FontFamily.Monospace
@@ -251,18 +270,12 @@ fun DashboardScreen(
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         FilterChip(
                             selected = selectedType == NativeBridge.CONTENT_TYPE_URL,
-                            onClick = {
-                                selectedType = NativeBridge.CONTENT_TYPE_URL
-                                inputPayload = "https://g00gle-security-check.cfd/auth/verify?id=9281"
-                            },
+                            onClick = { selectedType = NativeBridge.CONTENT_TYPE_URL },
                             label = { Text("URL", fontSize = 11.sp) }
                         )
                         FilterChip(
                             selected = selectedType == NativeBridge.CONTENT_TYPE_SMS_TEXT,
-                            onClick = {
-                                selectedType = NativeBridge.CONTENT_TYPE_SMS_TEXT
-                                inputPayload = "BANK ALERT: Unusual wire transfer of $2,450.00 initiated. Cancel now: http://fake.com"
-                            },
+                            onClick = { selectedType = NativeBridge.CONTENT_TYPE_SMS_TEXT },
                             label = { Text("SMS / Chat", fontSize = 11.sp) }
                         )
                     }
@@ -278,6 +291,14 @@ fun DashboardScreen(
                         OutlinedTextField(
                             value = inputPayload,
                             onValueChange = { inputPayload = it },
+                            placeholder = {
+                                Text(
+                                    text = if (selectedType == NativeBridge.CONTENT_TYPE_URL) "Enter or paste URL to inspect..." else "Enter or paste SMS text to inspect...",
+                                    color = Color(0xFF64748B),
+                                    fontSize = 12.sp,
+                                    fontFamily = FontFamily.Monospace
+                                )
+                            },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .onFocusChanged { isInputFocused = it.isFocused },
@@ -313,28 +334,125 @@ fun DashboardScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Action Button with micro-interaction scale press
-                    Button(
-                        onClick = {
-                            coroutineScope.launch {
-                                isScanning = true
-                                onTriggerScan(selectedType, inputPayload)
-                                delay(350)
-                                isScanning = false
-                            }
-                        },
-                        interactionSource = buttonInteractionSource,
-                        modifier = Modifier
-                            .align(Alignment.End)
-                            .scale(buttonScale),
-                        colors = ButtonDefaults.buttonColors(containerColor = CyberCyan)
+                    // Action Controls
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = if (isScanning) "Scanning Pipeline..." else "Evaluate Threat (<50ms)",
-                            color = Color.Black,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 12.sp
-                        )
+                        OutlinedButton(
+                            onClick = {
+                                clipboardManager.getText()?.text?.let { clipText ->
+                                    if (clipText.isNotBlank()) {
+                                        inputPayload = clipText
+                                    }
+                                }
+                            },
+                            border = BorderStroke(1.dp, Color(0xFF334155)),
+                            shape = RoundedCornerShape(8.dp),
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
+                        ) {
+                            Icon(Icons.Default.ContentPaste, contentDescription = "Paste", modifier = Modifier.size(14.dp))
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text("Paste", fontSize = 11.sp)
+                        }
+
+                        Button(
+                            onClick = {
+                                if (inputPayload.isNotBlank()) {
+                                    coroutineScope.launch {
+                                        isScanning = true
+                                        onTriggerScan(selectedType, inputPayload)
+                                        delay(350)
+                                        isScanning = false
+                                    }
+                                }
+                            },
+                            enabled = inputPayload.isNotBlank(),
+                            interactionSource = buttonInteractionSource,
+                            modifier = Modifier.scale(buttonScale),
+                            colors = ButtonDefaults.buttonColors(containerColor = CyberCyan)
+                        ) {
+                            Text(
+                                text = if (isScanning) "Scanning Pipeline..." else "Evaluate Threat (<50ms)",
+                                color = Color.Black,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 12.sp
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        // Manual Test Vectors
+        item {
+            Card(
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF0F172A)),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(1.dp, Color(0xFF1E293B), RoundedCornerShape(12.dp))
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = "Manual Test Vectors",
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 13.sp
+                    )
+                    Text(
+                        text = "Pre-calibrated scenarios for evaluating local heuristic classification.",
+                        color = Color(0xFF94A3B8),
+                        fontSize = 11.sp
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        OutlinedButton(
+                            onClick = {
+                                selectedType = NativeBridge.CONTENT_TYPE_URL
+                                inputPayload = "https://g00gle-security-check.cfd/auth/verify?id=9281"
+                                onTriggerScan(NativeBridge.CONTENT_TYPE_URL, inputPayload)
+                            },
+                            modifier = Modifier.weight(1f),
+                            border = BorderStroke(1.dp, CyberRose.copy(alpha = 0.5f)),
+                            shape = RoundedCornerShape(8.dp),
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = CyberRose)
+                        ) {
+                            Text("Phish URL", fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                        }
+
+                        OutlinedButton(
+                            onClick = {
+                                selectedType = NativeBridge.CONTENT_TYPE_SMS_TEXT
+                                inputPayload = "BANK ALERT: Unusual wire transfer of $2,450.00 initiated. Cancel now: http://fake-bank-auth.xyz"
+                                onTriggerScan(NativeBridge.CONTENT_TYPE_SMS_TEXT, inputPayload)
+                            },
+                            modifier = Modifier.weight(1f),
+                            border = BorderStroke(1.dp, CyberRose.copy(alpha = 0.5f)),
+                            shape = RoundedCornerShape(8.dp),
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = CyberRose)
+                        ) {
+                            Text("Fraud SMS", fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                        }
+
+                        OutlinedButton(
+                            onClick = {
+                                selectedType = NativeBridge.CONTENT_TYPE_URL
+                                inputPayload = "https://en.wikipedia.org/wiki/Computer_security"
+                                onTriggerScan(NativeBridge.CONTENT_TYPE_URL, inputPayload)
+                            },
+                            modifier = Modifier.weight(1f),
+                            border = BorderStroke(1.dp, CyberEmerald.copy(alpha = 0.5f)),
+                            shape = RoundedCornerShape(8.dp),
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = CyberEmerald)
+                        ) {
+                            Text("Benign URL", fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                        }
                     }
                 }
             }
@@ -352,11 +470,47 @@ fun DashboardScreen(
 
         if (recentLogs.isEmpty()) {
             item {
-                Text(
-                    text = "No threats logged yet. Try evaluating one of the test cases above.",
-                    color = Color(0xFF64748B),
-                    fontSize = 12.sp
-                )
+                Card(
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFF0F172A)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(1.dp, Color(0xFF1E293B), RoundedCornerShape(12.dp))
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(28.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(44.dp)
+                                .background(Color(0xFF1E293B), RoundedCornerShape(22.dp)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Shield,
+                                contentDescription = "Shield",
+                                tint = CyberEmerald,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Text(
+                            text = "No Threats Detected",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "System is actively monitoring. All on-device inspections are clear.",
+                            color = Color(0xFF64748B),
+                            fontSize = 11.sp
+                        )
+                    }
+                }
             }
         } else {
             itemsIndexed(recentLogs, key = { _, log -> log.id }) { index, log ->
