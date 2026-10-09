@@ -6,6 +6,7 @@ export interface ProcessAuditItem {
   name: string;
   path: string;
   is_suspicious: boolean;
+  is_system?: boolean;
   threat_detail: string;
 }
 

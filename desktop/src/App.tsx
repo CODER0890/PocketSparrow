@@ -162,15 +162,21 @@ export const App: React.FC = () => {
   };
 
   const handleTerminateProcess = async (pid: number) => {
+    const target = processes.find((p) => p.pid === pid);
+    if (target?.is_system) {
+      console.warn(`Safety Policy: Refusing to terminate protected system process PID ${pid}`);
+      return;
+    }
+
     try {
       if (typeof window !== "undefined" && (window as any).__TAURI_INTERNALS__) {
         const { invoke } = await import("@tauri-apps/api/core");
         await invoke("terminate_process", { pid });
       }
+      setProcesses((prev) => prev.filter((p) => p.pid !== pid));
     } catch (err) {
       console.warn("Unable to terminate process via Tauri IPC", err);
     }
-    setProcesses((prev) => prev.filter((p) => p.pid !== pid));
   };
 
   const toggleTheme = () => {

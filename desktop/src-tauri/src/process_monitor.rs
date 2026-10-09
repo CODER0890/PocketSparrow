@@ -8,6 +8,7 @@ pub struct DesktopProcessInfo {
     pub name: String,
     pub path: String,
     pub is_suspicious: bool,
+    pub is_system: bool,
     pub threat_detail: String,
 }
 
@@ -16,6 +17,224 @@ pub struct ProcessMonitor;
 impl ProcessMonitor {
     pub fn new() -> Self {
         Self
+    }
+
+    /// Determines if a process is an essential operating system component or system-related daemon.
+    pub fn is_system_process(pid: u32, name: &str, path: &str) -> bool {
+        // 1. Critical core system PIDs
+        // PID 0 (Idle / Swapper), PID 1 (init / systemd / launchd), PID 2 (kthreadd), PID 4 (System on Windows)
+        if pid <= 2 || pid == 4 {
+            return true;
+        }
+
+        // 2. Self-protection: Never terminate PocketSparrow itself
+        if pid == std::process::id() {
+            return true;
+        }
+
+        let name_lower = name.to_lowercase();
+        let path_lower = path.to_lowercase();
+
+        // 3. Kernel workers and threads (bracketed names like [kworker...], [ksoftirqd...])
+        if name.starts_with('[') && name.ends_with(']') {
+            return true;
+        }
+        if name_lower.starts_with("kworker")
+            || name_lower.starts_with("ksoftirqd")
+            || name_lower.starts_with("rcu_")
+            || name_lower.starts_with("migration/")
+            || name_lower.starts_with("cpuhp/")
+            || name_lower.starts_with("watchdog")
+            || name_lower.starts_with("jbd2/")
+            || name_lower.starts_with("scsi_")
+            || name_lower.starts_with("kswapd")
+            || name_lower.starts_with("khugepaged")
+            || name_lower.starts_with("kcompactd")
+            || name_lower.starts_with("ksmd")
+            || name_lower.starts_with("oom_reaper")
+        {
+            return true;
+        }
+
+        let base_name = Path::new(name)
+            .file_name()
+            .and_then(|f| f.to_str())
+            .unwrap_or(name)
+            .to_lowercase();
+        let clean_base = base_name.trim_end_matches(".exe");
+
+        // 4. Linux Core System Daemons & Services
+        const LINUX_SYSTEM_BINARIES: &[&str] = &[
+            "systemd",
+            "init",
+            "kthreadd",
+            "udevd",
+            "dbus-daemon",
+            "dbus-broker",
+            "polkitd",
+            "cron",
+            "crond",
+            "atd",
+            "sshd",
+            "networkmanager",
+            "wpa_supplicant",
+            "iwd",
+            "dhclient",
+            "dhcpcd",
+            "avahi-daemon",
+            "cupsd",
+            "rsyslogd",
+            "syslogd",
+            "syslog-ng",
+            "auditd",
+            "acpid",
+            "thermald",
+            "upowerd",
+            "accounts-daemon",
+            "pipewire",
+            "wireplumber",
+            "pulseaudio",
+            "alsactl",
+            "xorg",
+            "xwayland",
+            "wayland",
+            "kwin",
+            "mutter",
+            "gnome-shell",
+            "gnome-session",
+            "plasmashell",
+            "startplasma",
+            "gdm",
+            "lightdm",
+            "sddm",
+            "login",
+            "agetty",
+            "getty",
+            "su",
+            "sudo",
+            "containerd",
+            "dockerd",
+            "pocket_sparrow",
+            "pocket-sparrow",
+            "tauri",
+        ];
+
+        for sys_bin in LINUX_SYSTEM_BINARIES {
+            if clean_base == *sys_bin || clean_base.starts_with(&format!("{}-", sys_bin)) {
+                return true;
+            }
+        }
+
+        // 5. Windows Core System Processes
+        const WINDOWS_SYSTEM_BINARIES: &[&str] = &[
+            "system",
+            "idle",
+            "registry",
+            "smss",
+            "csrss",
+            "wininit",
+            "services",
+            "lsass",
+            "lsm",
+            "winlogon",
+            "svchost",
+            "fontdrvhost",
+            "dwm",
+            "sihost",
+            "taskhostw",
+            "explorer",
+            "spoolsv",
+            "audiodg",
+            "conhost",
+            "werfault",
+            "runtimebroker",
+            "searchindexer",
+            "searchhost",
+            "startmenuexperiencehost",
+            "shellexperiencehost",
+            "securityhealthservice",
+            "securityhealthsystray",
+            "mpcmdrun",
+            "msmpeng",
+            "dllhost",
+            "ctfmon",
+            "smartscreen",
+        ];
+
+        for win_bin in WINDOWS_SYSTEM_BINARIES {
+            if clean_base == *win_bin {
+                return true;
+            }
+        }
+
+        // 6. macOS Core System Daemons
+        const MACOS_SYSTEM_BINARIES: &[&str] = &[
+            "launchd",
+            "kernel_task",
+            "kextd",
+            "syspolicyd",
+            "opendirectoryd",
+            "securityd",
+            "trustd",
+            "logd",
+            "diskarbitrationd",
+            "coreauthd",
+            "powerd",
+            "thermalmonitord",
+            "windowserver",
+            "loginwindow",
+            "dock",
+            "finder",
+            "systemuiserver",
+            "controlcenter",
+            "notificationcenter",
+            "tccd",
+            "mds",
+            "mds_stores",
+            "distnoted",
+            "cfprefsd",
+        ];
+
+        for mac_bin in MACOS_SYSTEM_BINARIES {
+            if clean_base == *mac_bin {
+                return true;
+            }
+        }
+
+        // 7. System Directory Roots
+        if path_lower.starts_with("/sbin/")
+            || path_lower.starts_with("/usr/sbin/")
+            || path_lower.starts_with("/usr/lib/systemd/")
+            || path_lower.starts_with("/lib/systemd/")
+            || path_lower.starts_with("/usr/libexec/")
+        {
+            return true;
+        }
+
+        if path_lower.contains("\\windows\\system32\\")
+            || path_lower.contains("\\windows\\syswow64\\")
+            || path_lower.contains("\\windows\\systemapps\\")
+            || path_lower.contains("\\windows\\servicing\\")
+        {
+            return true;
+        }
+
+        if path_lower.starts_with("/system/library/")
+            || path_lower.starts_with("/system/library/coreservices/")
+            || path_lower.starts_with("/system/library/frameworks/")
+        {
+            return true;
+        }
+
+        if path_lower.starts_with("/system/bin/")
+            || path_lower.starts_with("/system/apex/")
+            || path_lower.starts_with("/vendor/bin/")
+            || path_lower.starts_with("/apex/")
+        {
+            return true;
+        }
+
+        false
     }
 
     /// Inspects running host processes cross-platform (Linux, Windows, macOS, Android).
@@ -107,7 +326,10 @@ impl ProcessMonitor {
                 }
             }
 
-            // Cross-platform threat heuristics
+            // Determine if this is a protected system process
+            let is_system = Self::is_system_process(pid_u32, &name, &path);
+
+            // Cross-platform threat heuristics (only applied to non-system processes)
             let lower_path = path.to_lowercase();
             let lower_cmd = cmdline.to_lowercase();
 
@@ -135,7 +357,10 @@ impl ProcessMonitor {
             let mut is_suspicious = false;
             let mut detail = String::new();
 
-            if has_rev_shell {
+            if is_system {
+                is_suspicious = false;
+                detail = "Essential operating system component. Termination prohibited.".to_string();
+            } else if has_rev_shell {
                 is_suspicious = true;
                 detail = "Interactive reverse shell invocation pattern detected in process arguments.".to_string();
             } else if is_in_tmp {
@@ -154,6 +379,7 @@ impl ProcessMonitor {
                 name,
                 path,
                 is_suspicious,
+                is_system,
                 threat_detail: detail,
             });
         }
@@ -175,7 +401,8 @@ impl ProcessMonitor {
                 name: "systemd".to_string(),
                 path: "/usr/lib/systemd/systemd".to_string(),
                 is_suspicious: false,
-                threat_detail: String::new(),
+                is_system: true,
+                threat_detail: "Essential operating system component. Termination prohibited.".to_string(),
             });
         }
 
@@ -183,11 +410,46 @@ impl ProcessMonitor {
     }
 
     /// Terminates a process by PID across Linux, Windows, macOS, Android.
+    /// Strictly protects operating system processes and system-related daemons from being killed.
     pub fn terminate_process(&self, pid: u32) -> Result<bool, String> {
         let mut sys = System::new();
         let sys_pid = Pid::from_u32(pid);
         sys.refresh_processes(sysinfo::ProcessesToUpdate::Some(&[sys_pid]), true);
 
+        // 1. Resolve process details to assert safety against system processes
+        let (name, path) = if let Some(proc) = sys.process(sys_pid) {
+            (
+                proc.name().to_string_lossy().to_string(),
+                proc.exe().map(|p| p.to_string_lossy().to_string()).unwrap_or_default(),
+            )
+        } else {
+            #[cfg(target_os = "linux")]
+            {
+                let comm = std::fs::read_to_string(format!("/proc/{}/comm", pid))
+                    .unwrap_or_default()
+                    .trim()
+                    .to_string();
+                let exe = std::fs::read_link(format!("/proc/{}/exe", pid))
+                    .map(|p| p.to_string_lossy().to_string())
+                    .unwrap_or_default();
+                (comm, exe)
+            }
+            #[cfg(not(target_os = "linux"))]
+            {
+                (String::new(), String::new())
+            }
+        };
+
+        // 2. Strict system process safety invariant: Refuse to terminate system processes
+        if Self::is_system_process(pid, &name, &path) {
+            return Err(format!(
+                "Protected Process: PID {} ('{}') is a vital operating system service and cannot be terminated.",
+                pid,
+                if name.is_empty() { "system" } else { &name }
+            ));
+        }
+
+        // 3. Terminate non-system threat or authorized process
         if let Some(process) = sys.process(sys_pid) {
             if process.kill() {
                 return Ok(true);
@@ -234,11 +496,43 @@ mod tests {
         let list = monitor.scan_processes();
         assert!(!list.is_empty());
         for p in &list[..5.min(list.len())] {
-            println!("PID {}: name='{}', path='{}', susp={}", p.pid, p.name, p.path, p.is_suspicious);
+            println!("PID {}: name='{}', path='{}', is_sys={}, susp={}", p.pid, p.name, p.path, p.is_system, p.is_suspicious);
         }
         for p in list {
             assert!(!p.name.trim().is_empty(), "PID {} has empty name!", p.pid);
             assert!(!p.path.trim().is_empty(), "PID {} has empty path!", p.pid);
         }
     }
+
+    #[test]
+    fn test_system_process_termination_strictly_blocked() {
+        let monitor = ProcessMonitor::new();
+
+        // 1. PID 1 (systemd / init) must be blocked
+        let res_pid1 = monitor.terminate_process(1);
+        assert!(res_pid1.is_err(), "Terminating PID 1 must be blocked!");
+        assert!(res_pid1.unwrap_err().contains("Protected Process"));
+
+        // 2. PID 2 (kthreadd) must be blocked
+        let res_pid2 = monitor.terminate_process(2);
+        assert!(res_pid2.is_err(), "Terminating PID 2 must be blocked!");
+
+        // 3. Current process (self) must be blocked
+        let self_pid = std::process::id();
+        let res_self = monitor.terminate_process(self_pid);
+        assert!(res_self.is_err(), "Terminating self PID must be blocked!");
+
+        // 4. Test is_system_process classification across platforms
+        assert!(ProcessMonitor::is_system_process(1, "systemd", "/sbin/init"));
+        assert!(ProcessMonitor::is_system_process(42, "dbus-daemon", "/usr/bin/dbus-daemon"));
+        assert!(ProcessMonitor::is_system_process(99, "[kworker/0:1]", ""));
+        assert!(ProcessMonitor::is_system_process(100, "svchost.exe", "C:\\Windows\\System32\\svchost.exe"));
+        assert!(ProcessMonitor::is_system_process(101, "launchd", "/sbin/launchd"));
+        assert!(ProcessMonitor::is_system_process(102, "service", "/system/bin/servicemanager"));
+
+        // Normal user processes should not be classified as system
+        assert!(!ProcessMonitor::is_system_process(12345, "my_rogue_app", "/tmp/my_rogue_app"));
+        assert!(!ProcessMonitor::is_system_process(54321, "calculator", "/home/user/apps/calc"));
+    }
 }
+

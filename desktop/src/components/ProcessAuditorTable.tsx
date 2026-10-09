@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { RotateCcw, Eye, ShieldAlert, ShieldCheck, X, Copy, Check, AlertTriangle } from "lucide-react";
+import { RotateCcw, Eye, ShieldAlert, ShieldCheck, X, Copy, Check, AlertTriangle, Lock } from "lucide-react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { MOTION_EASING, MOTION_DURATION } from "../styles/motion";
 
@@ -8,6 +8,7 @@ export interface ProcessAuditItem {
   name: string;
   path: string;
   is_suspicious: boolean;
+  is_system?: boolean;
   threat_detail: string;
 }
 
@@ -27,6 +28,7 @@ export const ProcessAuditorTable: React.FC<ProcessAuditorTableProps> = ({
   const [inspectingProc, setInspectingProc] = useState<ProcessAuditItem | null>(null);
   const [copied, setCopied] = useState(false);
   const suspiciousCount = processes.filter((p) => p.is_suspicious).length;
+  const systemCount = processes.filter((p) => p.is_system).length;
 
   const displayedProcesses = processes.filter((p) => {
     if (filter === "SUSPICIOUS") return p.is_suspicious;
@@ -71,9 +73,15 @@ export const ProcessAuditorTable: React.FC<ProcessAuditorTableProps> = ({
                 All Clear
               </span>
             )}
+            {systemCount > 0 && (
+              <span className="inline-flex items-center gap-1 text-[11px] text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/50 px-2 py-0.5 rounded font-mono">
+                <Lock className="w-3 h-3 text-cyan-500" />
+                {systemCount} OS Protected
+              </span>
+            )}
           </div>
           <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
-            Real-time cross-platform inspection of running processes across Linux, Windows, macOS, and Android.
+            Real-time cross-platform inspection of running processes. System-critical services are protected from termination.
           </p>
         </div>
 
@@ -121,7 +129,7 @@ export const ProcessAuditorTable: React.FC<ProcessAuditorTableProps> = ({
               <th className="py-2.5 px-4">PID</th>
               <th className="py-2.5 px-4">Process Name</th>
               <th className="py-2.5 px-4">Executable Path</th>
-              <th className="py-2.5 px-4">Status</th>
+              <th className="py-2.5 px-4">Classification</th>
               <th className="py-2.5 px-4 text-right">Actions</th>
             </tr>
           </thead>
@@ -156,6 +164,11 @@ export const ProcessAuditorTable: React.FC<ProcessAuditorTableProps> = ({
                           <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
                           Suspicious
                         </span>
+                      ) : proc.is_system ? (
+                        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium bg-cyan-50 text-cyan-700 border border-cyan-200 dark:bg-cyan-500/10 dark:text-cyan-400 dark:border-cyan-500/20">
+                          <ShieldCheck className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
+                          System Core
+                        </span>
                       ) : (
                         <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
@@ -173,13 +186,21 @@ export const ProcessAuditorTable: React.FC<ProcessAuditorTableProps> = ({
                           <Eye className="w-3 h-3 inline mr-1" />
                           Inspect
                         </button>
-                        {proc.is_suspicious ? (
+                        {proc.is_system ? (
+                          <span
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-zinc-100 dark:bg-zinc-800/80 text-zinc-400 dark:text-zinc-500 text-[11px] font-medium border border-zinc-200/60 dark:border-zinc-700/60 select-none cursor-not-allowed"
+                            title="Protected: Core operating system process cannot be terminated"
+                          >
+                            <Lock className="w-3 h-3 text-zinc-400 dark:text-zinc-500" />
+                            Protected
+                          </span>
+                        ) : proc.is_suspicious ? (
                           <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => onTerminateProcess && onTerminateProcess(proc.pid)}
                             className="px-2.5 py-1 rounded bg-rose-600 hover:bg-rose-700 text-white dark:bg-rose-500 dark:hover:bg-rose-600 text-[11px] font-medium transition-colors shadow-sm"
-                            title="Quarantine and kill suspicious process"
+                            title="Quarantine and terminate suspicious process"
                           >
                             Quarantine
                           </motion.button>
@@ -189,7 +210,7 @@ export const ProcessAuditorTable: React.FC<ProcessAuditorTableProps> = ({
                             whileTap={{ scale: 0.95 }}
                             onClick={() => onTerminateProcess && onTerminateProcess(proc.pid)}
                             className="px-2 py-1 rounded border border-zinc-200 dark:border-zinc-800 hover:border-rose-300 dark:hover:border-rose-500/30 text-zinc-500 hover:text-rose-600 dark:text-zinc-400 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 text-[11px] font-medium transition-colors"
-                            title="Terminate process"
+                            title="Terminate user process"
                           >
                             Kill
                           </motion.button>
@@ -221,6 +242,8 @@ export const ProcessAuditorTable: React.FC<ProcessAuditorTableProps> = ({
                     className={`p-2 rounded-lg ${
                       inspectingProc.is_suspicious
                         ? "bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400"
+                        : inspectingProc.is_system
+                        ? "bg-cyan-50 text-cyan-600 dark:bg-cyan-500/10 dark:text-cyan-400"
                         : "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400"
                     }`}
                   >
@@ -290,11 +313,21 @@ export const ProcessAuditorTable: React.FC<ProcessAuditorTableProps> = ({
                           {inspectingProc.threat_detail || "Process demonstrates anomalous background execution behavior or temporary path execution."}
                         </p>
                       </div>
+                    ) : inspectingProc.is_system ? (
+                      <div className="p-3 rounded bg-cyan-50 dark:bg-cyan-500/10 border border-cyan-200 dark:border-cyan-500/20 text-cyan-800 dark:text-cyan-300 space-y-1">
+                        <div className="flex items-center space-x-1.5 font-semibold">
+                          <ShieldCheck className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
+                          <span>Protected Operating System Component</span>
+                        </div>
+                        <p className="text-[11px] text-cyan-700 dark:text-cyan-400 leading-relaxed mt-0.5">
+                          This process is an essential operating system service (PID {inspectingProc.pid}). In order to preserve host operating system integrity and prevent kernel lockups or display server crashes, termination of system-related processes is strictly prohibited by security policy.
+                        </p>
+                      </div>
                     ) : (
                       <div className="p-3 rounded bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-emerald-800 dark:text-emerald-300">
                         <div className="flex items-center space-x-1.5 font-semibold">
                           <ShieldCheck className="w-3.5 h-3.5" />
-                          <span>Verified Operating System Process</span>
+                          <span>Verified User Application Process</span>
                         </div>
                         <p className="text-[11px] text-emerald-700 dark:text-emerald-400 mt-0.5">
                           Authentic binary signing and trusted binary directory. Zero reverse-shell patterns.
@@ -312,21 +345,32 @@ export const ProcessAuditorTable: React.FC<ProcessAuditorTableProps> = ({
                 >
                   Dismiss
                 </button>
-                <button
-                  onClick={() => {
-                    if (onTerminateProcess) {
-                      onTerminateProcess(inspectingProc.pid);
-                    }
-                    setInspectingProc(null);
-                  }}
-                  className={`px-3.5 py-1.5 rounded text-xs font-medium text-white transition-colors ${
-                    inspectingProc.is_suspicious
-                      ? "bg-rose-600 hover:bg-rose-700"
-                      : "bg-zinc-800 hover:bg-rose-600 dark:bg-zinc-700 dark:hover:bg-rose-600"
-                  }`}
-                >
-                  {inspectingProc.is_suspicious ? "Quarantine & Terminate" : "Kill Process"}
-                </button>
+                {inspectingProc.is_system ? (
+                  <button
+                    disabled
+                    className="px-3.5 py-1.5 rounded text-xs font-medium text-zinc-400 dark:text-zinc-500 bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 cursor-not-allowed flex items-center gap-1.5 select-none"
+                    title="Operating system processes cannot be terminated"
+                  >
+                    <Lock className="w-3.5 h-3.5" />
+                    Termination Prohibited
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => {
+                      if (onTerminateProcess) {
+                        onTerminateProcess(inspectingProc.pid);
+                      }
+                      setInspectingProc(null);
+                    }}
+                    className={`px-3.5 py-1.5 rounded text-xs font-medium text-white transition-colors ${
+                      inspectingProc.is_suspicious
+                        ? "bg-rose-600 hover:bg-rose-700"
+                        : "bg-zinc-800 hover:bg-rose-600 dark:bg-zinc-700 dark:hover:bg-rose-600"
+                    }`}
+                  >
+                    {inspectingProc.is_suspicious ? "Quarantine & Terminate" : "Kill Process"}
+                  </button>
+                )}
               </div>
             </motion.div>
           </div>
