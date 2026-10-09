@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dummy Sideloaded Test APK for Pocket Sparrow Airplane Mode Demo (Test Case C)
+     Simulates a Rogue Banking Trojan / SMS Stealer permission signature -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.dummy.bankingtrojan.test">
+
+    <!-- Flagged Combination 1: Banking Trojan / OTP Stealer -->
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
+    <!-- Flagged Combination 2: Sideloaded Dropper -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
+    <application
+        android:label="Dummy Trojan Test Fixture"
+        android:allowBackup="false">
+        <activity android:name=".MainActivity" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>

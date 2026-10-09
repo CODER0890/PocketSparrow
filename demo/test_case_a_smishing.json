@@ -1,0 +1,43 @@
+{
+  "test_case_name": "Test Case A: Smishing and Phishing URL Evaluation",
+  "sla_target_ms": 30.0,
+  "requires_airplane_mode": true,
+  "vectors": [
+    {
+      "id": "A1_URGENT_WIRE_SMISHING",
+      "type": "SMS_TEXT",
+      "input": "BANK ALERT: Unusual wire transfer of $2,450.00 initiated to unknown recipient. Cancel transaction now: http://fake-chase.top",
+      "expected_verdict": "MALICIOUS",
+      "expected_category": "URGENT_WIRE_TRANSFER",
+      "expected_latency_max_ms": 5.0,
+      "xai_explanation": "Urgent Financial Wire Transfer Scam: Do not click or call numbers in this message. Banks never require urgent wire cancellations via SMS links."
+    },
+    {
+      "id": "A2_CYRILLIC_HOMOGLYPH_URL",
+      "type": "URL",
+      "input": "https://\u0440aypal.com/account/login",
+      "expected_verdict": "MALICIOUS",
+      "expected_category": "HOMOGRAPH",
+      "expected_latency_max_ms": 5.0,
+      "xai_explanation": "Lookalike Deceptive Domain Detected: Mixed-script Cyrillic confusable 'р' (U+0440) disguising as Latin 'p'."
+    },
+    {
+      "id": "A3_SUBDOMAIN_DECEPTION_URL",
+      "type": "URL",
+      "input": "https://chase.com.security-alert-center.xyz/auth/login",
+      "expected_verdict": "MALICIOUS",
+      "expected_category": "SUBDOMAIN_DECEPTION",
+      "expected_latency_max_ms": 5.0,
+      "xai_explanation": "Brand Impersonation in Subdomain: Fake brand name nested in prefix of untrusted domain security-alert-center.xyz."
+    },
+    {
+      "id": "A4_BENIGN_CONTROL_URL",
+      "type": "URL",
+      "input": "https://en.wikipedia.org/wiki/Computer_security",
+      "expected_verdict": "SAFE",
+      "expected_category": "SAFE",
+      "expected_latency_max_ms": 5.0,
+      "xai_explanation": "Verified Safe Content: Standard domain structure with authentic DNS characteristics and normal entropy."
+    }
+  ]
+}

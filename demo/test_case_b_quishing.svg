@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="300" height="300">
+  <!-- Pocket Sparrow Test Case B: Quishing Simulation QR Code -->
+  <!-- Payload: MEBKM:TITLE:Claim Reward;URL:https://chase-login.top/account/suspend;; -->
+  <rect width="200" height="200" fill="#ffffff" />
+  
+  <!-- Finder Pattern Top-Left -->
+  <rect x="20" y="20" width="50" height="50" fill="#000000" />
+  <rect x="27" y="27" width="36" height="36" fill="#ffffff" />
+  <rect x="34" y="34" width="22" height="22" fill="#000000" />
+
+  <!-- Finder Pattern Top-Right -->
+  <rect x="130" y="20" width="50" height="50" fill="#000000" />
+  <rect x="137" y="27" width="36" height="36" fill="#ffffff" />
+  <rect x="144" y="34" width="22" height="22" fill="#000000" />
+
+  <!-- Finder Pattern Bottom-Left -->
+  <rect x="20" y="130" width="50" height="50" fill="#000000" />
+  <rect x="27" y="137" width="36" height="36" fill="#ffffff" />
+  <rect x="34" y="144" width="22" height="22" fill="#000000" />
+
+  <!-- Data Matrix Elements -->
+  <rect x="80" y="25" width="10" height="10" fill="#000000" />
+  <rect x="100" y="25" width="10" height="10" fill="#000000" />
+  <rect x="85" y="45" width="10" height="10" fill="#000000" />
+  <rect x="105" y="45" width="10" height="10" fill="#000000" />
+
+  <rect x="25" y="80" width="10" height="10" fill="#000000" />
+  <rect x="45" y="80" width="10" height="10" fill="#000000" />
+  <rect x="65" y="80" width="10" height="10" fill="#000000" />
+  <rect x="85" y="80" width="10" height="10" fill="#000000" />
+  <rect x="105" y="80" width="10" height="10" fill="#000000" />
+  <rect x="125" y="80" width="10" height="10" fill="#000000" />
+  <rect x="145" y="80" width="10" height="10" fill="#000000" />
+  <rect x="165" y="80" width="10" height="10" fill="#000000" />
+
+  <rect x="30" y="100" width="10" height="10" fill="#000000" />
+  <rect x="60" y="100" width="10" height="10" fill="#000000" />
+  <rect x="90" y="100" width="10" height="10" fill="#000000" />
+  <rect x="120" y="100" width="10" height="10" fill="#000000" />
+  <rect x="150" y="100" width="10" height="10" fill="#000000" />
+
+  <rect x="85" y="130" width="10" height="10" fill="#000000" />
+  <rect x="105" y="130" width="10" height="10" fill="#000000" />
+  <rect x="135" y="130" width="10" height="10" fill="#000000" />
+  <rect x="165" y="130" width="10" height="10" fill="#000000" />
+
+  <rect x="90" y="150" width="10" height="10" fill="#000000" />
+  <rect x="110" y="150" width="10" height="10" fill="#000000" />
+  <rect x="140" y="150" width="10" height="10" fill="#000000" />
+  <rect x="160" y="150" width="10" height="10" fill="#000000" />
+
+  <text x="100" y="195" font-family="monospace" font-size="8" text-anchor="middle" fill="#555555">TEST CASE B: QUISHING FIXTURE</text>
+</svg>
