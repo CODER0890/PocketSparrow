@@ -1,24 +1,37 @@
 package com.pocketsparrow.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.*
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pocketsparrow.core.NativeBridge
-import com.pocketsparrow.core.ScanResult
 import com.pocketsparrow.data.ScanLogEntity
 import com.pocketsparrow.ui.theme.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun DashboardScreen(
@@ -27,6 +40,97 @@ fun DashboardScreen(
 ) {
     var inputPayload by remember { mutableStateOf("https://g00gle-security-check.cfd/auth/verify?id=9281") }
     var selectedType by remember { mutableIntStateOf(NativeBridge.CONTENT_TYPE_URL) }
+    var isInputFocused by remember { mutableStateOf(false) }
+    var isScanning by remember { mutableStateOf(false) }
+
+    val coroutineScope = rememberCoroutineScope()
+    val reducedMotion = isReducedMotion()
+
+    // Threat counter pop animation state
+    val blockedCount = recentLogs.count { it.threatLevel == 2 }
+    val counterScale = remember { Animatable(1f) }
+    val counterColor = remember { Animatable(CyberRose) }
+
+    LaunchedEffect(blockedCount) {
+        if (blockedCount > 0 && !reducedMotion) {
+            coroutineScope.launch {
+                counterScale.animateTo(
+                    targetValue = 1.12f,
+                    animationSpec = MotionTokens.microTween()
+                )
+                counterScale.animateTo(
+                    targetValue = 1.0f,
+                    animationSpec = MotionTokens.threatSpring()
+                )
+            }
+            coroutineScope.launch {
+                counterColor.animateTo(
+                    targetValue = Color(0xFFFF4D4D),
+                    animationSpec = MotionTokens.microTween()
+                )
+                counterColor.animateTo(
+                    targetValue = CyberRose,
+                    animationSpec = MotionTokens.macroTween(delayMillis = 150)
+                )
+            }
+        }
+    }
+
+    // Metric cards staggered entrance
+    val cardEntrance1 = remember { Animatable(0f) }
+    val cardEntrance2 = remember { Animatable(0f) }
+    val cardEntrance3 = remember { Animatable(0f) }
+
+    LaunchedEffect(Unit) {
+        coroutineScope.launch {
+            cardEntrance1.animateTo(1f, MotionTokens.macroTween())
+        }
+        coroutineScope.launch {
+            cardEntrance2.animateTo(1f, MotionTokens.macroTween(delayMillis = MotionTokens.Duration.Stagger))
+        }
+        coroutineScope.launch {
+            cardEntrance3.animateTo(1f, MotionTokens.macroTween(delayMillis = MotionTokens.Duration.Stagger * 2))
+        }
+    }
+
+    // Infinite radar sweep animation for active inspection
+    val infiniteTransition = rememberInfiniteTransition(label = "pulseAndRadar")
+    val sweepProgress by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 800, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "sweepProgress"
+    )
+
+    // Subtle alert badge pulse (opacity 0.8 -> 1.0)
+    val badgePulseAlpha by infiniteTransition.animateFloat(
+        initialValue = 0.8f,
+        targetValue = 1.0f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1200, easing = MotionTokens.StandardEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "badgePulseAlpha"
+    )
+
+    // Input border glow animation
+    val inputBorderColor by animateColorAsState(
+        targetValue = if (isInputFocused) CyberCyan.copy(alpha = 0.8f) else Color(0xFF1E293B),
+        animationSpec = MotionTokens.microTween(),
+        label = "inputBorderColor"
+    )
+
+    // Evaluate button press scale micro-interaction
+    val buttonInteractionSource = remember { MutableInteractionSource() }
+    val isButtonPressed by buttonInteractionSource.collectIsPressedAsState()
+    val buttonScale by animateFloatAsState(
+        targetValue = if (isButtonPressed && !reducedMotion) 0.98f else 1.0f,
+        animationSpec = MotionTokens.microTween(),
+        label = "buttonScale"
+    )
 
     LazyColumn(
         modifier = Modifier
@@ -71,32 +175,62 @@ fun DashboardScreen(
             }
         }
 
-        // Metrics HUD Cards
+        // Metrics HUD Cards with Staggered Entrance and Live Counter Pop
         item {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                // Card 1: Threats Blocked (with Pop counter)
+                HudMetricCard(
+                    title = "THREATS BLOCKED",
+                    value = blockedCount.toString(),
+                    sub = "100% On-Device Zero WAN",
+                    accent = counterColor.value,
+                    modifier = Modifier
+                        .weight(1f)
+                        .graphicsLayer {
+                            alpha = cardEntrance1.value
+                            translationY = if (reducedMotion) 0f else (1f - cardEntrance1.value) * 12f
+                        },
+                    valueScale = if (reducedMotion) 1f else counterScale.value
+                )
+
+                // Card 2: Latency SLA
                 HudMetricCard(
                     title = "LATENCY SLA",
                     value = "< 50 ms",
-                    sub = "Tier 1: <5ms | Tier 2: <40ms",
+                    sub = "T1: <5ms | T2: <40ms",
                     accent = CyberCyan,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier
+                        .weight(1f)
+                        .graphicsLayer {
+                            alpha = cardEntrance2.value
+                            translationY = if (reducedMotion) 0f else (1f - cardEntrance2.value) * 12f
+                        }
                 )
+
+                // Card 3: Peak RAM
                 HudMetricCard(
                     title = "PEAK RAM",
                     value = "42.5 MB",
                     sub = "Budget: < 250 MB",
                     accent = CyberEmerald,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier
+                        .weight(1f)
+                        .graphicsLayer {
+                            alpha = cardEntrance3.value
+                            translationY = if (reducedMotion) 0f else (1f - cardEntrance3.value) * 12f
+                        }
                 )
             }
         }
 
-        // Live Threat Inspector
+        // Live Threat Inspector Card
         item {
             Card(
                 shape = RoundedCornerShape(12.dp),
                 colors = CardDefaults.cardColors(containerColor = Color(0xFF0F172A)),
-                modifier = Modifier.fillMaxWidth().border(1.dp, Color(0xFF1E293B), RoundedCornerShape(12.dp))
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(1.dp, Color(0xFF1E293B), RoundedCornerShape(12.dp))
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
@@ -135,28 +269,78 @@ fun DashboardScreen(
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    OutlinedTextField(
-                        value = inputPayload,
-                        onValueChange = { inputPayload = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        textStyle = LocalTextStyle.current.copy(fontFamily = FontFamily.Monospace, fontSize = 12.sp),
-                        maxLines = 3
-                    )
+                    // Input with animated focus border glow
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .border(1.5.dp, inputBorderColor, RoundedCornerShape(8.dp))
+                    ) {
+                        OutlinedTextField(
+                            value = inputPayload,
+                            onValueChange = { inputPayload = it },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .onFocusChanged { isInputFocused = it.isFocused },
+                            textStyle = LocalTextStyle.current.copy(fontFamily = FontFamily.Monospace, fontSize = 12.sp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = Color.Transparent,
+                                unfocusedBorderColor = Color.Transparent
+                            ),
+                            maxLines = 3
+                        )
+                    }
+
+                    // Active Scanning Radar Sweep Line
+                    if (isScanning && !reducedMotion) {
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(2.dp)
+                                .background(
+                                    Brush.horizontalGradient(
+                                        colors = listOf(
+                                            Color.Transparent,
+                                            CyberCyan,
+                                            Color.Transparent
+                                        ),
+                                        startX = sweepProgress * 600f - 200f,
+                                        endX = sweepProgress * 600f + 200f
+                                    )
+                                )
+                        )
+                    }
 
                     Spacer(modifier = Modifier.height(12.dp))
 
+                    // Action Button with micro-interaction scale press
                     Button(
-                        onClick = { onTriggerScan(selectedType, inputPayload) },
-                        modifier = Modifier.align(Alignment.End),
+                        onClick = {
+                            coroutineScope.launch {
+                                isScanning = true
+                                onTriggerScan(selectedType, inputPayload)
+                                delay(350)
+                                isScanning = false
+                            }
+                        },
+                        interactionSource = buttonInteractionSource,
+                        modifier = Modifier
+                            .align(Alignment.End)
+                            .scale(buttonScale),
                         colors = ButtonDefaults.buttonColors(containerColor = CyberCyan)
                     ) {
-                        Text("Evaluate Threat (<50ms)", color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                        Text(
+                            text = if (isScanning) "Scanning Pipeline..." else "Evaluate Threat (<50ms)",
+                            color = Color.Black,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 12.sp
+                        )
                     }
                 }
             }
         }
 
-        // Recent Audit Logs
+        // Recent Audit Logs Header
         item {
             Text(
                 text = "Local Encrypted Logs (Room + SQLCipher)",
@@ -175,32 +359,65 @@ fun DashboardScreen(
                 )
             }
         } else {
-            items(recentLogs) { log ->
-                LogItemRow(log)
+            itemsIndexed(recentLogs, key = { _, log -> log.id }) { index, log ->
+                AnimatedVisibility(
+                    visible = true,
+                    enter = fadeIn(MotionTokens.macroTween()) +
+                            if (!reducedMotion) slideInVertically(
+                                animationSpec = MotionTokens.macroTween(),
+                                initialOffsetY = { 24 }
+                            ) else androidx.compose.animation.EnterTransition.None
+                ) {
+                    LogItemRow(log = log, pulseAlpha = if (reducedMotion) 1f else badgePulseAlpha)
+                }
             }
         }
     }
 }
 
 @Composable
-fun HudMetricCard(title: String, value: String, sub: String, accent: Color, modifier: Modifier = Modifier) {
+fun HudMetricCard(
+    title: String,
+    value: String,
+    sub: String,
+    accent: Color,
+    modifier: Modifier = Modifier,
+    valueScale: Float = 1.0f
+) {
     Card(
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFF0F172A)),
         modifier = modifier.border(1.dp, Color(0xFF1E293B), RoundedCornerShape(12.dp))
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
-            Text(text = title, color = Color(0xFF94A3B8), fontSize = 10.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
+            Text(
+                text = title,
+                color = Color(0xFF94A3B8),
+                fontSize = 9.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily.Monospace,
+                maxLines = 1
+            )
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = value, color = accent, fontSize = 18.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
+            Text(
+                text = value,
+                color = accent,
+                fontSize = 17.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily.Monospace,
+                modifier = Modifier.scale(valueScale)
+            )
             Spacer(modifier = Modifier.height(2.dp))
-            Text(text = sub, color = Color(0xFF64748B), fontSize = 9.sp)
+            Text(text = sub, color = Color(0xFF64748B), fontSize = 9.sp, maxLines = 1)
         }
     }
 }
 
 @Composable
-fun LogItemRow(log: ScanLogEntity) {
+fun LogItemRow(
+    log: ScanLogEntity,
+    pulseAlpha: Float = 1.0f
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -220,7 +437,8 @@ fun LogItemRow(log: ScanLogEntity) {
             color = if (isMal) CyberRose else CyberEmerald,
             fontSize = 11.sp,
             fontWeight = FontWeight.Bold,
-            fontFamily = FontFamily.Monospace
+            fontFamily = FontFamily.Monospace,
+            modifier = Modifier.alpha(if (isMal) pulseAlpha else 1.0f)
         )
     }
 }

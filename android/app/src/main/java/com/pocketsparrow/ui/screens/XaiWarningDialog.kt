@@ -1,13 +1,20 @@
 package com.pocketsparrow.ui.screens
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -25,13 +32,40 @@ fun XaiWarningDialog(
     val isMalicious = result.threatLevel == 2
     val headerColor = if (isMalicious) CyberRose else CyberAmber
     val confPct = (result.confidence * 100).toInt()
+    val reducedMotion = isReducedMotion()
+
+    // Threat attention shake on entrance for malicious threats
+    val shakeOffset = remember { Animatable(0f) }
+    LaunchedEffect(result) {
+        if (isMalicious && !reducedMotion) {
+            shakeOffset.animateTo(-6f, tween(50, easing = MotionTokens.StandardEasing))
+            shakeOffset.animateTo(6f, tween(60, easing = MotionTokens.StandardEasing))
+            shakeOffset.animateTo(-4f, tween(60, easing = MotionTokens.StandardEasing))
+            shakeOffset.animateTo(4f, tween(60, easing = MotionTokens.StandardEasing))
+            shakeOffset.animateTo(0f, MotionTokens.threatSpring())
+        }
+    }
+
+    // Button micro-interaction
+    val buttonInteraction = remember { MutableInteractionSource() }
+    val isButtonPressed by buttonInteraction.collectIsPressedAsState()
+    val buttonScale by animateFloatAsState(
+        targetValue = if (isButtonPressed && !reducedMotion) 0.98f else 1.0f,
+        animationSpec = MotionTokens.microTween(),
+        label = "btnScale"
+    )
 
     Dialog(onDismissRequest = onDismiss) {
         Surface(
             shape = RoundedCornerShape(16.dp),
             color = Color(0xFF0F172A),
             tonalElevation = 8.dp,
-            modifier = Modifier.fillMaxWidth().padding(16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+                .graphicsLayer {
+                    translationX = shakeOffset.value
+                }
         ) {
             Column(
                 modifier = Modifier.padding(20.dp),
@@ -120,6 +154,8 @@ fun XaiWarningDialog(
 
                     Button(
                         onClick = onDismiss,
+                        interactionSource = buttonInteraction,
+                        modifier = Modifier.scale(buttonScale),
                         colors = ButtonDefaults.buttonColors(containerColor = headerColor),
                         shape = RoundedCornerShape(8.dp)
                     ) {

@@ -21,8 +21,11 @@ import com.pocketsparrow.ui.screens.ApkAuditScreen
 import com.pocketsparrow.ui.screens.DashboardScreen
 import com.pocketsparrow.ui.screens.QrScannerScreen
 import com.pocketsparrow.ui.screens.XaiWarningDialog
-import com.pocketsparrow.ui.theme.CyberCyan
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
+import com.pocketsparrow.ui.theme.MotionTokens
 import com.pocketsparrow.ui.theme.PocketSparrowTheme
+import com.pocketsparrow.ui.theme.isReducedMotion
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -105,19 +108,37 @@ class MainActivity : ComponentActivity() {
                     }
                 ) { innerPadding ->
                     Box(modifier = Modifier.padding(innerPadding)) {
-                        when (selectedTab) {
-                            0 -> DashboardScreen(
-                                recentLogs = recentLogs,
-                                onTriggerScan = performScan
-                            )
-                            1 -> QrScannerScreen(
-                                onTriggerQrScan = { payload ->
-                                    performScan(NativeBridge.CONTENT_TYPE_QR_PAYLOAD, payload)
+                        val reducedMotion = isReducedMotion()
+                        AnimatedContent(
+                            targetState = selectedTab,
+                            transitionSpec = {
+                                if (reducedMotion) {
+                                    fadeIn(animationSpec = MotionTokens.microTween()) togetherWith
+                                            fadeOut(animationSpec = MotionTokens.microTween())
+                                } else {
+                                    (fadeIn(animationSpec = MotionTokens.macroTween()) +
+                                            slideInVertically(
+                                                initialOffsetY = { 20 },
+                                                animationSpec = MotionTokens.macroTween()
+                                            )) togetherWith fadeOut(animationSpec = MotionTokens.microTween())
                                 }
-                            )
-                            2 -> ApkAuditScreen(
-                                onTriggerAudit = performAudit
-                            )
+                            },
+                            label = "tabPageTransition"
+                        ) { targetTab ->
+                            when (targetTab) {
+                                0 -> DashboardScreen(
+                                    recentLogs = recentLogs,
+                                    onTriggerScan = performScan
+                                )
+                                1 -> QrScannerScreen(
+                                    onTriggerQrScan = { payload ->
+                                        performScan(NativeBridge.CONTENT_TYPE_QR_PAYLOAD, payload)
+                                    }
+                                )
+                                2 -> ApkAuditScreen(
+                                    onTriggerAudit = performAudit
+                                )
+                            }
                         }
 
                         // Display Explainable AI Warning Card

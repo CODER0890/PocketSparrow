@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { RotateCcw } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
+import { MOTION_EASING, MOTION_DURATION } from "../styles/motion";
 
 export interface ProcessAuditItem {
   pid: number;
@@ -18,6 +20,7 @@ export const ProcessAuditorTable: React.FC<ProcessAuditorTableProps> = ({
   processes,
   onRefresh,
 }) => {
+  const shouldReduceMotion = !!useReducedMotion();
   const [filter, setFilter] = useState<"ALL" | "SUSPICIOUS">("ALL");
   const suspiciousCount = processes.filter((p) => p.is_suspicious).length;
 
@@ -36,10 +39,22 @@ export const ProcessAuditorTable: React.FC<ProcessAuditorTableProps> = ({
               Active Process Audit
             </h3>
             {suspiciousCount > 0 ? (
-              <span className="inline-flex items-center gap-1.5 text-xs text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 px-2 py-0.5 rounded font-medium">
+              <motion.span
+                animate={
+                  shouldReduceMotion
+                    ? undefined
+                    : { opacity: [0.8, 1, 0.8] }
+                }
+                transition={{
+                  duration: 2.2,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                className="inline-flex items-center gap-1.5 text-xs text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 px-2 py-0.5 rounded font-medium"
+              >
                 <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
                 {suspiciousCount} Alert
-              </span>
+              </motion.span>
             ) : (
               <span className="inline-flex items-center gap-1.5 text-xs text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 px-2 py-0.5 rounded font-medium">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
@@ -76,13 +91,15 @@ export const ProcessAuditorTable: React.FC<ProcessAuditorTableProps> = ({
             </button>
           </div>
 
-          <button
+          <motion.button
+            whileTap={{ rotate: 180 }}
+            transition={{ duration: MOTION_DURATION.macro, ease: MOTION_EASING }}
             onClick={onRefresh}
             className="p-1.5 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 transition-colors"
             title="Rescan processes"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-          </button>
+          </motion.button>
         </div>
       </div>
 
@@ -100,7 +117,10 @@ export const ProcessAuditorTable: React.FC<ProcessAuditorTableProps> = ({
           </thead>
           <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/60 bg-white dark:bg-zinc-900/20">
             {displayedProcesses.map((proc) => (
-              <tr key={proc.pid} className="hover:bg-zinc-50/80 dark:hover:bg-zinc-800/30 transition-colors">
+              <tr
+                key={proc.pid}
+                className="hover:bg-zinc-50/80 dark:hover:bg-zinc-800/30 transition-colors group"
+              >
                 <td className="py-3 px-4 font-mono text-zinc-500 dark:text-zinc-400">{proc.pid}</td>
                 <td className="py-3 px-4 font-medium text-zinc-900 dark:text-zinc-200">{proc.name}</td>
                 <td className="py-3 px-4 font-mono text-zinc-500 dark:text-zinc-400 max-w-xs truncate" title={proc.path}>
@@ -121,12 +141,14 @@ export const ProcessAuditorTable: React.FC<ProcessAuditorTableProps> = ({
                 </td>
                 <td className="py-3 px-4 text-right">
                   {proc.is_suspicious ? (
-                    <button
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                       onClick={() => alert(`Quarantining PID ${proc.pid}`)}
-                      className="px-2.5 py-1 rounded bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 dark:bg-rose-500/10 dark:hover:bg-rose-500/20 dark:border-rose-500/30 dark:text-rose-400 text-xs font-medium transition-colors"
+                      className="px-2.5 py-1 rounded bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 dark:bg-rose-500/10 dark:hover:bg-rose-500/20 dark:border-rose-500/30 dark:text-rose-400 text-xs font-medium transition-colors shadow-sm"
                     >
                       Terminate
-                    </button>
+                    </motion.button>
                   ) : (
                     <span className="text-zinc-400 dark:text-zinc-600 text-xs font-mono">—</span>
                   )}

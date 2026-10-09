@@ -1,5 +1,7 @@
 import React from "react";
 import { Link2, MessageSquare, QrCode, Clipboard } from "lucide-react";
+import { motion } from "framer-motion";
+import { MOTION_EASING, MOTION_DURATION } from "../styles/motion";
 
 interface QuickActionsGridProps {
   onSelectAction: (actionType: "Url" | "SmsText" | "QrPayload", autoPaste?: boolean) => void;
@@ -56,14 +58,22 @@ export const QuickActionsGrid: React.FC<QuickActionsGridProps> = ({ onSelectActi
         {actions.map((act) => {
           const Icon = act.icon;
           return (
-            <button
+            <motion.button
               key={act.id}
+              whileHover="hover"
+              whileTap={{ scale: 0.98 }}
               onClick={() => onSelectAction(act.type, act.autoPaste)}
               className="flex items-start space-x-3 p-3 rounded-md border border-zinc-200 dark:border-zinc-800 bg-zinc-50/60 dark:bg-zinc-950/60 hover:bg-zinc-100 dark:hover:bg-zinc-800/60 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all text-left group"
             >
-              <div className="p-2 rounded bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors">
+              <motion.div
+                variants={{
+                  hover: { x: 3 },
+                }}
+                transition={{ duration: MOTION_DURATION.micro, ease: MOTION_EASING }}
+                className="p-2 rounded bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors"
+              >
                 <Icon className="h-4 w-4" />
-              </div>
+              </motion.div>
               <div className="min-w-0">
                 <div className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                   {act.label}
@@ -72,7 +82,7 @@ export const QuickActionsGrid: React.FC<QuickActionsGridProps> = ({ onSelectActi
                   {act.description}
                 </div>
               </div>
-            </button>
+            </motion.button>
           );
         })}
       </div>

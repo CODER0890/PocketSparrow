@@ -8,7 +8,9 @@ import {
   Search,
   Loader2,
 } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
 import { ScanResultPayload } from "./XaiDrawer";
+import { MOTION_EASING, MOTION_DURATION } from "../styles/motion";
 
 interface ThreatInspectorProps {
   onScan: (type: "Url" | "SmsText" | "QrPayload", payload: string) => Promise<ScanResultPayload>;
@@ -21,6 +23,7 @@ export const ThreatInspector: React.FC<ThreatInspectorProps> = ({
   selectedType,
   initialPayload,
 }) => {
+  const shouldReduceMotion = !!useReducedMotion();
   const [contentType, setContentType] = useState<"Url" | "SmsText" | "QrPayload">(
     selectedType || "Url"
   );
@@ -30,7 +33,6 @@ export const ThreatInspector: React.FC<ThreatInspectorProps> = ({
   const [isScanning, setIsScanning] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  // Sync if parent updates selectedType or initialPayload
   React.useEffect(() => {
     if (selectedType) setContentType(selectedType);
   }, [selectedType]);
@@ -141,8 +143,22 @@ export const ThreatInspector: React.FC<ThreatInspectorProps> = ({
         </div>
       </div>
 
-      {/* Input Textarea (Clean, Standard UI) */}
-      <div className="relative">
+      {/* Input Container with Soft Glow Focus & Scanning Radar Sweep */}
+      <div className="relative group rounded-md overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500/20 focus-within:border-indigo-500/60 transition-all duration-200 border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950">
+        {/* Sleek Scanning Sweep Radar Line */}
+        {isScanning && !shouldReduceMotion && (
+          <motion.div
+            className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-indigo-500 to-transparent z-10"
+            initial={{ x: "-100%" }}
+            animate={{ x: "100%" }}
+            transition={{
+              duration: 0.6,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          />
+        )}
+
         <textarea
           rows={3}
           value={inputPayload}
@@ -153,8 +169,9 @@ export const ThreatInspector: React.FC<ThreatInspectorProps> = ({
             }
           }}
           placeholder="Enter URL, text message, or QR string to evaluate..."
-          className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-md p-3.5 text-sm font-mono text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-700 transition-colors resize-none leading-relaxed"
+          className="w-full bg-transparent p-3.5 text-sm font-mono text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none transition-colors resize-none leading-relaxed"
         />
+
         <div className="absolute right-3 bottom-3 flex items-center space-x-2">
           <button
             onClick={handleCopy}
@@ -173,8 +190,11 @@ export const ThreatInspector: React.FC<ThreatInspectorProps> = ({
       <div className="flex flex-wrap items-center gap-2 pt-1">
         <span className="text-xs text-zinc-500 dark:text-zinc-400 mr-1">Sample vectors:</span>
         {DEMO_PRESETS.map((preset, idx) => (
-          <button
+          <motion.button
             key={idx}
+            whileHover={{ y: -1 }}
+            whileTap={{ y: 0 }}
+            transition={{ duration: MOTION_DURATION.micro, ease: MOTION_EASING }}
             onClick={() => {
               setContentType(preset.type);
               setInputPayload(preset.value);
@@ -182,7 +202,7 @@ export const ThreatInspector: React.FC<ThreatInspectorProps> = ({
             className="text-xs px-2.5 py-1 rounded bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 text-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800 dark:border-zinc-800 dark:text-zinc-300 dark:hover:text-zinc-100 transition-colors"
           >
             {preset.label}
-          </button>
+          </motion.button>
         ))}
       </div>
 
@@ -197,7 +217,11 @@ export const ThreatInspector: React.FC<ThreatInspectorProps> = ({
             Press <kbd className="px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 font-mono">⌘ + ↵</kbd>
           </span>
 
-          <button
+          {/* Evaluate Button: micro-scale on hover and tap */}
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            transition={{ duration: MOTION_DURATION.micro, ease: MOTION_EASING }}
             onClick={handleScan}
             disabled={isScanning || !inputPayload.trim()}
             className="flex items-center space-x-2 px-4 py-2 rounded-md bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-zinc-200 dark:text-zinc-900 font-medium text-xs transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
@@ -208,7 +232,7 @@ export const ThreatInspector: React.FC<ThreatInspectorProps> = ({
               <Search className="w-3.5 h-3.5" />
             )}
             <span>{isScanning ? "Evaluating..." : "Evaluate Threat"}</span>
-          </button>
+          </motion.button>
         </div>
       </div>
     </div>

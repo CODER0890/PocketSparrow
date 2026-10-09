@@ -8,6 +8,8 @@ import {
   Shield,
   WifiOff,
 } from "lucide-react";
+import { motion } from "framer-motion";
+import { MOTION_DURATION } from "../styles/motion";
 
 export type NavTab = "dashboard" | "inspector" | "processes" | "logs" | "settings";
 
@@ -52,7 +54,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </span>
         </div>
 
-        {/* Navigation Links */}
+        {/* Navigation Links with Layout Sliding Indicator */}
         <div className="px-3 py-6">
           <div className="px-3 pb-2 text-xs font-medium uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
             Platform
@@ -65,20 +67,47 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <button
                   key={item.id}
                   onClick={() => onSelectTab(item.id)}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  className={`relative w-full flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                     isActive
-                      ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-sm"
-                      : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-900/60"
+                      ? "text-zinc-900 dark:text-zinc-100"
+                      : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
                   }`}
                 >
-                  <div className="flex items-center space-x-3">
+                  {/* Sliding layout active indicator */}
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeSidebarIndicator"
+                      className="absolute inset-0 rounded-md bg-zinc-100 dark:bg-zinc-800 shadow-sm"
+                      transition={{
+                        type: "spring",
+                        stiffness: 420,
+                        damping: 32,
+                        duration: MOTION_DURATION.macro,
+                      }}
+                    />
+                  )}
+
+                  <div className="relative z-10 flex items-center space-x-3">
                     <Icon className="w-4 h-4 text-zinc-500 dark:text-zinc-400" />
                     <span>{item.label}</span>
                   </div>
+
                   {item.badge && (
-                    <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20">
+                    <motion.span
+                      animate={
+                        item.badge.includes("Alert")
+                          ? { opacity: [0.8, 1, 0.8] }
+                          : undefined
+                      }
+                      transition={{
+                        duration: 2.2,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      }}
+                      className="relative z-10 text-[11px] font-medium px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20"
+                    >
                       {item.badge}
-                    </span>
+                    </motion.span>
                   )}
                 </button>
               );
