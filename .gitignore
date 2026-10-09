@@ -1,0 +1,36 @@
+# Build outputs & targets
+target/
+core/build/
+**/build/
+desktop/dist/
+desktop/src-tauri/target/
+
+# Gradle & Android
+.gradle/
+android/.gradle/
+android/app/build/
+local.properties
+.idea/
+*.iml
+
+# Node / Web
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+
+# Database & runtime logs
+*.db
+*.db-journal
+*.log
+
+# OS artifacts
+.DS_Store
+Thumbs.db
