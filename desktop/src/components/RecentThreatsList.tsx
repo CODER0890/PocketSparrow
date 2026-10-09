@@ -42,8 +42,21 @@ export const RecentThreatsList: React.FC<RecentThreatsListProps> = ({
       </div>
 
       <div className="divide-y divide-zinc-100 dark:divide-zinc-800/80 mt-1">
-        <AnimatePresence initial={false}>
-          {recentLogs.map((log) => {
+        {recentLogs.length === 0 ? (
+          <div className="py-8 flex flex-col items-center justify-center text-center">
+            <div className="p-2.5 rounded-full bg-zinc-100 dark:bg-zinc-800/60 text-emerald-600 dark:text-emerald-400 mb-2.5">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <p className="text-xs font-semibold text-zinc-900 dark:text-zinc-200">
+              No threats detected
+            </p>
+            <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1 max-w-xs">
+              System is actively monitoring incoming vectors in real-time. Zero malicious payloads intercepted.
+            </p>
+          </div>
+        ) : (
+          <AnimatePresence initial={false}>
+            {recentLogs.map((log) => {
             const isBlocked = log.verdict === "Malicious";
             return (
               <motion.div
@@ -118,7 +131,8 @@ export const RecentThreatsList: React.FC<RecentThreatsListProps> = ({
               </motion.div>
             );
           })}
-        </AnimatePresence>
+          </AnimatePresence>
+        )}
       </div>
     </div>
   );

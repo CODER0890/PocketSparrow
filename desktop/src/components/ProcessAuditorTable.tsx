@@ -14,11 +14,13 @@ export interface ProcessAuditItem {
 interface ProcessAuditorTableProps {
   processes: ProcessAuditItem[];
   onRefresh: () => void;
+  onTerminateProcess?: (pid: number) => void;
 }
 
 export const ProcessAuditorTable: React.FC<ProcessAuditorTableProps> = ({
   processes,
   onRefresh,
+  onTerminateProcess,
 }) => {
   const shouldReduceMotion = !!useReducedMotion();
   const [filter, setFilter] = useState<"ALL" | "SUSPICIOUS">("ALL");
@@ -116,45 +118,55 @@ export const ProcessAuditorTable: React.FC<ProcessAuditorTableProps> = ({
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/60 bg-white dark:bg-zinc-900/20">
-            {displayedProcesses.map((proc) => (
-              <tr
-                key={proc.pid}
-                className="hover:bg-zinc-50/80 dark:hover:bg-zinc-800/30 transition-colors group"
-              >
-                <td className="py-3 px-4 font-mono text-zinc-500 dark:text-zinc-400">{proc.pid}</td>
-                <td className="py-3 px-4 font-medium text-zinc-900 dark:text-zinc-200">{proc.name}</td>
-                <td className="py-3 px-4 font-mono text-zinc-500 dark:text-zinc-400 max-w-xs truncate" title={proc.path}>
-                  {proc.path}
-                </td>
-                <td className="py-3 px-4">
-                  {proc.is_suspicious ? (
-                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20">
-                      <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-                      Suspicious
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                      Verified
-                    </span>
-                  )}
-                </td>
-                <td className="py-3 px-4 text-right">
-                  {proc.is_suspicious ? (
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => alert(`Quarantining PID ${proc.pid}`)}
-                      className="px-2.5 py-1 rounded bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 dark:bg-rose-500/10 dark:hover:bg-rose-500/20 dark:border-rose-500/30 dark:text-rose-400 text-xs font-medium transition-colors shadow-sm"
-                    >
-                      Terminate
-                    </motion.button>
-                  ) : (
-                    <span className="text-zinc-400 dark:text-zinc-600 text-xs font-mono">—</span>
-                  )}
+            {displayedProcesses.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="py-8 text-center text-zinc-400 dark:text-zinc-500">
+                  {filter === "SUSPICIOUS"
+                    ? "No suspicious processes detected. Host runtime is secure."
+                    : "No active processes recorded. Click refresh to scan host processes."}
                 </td>
               </tr>
-            ))}
+            ) : (
+              displayedProcesses.map((proc) => (
+                <tr
+                  key={proc.pid}
+                  className="hover:bg-zinc-50/80 dark:hover:bg-zinc-800/30 transition-colors group"
+                >
+                  <td className="py-3 px-4 font-mono text-zinc-500 dark:text-zinc-400">{proc.pid}</td>
+                  <td className="py-3 px-4 font-medium text-zinc-900 dark:text-zinc-200">{proc.name}</td>
+                  <td className="py-3 px-4 font-mono text-zinc-500 dark:text-zinc-400 max-w-xs truncate" title={proc.path}>
+                    {proc.path}
+                  </td>
+                  <td className="py-3 px-4">
+                    {proc.is_suspicious ? (
+                      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20">
+                        <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                        Suspicious
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                        Verified
+                      </span>
+                    )}
+                  </td>
+                  <td className="py-3 px-4 text-right">
+                    {proc.is_suspicious ? (
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => onTerminateProcess && onTerminateProcess(proc.pid)}
+                        className="px-2.5 py-1 rounded bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 dark:bg-rose-500/10 dark:hover:bg-rose-500/20 dark:border-rose-500/30 dark:text-rose-400 text-xs font-medium transition-colors shadow-sm"
+                      >
+                        Terminate
+                      </motion.button>
+                    ) : (
+                      <span className="text-zinc-400 dark:text-zinc-600 text-xs font-mono">—</span>
+                    )}
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

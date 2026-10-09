@@ -543,6 +543,12 @@ bash demo/run_airplane_demo.sh
 <br/>
 
 > **Prerequisites**: <kbd>Node.js 18+</kbd>, <kbd>npm</kbd>, <kbd>Rust 1.75+</kbd>, and system webkit/gtk libraries.
+> 
+> **Production Desktop Capabilities**:
+> - ⚡ **Zero-Mock Architecture**: 100% production-ready runtime with real-time data fetching, zero demo banners, and zero hardcoded test buttons.
+> - ✈️ **Hardware Network Tracking**: Automatically syncs with host physical network interface (`navigator.onLine`) to reflect real Airplane Mode & Zero-WAN isolation.
+> - 🔒 **Local SQLCipher Vault & Process Auditor**: Direct IPC access to encrypted on-device SQLite ledger and Linux `/proc` reverse shell detector.
+> - 📋 **Instant Clipboard & Vector Shield**: Immediate evaluation of untrusted links, phishing SMS payloads, and executable QR schemes.
 
 #### 1. Install Frontend Dependencies:
 ```bash

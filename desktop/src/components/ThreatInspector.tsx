@@ -27,9 +27,7 @@ export const ThreatInspector: React.FC<ThreatInspectorProps> = ({
   const [contentType, setContentType] = useState<"Url" | "SmsText" | "QrPayload">(
     selectedType || "Url"
   );
-  const [inputPayload, setInputPayload] = useState(
-    initialPayload || "https://secure-p\u0430ypal.com/verify-account?token=9281a4b"
-  );
+  const [inputPayload, setInputPayload] = useState(initialPayload || "");
   const [isScanning, setIsScanning] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -40,30 +38,6 @@ export const ThreatInspector: React.FC<ThreatInspectorProps> = ({
   React.useEffect(() => {
     if (initialPayload !== undefined) setInputPayload(initialPayload);
   }, [initialPayload]);
-
-  const DEMO_PRESETS = [
-    {
-      label: "Cyrillic Homoglyph",
-      type: "Url" as const,
-      value: "https://secure-p\u0430ypal.com/verify-account?token=9281a4b",
-    },
-    {
-      label: "Urgent Wire Transfer",
-      type: "SmsText" as const,
-      value:
-        "BANK ALERT: Unusual wire transfer of $2,450.00 initiated to unknown recipient. Cancel transaction now: http://fake-chase.top",
-    },
-    {
-      label: "Malicious QR Scheme",
-      type: "QrPayload" as const,
-      value: "javascript:alert('Stolen Token: ' + document.cookie)",
-    },
-    {
-      label: "Benign Domain",
-      type: "Url" as const,
-      value: "https://en.wikipedia.org/wiki/Information_security",
-    },
-  ];
 
   const handleScan = async () => {
     if (!inputPayload.trim() || isScanning) return;
@@ -76,13 +50,28 @@ export const ThreatInspector: React.FC<ThreatInspectorProps> = ({
   };
 
   const handleCopy = () => {
+    if (!inputPayload) return;
     navigator.clipboard.writeText(inputPayload);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const getPlaceholder = () => {
+    switch (contentType) {
+      case "Url":
+        return "Enter suspicious URL or domain to evaluate (e.g., https://...)...";
+      case "SmsText":
+        return "Paste incoming SMS text message or communication payload to inspect for social engineering...";
+      case "QrPayload":
+        return "Enter decoded QR payload, data URI, or executable scheme (e.g., javascript:, smsto:)...";
+    }
+  };
+
   return (
-    <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/40 p-6 space-y-5 transition-colors shadow-sm dark:shadow-none">
+    <div
+      id="threat-inspector-card"
+      className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/40 p-6 space-y-5 transition-colors shadow-sm dark:shadow-none"
+    >
       {/* Header and Type Selector */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -97,10 +86,7 @@ export const ThreatInspector: React.FC<ThreatInspectorProps> = ({
         {/* Vector Tabs */}
         <div className="inline-flex p-1 rounded-md bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 self-start sm:self-auto text-xs">
           <button
-            onClick={() => {
-              setContentType("Url");
-              setInputPayload("https://secure-p\u0430ypal.com/verify-account?token=9281a4b");
-            }}
+            onClick={() => setContentType("Url")}
             className={`flex items-center space-x-1.5 px-3 py-1.5 rounded transition-colors ${
               contentType === "Url"
                 ? "bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-medium shadow-sm"
@@ -111,12 +97,7 @@ export const ThreatInspector: React.FC<ThreatInspectorProps> = ({
             <span>URL</span>
           </button>
           <button
-            onClick={() => {
-              setContentType("SmsText");
-              setInputPayload(
-                "BANK ALERT: Unusual wire transfer of $2,450.00 initiated to unknown recipient. Cancel transaction now: http://fake-chase.top"
-              );
-            }}
+            onClick={() => setContentType("SmsText")}
             className={`flex items-center space-x-1.5 px-3 py-1.5 rounded transition-colors ${
               contentType === "SmsText"
                 ? "bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-medium shadow-sm"
@@ -127,10 +108,7 @@ export const ThreatInspector: React.FC<ThreatInspectorProps> = ({
             <span>SMS / Message</span>
           </button>
           <button
-            onClick={() => {
-              setContentType("QrPayload");
-              setInputPayload("javascript:alert('Stolen Token: ' + document.cookie)");
-            }}
+            onClick={() => setContentType("QrPayload")}
             className={`flex items-center space-x-1.5 px-3 py-1.5 rounded transition-colors ${
               contentType === "QrPayload"
                 ? "bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-medium shadow-sm"
@@ -160,6 +138,7 @@ export const ThreatInspector: React.FC<ThreatInspectorProps> = ({
         )}
 
         <textarea
+          id="threat-inspector-input"
           rows={3}
           value={inputPayload}
           onChange={(e) => setInputPayload(e.target.value)}
@@ -168,42 +147,28 @@ export const ThreatInspector: React.FC<ThreatInspectorProps> = ({
               handleScan();
             }
           }}
-          placeholder="Enter URL, text message, or QR string to evaluate..."
+          placeholder={getPlaceholder()}
           className="w-full bg-transparent p-3.5 text-sm font-mono text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none transition-colors resize-none leading-relaxed"
         />
 
         <div className="absolute right-3 bottom-3 flex items-center space-x-2">
-          <button
-            onClick={handleCopy}
-            className="p-1 rounded text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300 transition-colors"
-            title="Copy payload"
-          >
-            {copied ? <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-          </button>
+          {inputPayload ? (
+            <button
+              onClick={handleCopy}
+              className="p-1 rounded text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300 transition-colors"
+              title="Copy payload"
+            >
+              {copied ? (
+                <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+              ) : (
+                <Copy className="w-3.5 h-3.5" />
+              )}
+            </button>
+          ) : null}
           <span className="text-xs font-mono text-zinc-400 dark:text-zinc-600">
-            {inputPayload.length} B
+            {new TextEncoder().encode(inputPayload).length} B
           </span>
         </div>
-      </div>
-
-      {/* Quick Test Vectors */}
-      <div className="flex flex-wrap items-center gap-2 pt-1">
-        <span className="text-xs text-zinc-500 dark:text-zinc-400 mr-1">Sample vectors:</span>
-        {DEMO_PRESETS.map((preset, idx) => (
-          <motion.button
-            key={idx}
-            whileHover={{ y: -1 }}
-            whileTap={{ y: 0 }}
-            transition={{ duration: MOTION_DURATION.micro, ease: MOTION_EASING }}
-            onClick={() => {
-              setContentType(preset.type);
-              setInputPayload(preset.value);
-            }}
-            className="text-xs px-2.5 py-1 rounded bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 text-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800 dark:border-zinc-800 dark:text-zinc-300 dark:hover:text-zinc-100 transition-colors"
-          >
-            {preset.label}
-          </motion.button>
-        ))}
       </div>
 
       {/* Action Row */}
@@ -238,3 +203,5 @@ export const ThreatInspector: React.FC<ThreatInspectorProps> = ({
     </div>
   );
 };
+
+export default ThreatInspector;

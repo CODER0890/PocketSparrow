@@ -6,7 +6,6 @@ import { ThreatInspector } from "./components/ThreatInspector";
 import { ProcessAuditorTable, ProcessAuditItem } from "./components/ProcessAuditorTable";
 import { AuditVaultTable, LogEntry } from "./components/AuditVaultTable";
 import { XaiDrawer, ScanResultPayload } from "./components/XaiDrawer";
-import { DemoBanner } from "./components/DemoBanner";
 import { ProtectionCard } from "./components/ProtectionCard";
 import { QuickActionsGrid } from "./components/QuickActionsGrid";
 import { RecentThreatsList } from "./components/RecentThreatsList";
@@ -28,25 +27,37 @@ export const App: React.FC = () => {
   });
 
   const [activeTab, setActiveTab] = useState<NavTab>("dashboard");
-  const [airplaneMode] = useState<boolean>(true);
+
+  // Dynamic hardware network tracking (offline / Airplane Mode)
+  const [airplaneMode, setAirplaneMode] = useState<boolean>(() => {
+    if (typeof navigator !== "undefined" && typeof navigator.onLine === "boolean") {
+      return !navigator.onLine;
+    }
+    return false;
+  });
+
   const [wanBytes] = useState<number>(0);
   const [lastLatencyUs, setLastLatencyUs] = useState<number>(18);
-  const [totalScans, setTotalScans] = useState<number>(14);
-  const [threatsBlocked, setThreatsBlocked] = useState<number>(8);
   const [peakRamMb] = useState<number>(14.9);
   const [activeAlert, setActiveAlert] = useState<ScanResultPayload | null>(null);
 
-  // New module states
-  const [showDemoBanner, setShowDemoBanner] = useState<boolean>(true);
+  // Protection & Inspector states (clean defaults)
   const [clipboardShield, setClipboardShield] = useState<boolean>(true);
   const [inspectorType, setInspectorType] = useState<"Url" | "SmsText" | "QrPayload">("Url");
-  const [inspectorPayload, setInspectorPayload] = useState<string>(
-    "https://secure-p\u0430ypal.com/verify-account?token=9281a4b"
-  );
+  const [inspectorPayload, setInspectorPayload] = useState<string>("");
 
   // Engine configuration settings
   const [entropyThreshold, setEntropyThreshold] = useState<number>(4.5);
   const [activeDelegate, setActiveDelegate] = useState<string>("CPU (x86_64 INT8 AVX2)");
+
+  // Real production logs & processes lists
+  const [logs, setLogs] = useState<LogEntry[]>([]);
+  const [processes, setProcesses] = useState<ProcessAuditItem[]>([]);
+
+  // Dynamically derived production metrics
+  const totalScans = logs.length;
+  const threatsBlocked = logs.filter((l) => l.verdict === "Malicious").length;
+  const suspiciousCount = processes.filter((p) => p.is_suspicious).length;
 
   // Sync theme with HTML document class and localStorage
   useEffect(() => {
@@ -60,72 +71,86 @@ export const App: React.FC = () => {
     }
   }, [theme]);
 
+  // Dynamic network online/offline hardware listeners
+  useEffect(() => {
+    const updateNetworkStatus = () => {
+      if (typeof navigator !== "undefined" && typeof navigator.onLine === "boolean") {
+        setAirplaneMode(!navigator.onLine);
+      }
+    };
+
+    window.addEventListener("online", updateNetworkStatus);
+    window.addEventListener("offline", updateNetworkStatus);
+
+    return () => {
+      window.removeEventListener("online", updateNetworkStatus);
+      window.removeEventListener("offline", updateNetworkStatus);
+    };
+  }, []);
+
+  // Fetch real data on initial load from Tauri backend
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      try {
+        if (typeof window !== "undefined" && (window as any).__TAURI_INTERNALS__) {
+          const { invoke } = await import("@tauri-apps/api/core");
+          const [fetchedLogs, fetchedProcesses] = await Promise.all([
+            invoke<any[]>("get_logs").catch(() => []),
+            invoke<ProcessAuditItem[]>("get_processes").catch(() => []),
+          ]);
+
+          if (Array.isArray(fetchedLogs) && fetchedLogs.length > 0) {
+            const mappedLogs: LogEntry[] = fetchedLogs.map((l, idx) => ({
+              id: l.id || `log_${idx}`,
+              timestamp: l.timestamp || new Date().toLocaleTimeString(),
+              type: (l.content_type || "URL").toUpperCase(),
+              payload_snippet: l.payload_snippet || "",
+              verdict:
+                l.verdict === "MALICIOUS" || l.verdict === "Malicious"
+                  ? "Malicious"
+                  : l.verdict === "SUSPICIOUS" || l.verdict === "Suspicious"
+                  ? "Suspicious"
+                  : "Safe",
+              category: l.category || "GENERAL",
+              latency_us: l.latency_us || 18,
+            }));
+            setLogs(mappedLogs);
+            setLastLatencyUs(mappedLogs[0]?.latency_us || 18);
+          }
+
+          if (Array.isArray(fetchedProcesses)) {
+            setProcesses(fetchedProcesses);
+          }
+        }
+      } catch (err) {
+        console.warn("Tauri background IPC unavailable in current shell", err);
+      }
+    };
+
+    fetchInitialData();
+  }, []);
+
+  const refreshProcesses = async () => {
+    try {
+      if (typeof window !== "undefined" && (window as any).__TAURI_INTERNALS__) {
+        const { invoke } = await import("@tauri-apps/api/core");
+        const procs = await invoke<ProcessAuditItem[]>("get_processes");
+        if (Array.isArray(procs)) {
+          setProcesses(procs);
+        }
+      }
+    } catch (err) {
+      console.warn("Unable to refresh host processes", err);
+    }
+  };
+
+  const handleTerminateProcess = (pid: number) => {
+    setProcesses((prev) => prev.filter((p) => p.pid !== pid));
+  };
+
   const toggleTheme = () => {
     setTheme((prev) => (prev === "dark" ? "light" : "dark"));
   };
-
-  const [logs, setLogs] = useState<LogEntry[]>([
-    {
-      id: "log_1",
-      timestamp: "15:52:12",
-      type: "URL",
-      payload_snippet: "https://secure-p\u0430ypal.com/verify-account",
-      verdict: "Malicious",
-      category: "HOMOGRAPH_PUNYCODE",
-      latency_us: 18,
-    },
-    {
-      id: "log_2",
-      timestamp: "15:46:05",
-      type: "SMS",
-      payload_snippet: "BANK ALERT: Unusual wire transfer of $2,450.00 initiated...",
-      verdict: "Malicious",
-      category: "URGENT_WIRE_TRANSFER",
-      latency_us: 420,
-    },
-    {
-      id: "log_3",
-      timestamp: "15:42:30",
-      type: "QR",
-      payload_snippet: "javascript:alert(document.cookie)",
-      verdict: "Malicious",
-      category: "MALICIOUS_QR_SCHEME",
-      latency_us: 45,
-    },
-    {
-      id: "log_4",
-      timestamp: "15:40:19",
-      type: "URL",
-      payload_snippet: "https://en.wikipedia.org/wiki/Information_security",
-      verdict: "Safe",
-      category: "SAFE_AUTHORITATIVE",
-      latency_us: 89,
-    },
-  ]);
-
-  const [processes, setProcesses] = useState<ProcessAuditItem[]>([
-    {
-      pid: 1042,
-      name: "systemd",
-      path: "/usr/lib/systemd/systemd",
-      is_suspicious: false,
-      threat_detail: "",
-    },
-    {
-      pid: 3819,
-      name: "pocket-sparrow-daemon",
-      path: "/usr/bin/pocket-sparrow-daemon",
-      is_suspicious: false,
-      threat_detail: "",
-    },
-    {
-      pid: 8912,
-      name: "curl_exfil_script.sh",
-      path: "/tmp/.hidden/curl_exfil_script.sh",
-      is_suspicious: true,
-      threat_detail: "Hidden script executing from temporary directory with background socket parameters.",
-    },
-  ]);
 
   // Scan handler invoking Tauri or local loopback bridge
   const handleScan = async (
@@ -170,10 +195,6 @@ export const App: React.FC = () => {
 
     setActiveAlert(result);
     setLastLatencyUs(result.latency_us);
-    setTotalScans((prev) => prev + 1);
-    if (result.verdict === "Malicious") {
-      setThreatsBlocked((prev) => prev + 1);
-    }
 
     const newLog: LogEntry = {
       id: `log_${Date.now()}`,
@@ -246,12 +267,13 @@ export const App: React.FC = () => {
     };
   };
 
-  // Quick Action Dispatcher
+  // Quick Action Dispatcher - triggers live inspection or readies input for real payload
   const handleQuickAction = async (
     type: "Url" | "SmsText" | "QrPayload",
     autoPaste: boolean = false
   ) => {
     setInspectorType(type);
+
     if (autoPaste) {
       try {
         const text = await navigator.clipboard.readText();
@@ -265,14 +287,14 @@ export const App: React.FC = () => {
       }
     }
 
-    if (type === "Url") {
-      setInspectorPayload("https://secure-p\u0430ypal.com/verify-account?token=9281a4b");
-    } else if (type === "SmsText") {
-      setInspectorPayload(
-        "BANK ALERT: Unusual wire transfer of $2,450.00 initiated to unknown recipient. Cancel transaction now: http://fake-chase.top"
-      );
+    if (inspectorPayload.trim()) {
+      await handleScan(type, inspectorPayload);
     } else {
-      setInspectorPayload("javascript:alert('Stolen Token: ' + document.cookie)");
+      const inputEl = document.getElementById("threat-inspector-input");
+      if (inputEl) {
+        inputEl.focus();
+        inputEl.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
     }
   };
 
@@ -285,6 +307,7 @@ export const App: React.FC = () => {
           onSelectTab={setActiveTab}
           airplaneMode={airplaneMode}
           wanBytes={wanBytes}
+          suspiciousCount={suspiciousCount}
         />
 
         {/* 2. Main Workspace */}
@@ -294,6 +317,7 @@ export const App: React.FC = () => {
             activeTab={activeTab}
             latencyUs={lastLatencyUs}
             wanBytes={wanBytes}
+            airplaneMode={airplaneMode}
             theme={theme}
             onToggleTheme={toggleTheme}
             onOpenInspector={() => setActiveTab("inspector")}
@@ -311,20 +335,7 @@ export const App: React.FC = () => {
               >
                 {activeTab === "dashboard" && (
                   <div className="space-y-8 max-w-7xl mx-auto">
-                    {/* Module 1: Dismissible Demo Mode Banner */}
-                    {showDemoBanner && (
-                      <DemoBanner
-                        onDismiss={() => setShowDemoBanner(false)}
-                        onQuickDemo={() =>
-                          handleScan(
-                            "Url",
-                            "https://secure-p\u0430ypal.com/verify-account?token=9281a4b"
-                          )
-                        }
-                      />
-                    )}
-
-                    {/* Module 2: 4-Column High-Level Metrics Grid */}
+                    {/* Module 1: 4-Column High-Level Metrics Grid */}
                     <MetricsGrid
                       totalScans={totalScans}
                       threatsBlocked={threatsBlocked}
@@ -333,7 +344,7 @@ export const App: React.FC = () => {
                       wanBytes={wanBytes}
                     />
 
-                    {/* Modules 3 & 4: Protection Active Card & Quick Actions Grid */}
+                    {/* Modules 2 & 3: Protection Active Card & Quick Actions Grid */}
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
                       <div className="lg:col-span-5 flex">
                         <div className="w-full">
@@ -351,19 +362,20 @@ export const App: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Module 5: Live Payload Inspector */}
+                    {/* Module 4: Live Payload Inspector */}
                     <ThreatInspector
                       onScan={handleScan}
                       selectedType={inspectorType}
                       initialPayload={inspectorPayload}
                     />
 
-                    {/* Module 6: Process Auditor Table & Recent Threats List */}
+                    {/* Module 5: Process Auditor Table & Recent Threats List */}
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                       <div className="lg:col-span-7">
                         <ProcessAuditorTable
                           processes={processes}
-                          onRefresh={() => setProcesses((prev) => [...prev])}
+                          onRefresh={refreshProcesses}
+                          onTerminateProcess={handleTerminateProcess}
                         />
                       </div>
                       <div className="lg:col-span-5">
@@ -395,7 +407,8 @@ export const App: React.FC = () => {
                   <div className="space-y-8 max-w-5xl mx-auto">
                     <ProcessAuditorTable
                       processes={processes}
-                      onRefresh={() => setProcesses((prev) => [...prev])}
+                      onRefresh={refreshProcesses}
+                      onTerminateProcess={handleTerminateProcess}
                     />
                   </div>
                 )}

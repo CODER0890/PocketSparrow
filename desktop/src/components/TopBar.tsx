@@ -1,5 +1,5 @@
 import React from "react";
-import { ChevronRight, Search, Zap, Sun, Moon } from "lucide-react";
+import { ChevronRight, Search, Zap, Sun, Moon, Plane } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { NavTab } from "./Sidebar";
 import { MOTION_EASING, MOTION_DURATION } from "../styles/motion";
@@ -8,6 +8,7 @@ interface TopBarProps {
   activeTab: NavTab;
   latencyUs: number;
   wanBytes: number;
+  airplaneMode?: boolean;
   theme: "dark" | "light";
   onToggleTheme: () => void;
   onOpenInspector: () => void;
@@ -17,6 +18,7 @@ export const TopBar: React.FC<TopBarProps> = ({
   activeTab,
   latencyUs,
   wanBytes,
+  airplaneMode = false,
   theme,
   onToggleTheme,
   onOpenInspector,
@@ -56,10 +58,16 @@ export const TopBar: React.FC<TopBarProps> = ({
           <span className="font-medium text-zinc-900 dark:text-zinc-200 font-mono">{latencyMs} ms</span>
         </div>
 
-        {/* Offline Air-Gap Badge */}
+        {/* Dynamic Air-Gap / Hardware Airplane Badge */}
         <div className="flex items-center space-x-2 px-3 py-1.5 rounded-md border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/40 text-xs">
-          <span className="flex h-2 w-2 rounded-full bg-emerald-500" />
-          <span className="font-medium text-zinc-900 dark:text-zinc-200">Air-Gapped</span>
+          {airplaneMode ? (
+            <Plane className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+          ) : (
+            <span className="flex h-2 w-2 rounded-full bg-emerald-500" />
+          )}
+          <span className="font-medium text-zinc-900 dark:text-zinc-200">
+            {airplaneMode ? "Airplane Mode (Air-Gapped)" : "Air-Gapped"}
+          </span>
           <span className="text-zinc-400 dark:text-zinc-500 font-mono">({wanBytes} B WAN)</span>
         </div>
 

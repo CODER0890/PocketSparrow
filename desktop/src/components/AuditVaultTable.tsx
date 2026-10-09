@@ -81,7 +81,9 @@ export const AuditVaultTable: React.FC<AuditVaultTableProps> = ({ logs, onSelect
             {filteredLogs.length === 0 ? (
               <tr>
                 <td colSpan={6} className="py-8 text-center text-zinc-400 dark:text-zinc-500">
-                  No records match the selected filter.
+                  {logs.length === 0
+                    ? "Encrypted ledger empty. No audit events recorded yet."
+                    : "No records match the selected filter."}
                 </td>
               </tr>
             ) : (

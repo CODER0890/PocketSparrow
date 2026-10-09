@@ -7,6 +7,7 @@ import {
   Sliders,
   Shield,
   WifiOff,
+  Plane,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { MOTION_DURATION } from "../styles/motion";
@@ -18,17 +19,25 @@ interface SidebarProps {
   onSelectTab: (tab: NavTab) => void;
   airplaneMode: boolean;
   wanBytes: number;
+  suspiciousCount?: number;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   activeTab,
   onSelectTab,
+  airplaneMode,
   wanBytes,
+  suspiciousCount = 0,
 }) => {
   const navItems = [
     { id: "dashboard" as NavTab, label: "Overview", icon: LayoutDashboard },
     { id: "inspector" as NavTab, label: "Payload Inspector", icon: Search },
-    { id: "processes" as NavTab, label: "Process Monitor", icon: Cpu, badge: "1 Alert" },
+    {
+      id: "processes" as NavTab,
+      label: "Process Monitor",
+      icon: Cpu,
+      badge: suspiciousCount > 0 ? `${suspiciousCount} Alert` : undefined,
+    },
     { id: "logs" as NavTab, label: "Forensic Vault", icon: Database },
     { id: "settings" as NavTab, label: "Engine Settings", icon: Sliders },
   ];
@@ -121,16 +130,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/40 p-3.5 space-y-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2 text-xs text-zinc-700 dark:text-zinc-300 font-medium">
-              <WifiOff className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-              <span>Offline Isolation</span>
+              {airplaneMode ? (
+                <Plane className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+              ) : (
+                <WifiOff className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+              )}
+              <span>{airplaneMode ? "Hardware Airplane" : "Zero-WAN Air-Gap"}</span>
             </div>
             <span className="inline-flex items-center gap-1.5 text-[11px] text-emerald-700 dark:text-emerald-400 font-medium">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              Active
+              {airplaneMode ? "Offline" : "Enforced"}
             </span>
           </div>
           <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
-            All models execute locally on-device. Zero network packets sent to WAN.
+            {airplaneMode
+              ? "Device is operating in physical hardware isolation. Zero external network link."
+              : "All models execute locally on-device. Zero network packets sent to WAN."}
           </p>
           <div className="pt-2 border-t border-zinc-200/60 dark:border-zinc-800/60 flex items-center justify-between text-xs text-zinc-600 dark:text-zinc-400 font-mono">
             <span>WAN Egress:</span>
