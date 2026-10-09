@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# Set default values for variables
+APP_BASE_NAME=`basename "$0"`
+APP_HOME="`dirname "$0"`"
+
+# Use JAVA_HOME if set, otherwise try java on PATH
+if [ -n "$JAVA_HOME" ] ; then
+    JAVACMD="$JAVA_HOME/bin/java"
+else
+    JAVACMD="java"
+fi
+
+# Find Gradle wrapper jar
+CLASSPATH="$APP_HOME/gradle/wrapper/gradle-wrapper.jar"
+
+# Execute Gradle
+exec "$JAVACMD" "-Dorg.gradle.appname=$APP_BASE_NAME" -classpath "$CLASSPATH" org.gradle.wrapper.GradleWrapperMain "$@"

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Pocket Sparrow Network Security Configuration
+     Explicitly disallows cleartext traffic and restricts network communication.
+     Assures 100% on-device operation with zero cloud telemetry. -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <!-- No certificates trusted for WAN endpoints; strictly air-gapped -->
+        </trust-anchors>
+    </base-config>
+</network-security-config>

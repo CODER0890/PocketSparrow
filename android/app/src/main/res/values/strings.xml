@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Pocket Sparrow</string>
+    <string name="notification_service_label">Pocket Sparrow Threat Interceptor</string>
+    <string name="notification_service_desc">Inspects incoming notification URLs and SMS messages strictly on-device to prevent phishing and smishing.</string>
+</resources>
