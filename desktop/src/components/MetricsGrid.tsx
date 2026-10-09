@@ -24,108 +24,108 @@ export const MetricsGrid: React.FC<MetricsGridProps> = ({
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {/* 1. Evaluation Latency SLA */}
-      <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-6 flex flex-col justify-between hover:border-zinc-700 transition-colors">
+      <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/40 p-6 flex flex-col justify-between hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors shadow-sm dark:shadow-none">
         <div className="flex items-start justify-between">
-          <span className="text-xs font-medium text-zinc-400 uppercase tracking-wider">
+          <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
             Evaluation Latency
           </span>
-          <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">
+          <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 px-2 py-0.5 rounded">
             <CheckCircle2 className="w-3 h-3" />
             SLA Met
           </span>
         </div>
         <div className="mt-4">
-          <div className="text-3xl font-semibold text-zinc-100 font-sans tracking-tight">
-            {latencyMs} <span className="text-sm font-normal text-zinc-400">ms</span>
+          <div className="text-3xl font-semibold text-zinc-900 dark:text-zinc-100 font-sans tracking-tight">
+            {latencyMs} <span className="text-sm font-normal text-zinc-500 dark:text-zinc-400">ms</span>
           </div>
-          <p className="mt-1 text-xs text-zinc-400">
+          <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
             P99 target: &lt;50.0 ms ceiling
           </p>
         </div>
-        <div className="mt-4 pt-3 border-t border-zinc-800/80 flex items-center justify-between text-xs text-zinc-400">
+        <div className="mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400">
           <span>Tier 1 Heuristic:</span>
-          <span className="font-mono text-zinc-300">16 µs</span>
+          <span className="font-mono text-zinc-700 dark:text-zinc-300">16 µs</span>
         </div>
       </div>
 
       {/* 2. Threats Intercepted */}
-      <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-6 flex flex-col justify-between hover:border-zinc-700 transition-colors">
+      <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/40 p-6 flex flex-col justify-between hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors shadow-sm dark:shadow-none">
         <div className="flex items-start justify-between">
-          <span className="text-xs font-medium text-zinc-400 uppercase tracking-wider">
+          <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
             Threats Intercepted
           </span>
-          <span className="inline-flex items-center text-xs font-medium text-rose-400 bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded">
+          <span className="inline-flex items-center text-xs font-medium text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 px-2 py-0.5 rounded">
             {blockRate}% Filtered
           </span>
         </div>
         <div className="mt-4">
-          <div className="text-3xl font-semibold text-zinc-100 font-sans tracking-tight">
+          <div className="text-3xl font-semibold text-zinc-900 dark:text-zinc-100 font-sans tracking-tight">
             {threatsBlocked}{" "}
-            <span className="text-sm font-normal text-zinc-400">
+            <span className="text-sm font-normal text-zinc-500 dark:text-zinc-400">
               / {totalScans} scanned
             </span>
           </div>
-          <p className="mt-1 text-xs text-zinc-400">
+          <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
             Phishing, Smishing &amp; QR Malscripts
           </p>
         </div>
-        <div className="mt-4 pt-3 border-t border-zinc-800/80 flex items-center justify-between text-xs text-zinc-400">
+        <div className="mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400">
           <span>False Positives:</span>
-          <span className="text-emerald-400 font-medium">0.00%</span>
+          <span className="text-emerald-600 dark:text-emerald-400 font-medium">0.00%</span>
         </div>
       </div>
 
       {/* 3. Memory Footprint */}
-      <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-6 flex flex-col justify-between hover:border-zinc-700 transition-colors">
+      <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/40 p-6 flex flex-col justify-between hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors shadow-sm dark:shadow-none">
         <div className="flex items-start justify-between">
-          <span className="text-xs font-medium text-zinc-400 uppercase tracking-wider">
+          <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
             Resident Memory
           </span>
-          <span className="text-xs font-medium text-zinc-400 bg-zinc-800 px-2 py-0.5 rounded border border-zinc-700/60">
+          <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded border border-zinc-200 dark:border-zinc-700/60">
             {ramPercent}% of Budget
           </span>
         </div>
         <div className="mt-4">
-          <div className="text-3xl font-semibold text-zinc-100 font-sans tracking-tight">
+          <div className="text-3xl font-semibold text-zinc-900 dark:text-zinc-100 font-sans tracking-tight">
             {peakRamMb.toFixed(1)}{" "}
-            <span className="text-sm font-normal text-zinc-400">MB</span>
+            <span className="text-sm font-normal text-zinc-500 dark:text-zinc-400">MB</span>
           </div>
-          <div className="mt-2.5 w-full bg-zinc-800 rounded-full h-1.5 overflow-hidden">
+          <div className="mt-2.5 w-full bg-zinc-100 dark:bg-zinc-800 rounded-full h-1.5 overflow-hidden">
             <div
-              className="bg-indigo-500 h-full rounded-full transition-all duration-300"
+              className="bg-indigo-600 dark:bg-indigo-500 h-full rounded-full transition-all duration-300"
               style={{ width: `${ramPercent}%` }}
             />
           </div>
         </div>
-        <div className="mt-4 pt-3 border-t border-zinc-800/80 flex items-center justify-between text-xs text-zinc-400">
+        <div className="mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400">
           <span>Max Allowed Budget:</span>
-          <span className="font-mono text-zinc-300">250.0 MB</span>
+          <span className="font-mono text-zinc-700 dark:text-zinc-300">250.0 MB</span>
         </div>
       </div>
 
       {/* 4. WAN Telemetry (Air-Gap) */}
-      <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-6 flex flex-col justify-between hover:border-zinc-700 transition-colors">
+      <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/40 p-6 flex flex-col justify-between hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors shadow-sm dark:shadow-none">
         <div className="flex items-start justify-between">
-          <span className="text-xs font-medium text-zinc-400 uppercase tracking-wider">
+          <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
             Telemetry Egress
           </span>
-          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 px-2 py-0.5 rounded">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
             Air-Gapped
           </span>
         </div>
         <div className="mt-4">
-          <div className="text-3xl font-semibold text-zinc-100 font-sans tracking-tight">
+          <div className="text-3xl font-semibold text-zinc-900 dark:text-zinc-100 font-sans tracking-tight">
             {wanBytes}{" "}
-            <span className="text-sm font-normal text-zinc-400">Bytes</span>
+            <span className="text-sm font-normal text-zinc-500 dark:text-zinc-400">Bytes</span>
           </div>
-          <p className="mt-1 text-xs text-zinc-400">
+          <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
             100% on-device local execution
           </p>
         </div>
-        <div className="mt-4 pt-3 border-t border-zinc-800/80 flex items-center justify-between text-xs text-zinc-400">
+        <div className="mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400">
           <span>IPC Socket:</span>
-          <span className="font-mono text-zinc-300">127.0.0.1:41789</span>
+          <span className="font-mono text-zinc-700 dark:text-zinc-300">127.0.0.1:41789</span>
         </div>
       </div>
     </div>

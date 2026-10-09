@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Sidebar, NavTab } from "./components/Sidebar";
 import { TopBar } from "./components/TopBar";
 import { MetricsGrid } from "./components/MetricsGrid";
@@ -6,9 +6,22 @@ import { ThreatInspector } from "./components/ThreatInspector";
 import { ProcessAuditorTable, ProcessAuditItem } from "./components/ProcessAuditorTable";
 import { AuditVaultTable, LogEntry } from "./components/AuditVaultTable";
 import { XaiDrawer, ScanResultPayload } from "./components/XaiDrawer";
+import { DemoBanner } from "./components/DemoBanner";
+import { ProtectionCard } from "./components/ProtectionCard";
+import { QuickActionsGrid } from "./components/QuickActionsGrid";
+import { RecentThreatsList } from "./components/RecentThreatsList";
 import { Sliders } from "lucide-react";
 
 export const App: React.FC = () => {
+  // Theme state: dark is default
+  const [theme, setTheme] = useState<"dark" | "light">(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("sparrow_theme");
+      if (saved === "light" || saved === "dark") return saved;
+    }
+    return "dark";
+  });
+
   const [activeTab, setActiveTab] = useState<NavTab>("dashboard");
   const [airplaneMode] = useState<boolean>(true);
   const [wanBytes] = useState<number>(0);
@@ -18,9 +31,33 @@ export const App: React.FC = () => {
   const [peakRamMb] = useState<number>(14.9);
   const [activeAlert, setActiveAlert] = useState<ScanResultPayload | null>(null);
 
+  // New module states
+  const [showDemoBanner, setShowDemoBanner] = useState<boolean>(true);
+  const [clipboardShield, setClipboardShield] = useState<boolean>(true);
+  const [inspectorType, setInspectorType] = useState<"Url" | "SmsText" | "QrPayload">("Url");
+  const [inspectorPayload, setInspectorPayload] = useState<string>(
+    "https://secure-p\u0430ypal.com/verify-account?token=9281a4b"
+  );
+
   // Engine configuration settings
   const [entropyThreshold, setEntropyThreshold] = useState<number>(4.5);
   const [activeDelegate, setActiveDelegate] = useState<string>("CPU (x86_64 INT8 AVX2)");
+
+  // Sync theme with HTML document class and localStorage
+  useEffect(() => {
+    if (typeof document !== "undefined") {
+      if (theme === "dark") {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+      localStorage.setItem("sparrow_theme", theme);
+    }
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+  };
 
   const [logs, setLogs] = useState<LogEntry[]>([
     {
@@ -204,161 +241,247 @@ export const App: React.FC = () => {
     };
   };
 
-  return (
-    <div className="flex h-screen bg-zinc-950 text-zinc-100 font-sans antialiased overflow-hidden">
-      {/* 1. Left Navigation Sidebar */}
-      <Sidebar
-        activeTab={activeTab}
-        onSelectTab={setActiveTab}
-        airplaneMode={airplaneMode}
-        wanBytes={wanBytes}
-      />
+  // Quick Action Dispatcher
+  const handleQuickAction = async (
+    type: "Url" | "SmsText" | "QrPayload",
+    autoPaste: boolean = false
+  ) => {
+    setInspectorType(type);
+    if (autoPaste) {
+      try {
+        const text = await navigator.clipboard.readText();
+        if (text && text.trim()) {
+          setInspectorPayload(text);
+          await handleScan(type, text);
+          return;
+        }
+      } catch {
+        // Fallback if clipboard permissions restricted
+      }
+    }
 
-      {/* 2. Main Workspace */}
-      <div className="flex-1 flex flex-col h-screen overflow-hidden">
-        {/* Top Header */}
-        <TopBar
+    if (type === "Url") {
+      setInspectorPayload("https://secure-p\u0430ypal.com/verify-account?token=9281a4b");
+    } else if (type === "SmsText") {
+      setInspectorPayload(
+        "BANK ALERT: Unusual wire transfer of $2,450.00 initiated to unknown recipient. Cancel transaction now: http://fake-chase.top"
+      );
+    } else {
+      setInspectorPayload("javascript:alert('Stolen Token: ' + document.cookie)");
+    }
+  };
+
+  return (
+    <div className={theme === "dark" ? "dark" : ""}>
+      <div className="flex h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans antialiased overflow-hidden transition-colors">
+        {/* 1. Left Navigation Sidebar */}
+        <Sidebar
           activeTab={activeTab}
-          latencyUs={lastLatencyUs}
+          onSelectTab={setActiveTab}
+          airplaneMode={airplaneMode}
           wanBytes={wanBytes}
-          onOpenInspector={() => setActiveTab("inspector")}
         />
 
-        {/* Main Content Area */}
-        <main className="flex-1 overflow-y-auto p-8 space-y-8">
-          {activeTab === "dashboard" && (
-            <div className="space-y-8 max-w-7xl mx-auto">
-              {/* Row 1: High-Level Metrics (4-Column Grid) */}
-              <MetricsGrid
-                totalScans={totalScans}
-                threatsBlocked={threatsBlocked}
-                lastLatencyUs={lastLatencyUs}
-                peakRamMb={peakRamMb}
-                wanBytes={wanBytes}
-              />
+        {/* 2. Main Workspace */}
+        <div className="flex-1 flex flex-col h-screen overflow-hidden">
+          {/* Top Header with Theme Toggle */}
+          <TopBar
+            activeTab={activeTab}
+            latencyUs={lastLatencyUs}
+            wanBytes={wanBytes}
+            theme={theme}
+            onToggleTheme={toggleTheme}
+            onOpenInspector={() => setActiveTab("inspector")}
+          />
 
-              {/* Row 2: Live Payload Inspector */}
-              <ThreatInspector onScan={handleScan} />
+          {/* Main Content Area */}
+          <main className="flex-1 overflow-y-auto p-8 space-y-8">
+            {activeTab === "dashboard" && (
+              <div className="space-y-8 max-w-7xl mx-auto">
+                {/* Module 1: Dismissible Demo Mode Banner */}
+                {showDemoBanner && (
+                  <DemoBanner
+                    onDismiss={() => setShowDemoBanner(false)}
+                    onQuickDemo={() =>
+                      handleScan(
+                        "Url",
+                        "https://secure-p\u0430ypal.com/verify-account?token=9281a4b"
+                      )
+                    }
+                  />
+                )}
 
-              {/* Row 3: Process Auditor & Forensic Vault Tables */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <ProcessAuditorTable
-                  processes={processes}
-                  onRefresh={() => setProcesses((prev) => [...prev])}
+                {/* Module 2: 4-Column High-Level Metrics Grid */}
+                <MetricsGrid
+                  totalScans={totalScans}
+                  threatsBlocked={threatsBlocked}
+                  lastLatencyUs={lastLatencyUs}
+                  peakRamMb={peakRamMb}
+                  wanBytes={wanBytes}
+                />
+
+                {/* Module 3 & 4: Protection Active Card (4 cols) & Quick Actions Grid (8 cols) */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                  <div className="lg:col-span-5 flex">
+                    <div className="w-full">
+                      <ProtectionCard
+                        clipboardShield={clipboardShield}
+                        onToggleClipboardShield={setClipboardShield}
+                        latencyUs={lastLatencyUs}
+                      />
+                    </div>
+                  </div>
+                  <div className="lg:col-span-7 flex">
+                    <div className="w-full">
+                      <QuickActionsGrid onSelectAction={handleQuickAction} />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Module 5: Live Payload Inspector */}
+                <ThreatInspector
+                  onScan={handleScan}
+                  selectedType={inspectorType}
+                  initialPayload={inspectorPayload}
+                />
+
+                {/* Module 6: Process Auditor Table & Recent Threats Feed */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                  <div className="lg:col-span-7">
+                    <ProcessAuditorTable
+                      processes={processes}
+                      onRefresh={() => setProcesses((prev) => [...prev])}
+                    />
+                  </div>
+                  <div className="lg:col-span-5">
+                    <RecentThreatsList
+                      logs={logs}
+                      onSelectThreat={(result) => setActiveAlert(result)}
+                      onViewAll={() => setActiveTab("logs")}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === "inspector" && (
+              <div className="space-y-8 max-w-5xl mx-auto">
+                <ThreatInspector
+                  onScan={handleScan}
+                  selectedType={inspectorType}
+                  initialPayload={inspectorPayload}
                 />
                 <AuditVaultTable
                   logs={logs}
                   onSelectLog={(result) => setActiveAlert(result)}
                 />
               </div>
-            </div>
-          )}
+            )}
 
-          {activeTab === "inspector" && (
-            <div className="space-y-8 max-w-5xl mx-auto">
-              <ThreatInspector onScan={handleScan} />
-              <AuditVaultTable
-                logs={logs}
-                onSelectLog={(result) => setActiveAlert(result)}
-              />
-            </div>
-          )}
+            {activeTab === "processes" && (
+              <div className="space-y-8 max-w-5xl mx-auto">
+                <ProcessAuditorTable
+                  processes={processes}
+                  onRefresh={() => setProcesses((prev) => [...prev])}
+                />
+              </div>
+            )}
 
-          {activeTab === "processes" && (
-            <div className="space-y-8 max-w-5xl mx-auto">
-              <ProcessAuditorTable
-                processes={processes}
-                onRefresh={() => setProcesses((prev) => [...prev])}
-              />
-            </div>
-          )}
+            {activeTab === "logs" && (
+              <div className="space-y-8 max-w-5xl mx-auto">
+                <AuditVaultTable
+                  logs={logs}
+                  onSelectLog={(result) => setActiveAlert(result)}
+                />
+              </div>
+            )}
 
-          {activeTab === "logs" && (
-            <div className="space-y-8 max-w-5xl mx-auto">
-              <AuditVaultTable
-                logs={logs}
-                onSelectLog={(result) => setActiveAlert(result)}
-              />
-            </div>
-          )}
-
-          {activeTab === "settings" && (
-            <div className="space-y-6 max-w-3xl mx-auto">
-              <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-6 space-y-5">
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 rounded-md bg-zinc-900 border border-zinc-800 text-zinc-300">
-                    <Sliders className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h2 className="text-sm font-semibold text-zinc-100">
-                      Engine Configuration
-                    </h2>
-                    <p className="text-xs text-zinc-400 mt-0.5">
-                      Adjust runtime thresholds for local heuristic models and INT8 delegates.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="space-y-4 pt-4 border-t border-zinc-800 text-xs">
-                  {/* Shannon Entropy Threshold */}
-                  <div className="flex items-center justify-between p-4 rounded-md bg-zinc-950 border border-zinc-800">
+            {activeTab === "settings" && (
+              <div className="space-y-6 max-w-3xl mx-auto">
+                <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/40 p-6 space-y-5 transition-colors shadow-sm dark:shadow-none">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 rounded-md bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300">
+                      <Sliders className="w-4 h-4" />
+                    </div>
                     <div>
-                      <div className="font-medium text-zinc-200">Shannon Entropy Threshold</div>
-                      <div className="text-xs text-zinc-400 mt-0.5">
-                        Flags algorithmic randomness in DGA subdomains (Default: 4.5)
+                      <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                        Engine Configuration
+                      </h2>
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                        Adjust runtime thresholds for local heuristic models and INT8 delegates.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 pt-4 border-t border-zinc-100 dark:border-zinc-800 text-xs">
+                    {/* Shannon Entropy Threshold */}
+                    <div className="flex items-center justify-between p-4 rounded-md bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800">
+                      <div>
+                        <div className="font-medium text-zinc-900 dark:text-zinc-200">
+                          Shannon Entropy Threshold
+                        </div>
+                        <div className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                          Flags algorithmic randomness in DGA subdomains (Default: 4.5)
+                        </div>
+                      </div>
+                      <div>
+                        <input
+                          type="number"
+                          step="0.1"
+                          value={entropyThreshold}
+                          onChange={(e) =>
+                            setEntropyThreshold(parseFloat(e.target.value) || 4.5)
+                          }
+                          className="w-16 p-1.5 rounded bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-center text-zinc-900 dark:text-zinc-100 font-mono focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-700"
+                        />
                       </div>
                     </div>
-                    <div>
-                      <input
-                        type="number"
-                        step="0.1"
-                        value={entropyThreshold}
-                        onChange={(e) => setEntropyThreshold(parseFloat(e.target.value) || 4.5)}
-                        className="w-16 p-1.5 rounded bg-zinc-900 border border-zinc-800 text-center text-zinc-100 font-mono focus:outline-none focus:border-zinc-700"
-                      />
-                    </div>
-                  </div>
 
-                  {/* INT8 Execution Delegate */}
-                  <div className="flex items-center justify-between p-4 rounded-md bg-zinc-950 border border-zinc-800">
-                    <div>
-                      <div className="font-medium text-zinc-200">Transformer INT8 Delegate</div>
-                      <div className="text-xs text-zinc-400 mt-0.5">
-                        Hardware acceleration provider for MobileBERT
+                    {/* INT8 Execution Delegate */}
+                    <div className="flex items-center justify-between p-4 rounded-md bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800">
+                      <div>
+                        <div className="font-medium text-zinc-900 dark:text-zinc-200">
+                          Transformer INT8 Delegate
+                        </div>
+                        <div className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                          Hardware acceleration provider for MobileBERT
+                        </div>
                       </div>
+                      <select
+                        value={activeDelegate}
+                        onChange={(e) => setActiveDelegate(e.target.value)}
+                        className="p-1.5 rounded bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-200 text-xs focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-700"
+                      >
+                        <option>CPU (x86_64 INT8 AVX2)</option>
+                        <option>Android NNAPI Delegate</option>
+                        <option>Vulkan / DirectML</option>
+                      </select>
                     </div>
-                    <select
-                      value={activeDelegate}
-                      onChange={(e) => setActiveDelegate(e.target.value)}
-                      className="p-1.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-200 text-xs focus:outline-none focus:border-zinc-700"
-                    >
-                      <option>CPU (x86_64 INT8 AVX2)</option>
-                      <option>Android NNAPI Delegate</option>
-                      <option>Vulkan / DirectML</option>
-                    </select>
-                  </div>
 
-                  {/* Encrypted Vault Path */}
-                  <div className="flex items-center justify-between p-4 rounded-md bg-zinc-950 border border-zinc-800">
-                    <div>
-                      <div className="font-medium text-zinc-200">Encrypted Vault Storage</div>
-                      <div className="text-xs text-zinc-400 mt-0.5">
-                        AES-256 SQLCipher local database path
+                    {/* Encrypted Vault Path */}
+                    <div className="flex items-center justify-between p-4 rounded-md bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800">
+                      <div>
+                        <div className="font-medium text-zinc-900 dark:text-zinc-200">
+                          Encrypted Vault Storage
+                        </div>
+                        <div className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                          AES-256 SQLCipher local database path
+                        </div>
                       </div>
+                      <span className="text-xs font-mono text-zinc-500 dark:text-zinc-400">
+                        ~/.pocket_sparrow/vault.db
+                      </span>
                     </div>
-                    <span className="text-xs font-mono text-zinc-400">
-                      ~/.pocket_sparrow/vault.db
-                    </span>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
-        </main>
-      </div>
+            )}
+          </main>
+        </div>
 
-      {/* 3. Forensic Detail Slide-Out Sheet */}
-      <XaiDrawer result={activeAlert} onClose={() => setActiveAlert(null)} />
+        {/* 3. Forensic Detail Slide-Out Sheet */}
+        <XaiDrawer result={activeAlert} onClose={() => setActiveAlert(null)} />
+      </div>
     </div>
   );
 };
