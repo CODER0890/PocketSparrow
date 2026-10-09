@@ -93,72 +93,15 @@ Engineered by **Team Silent Flight (Team ID: HJAZ)** for **Code Carnival 3.0** o
 > [!TIP]
 > Every metric below has been profiled and confirmed across 12,000 continuous benchmark cycles using automated profiling harnesses ([`benchmarks/`](file:///home/gjgameryt-0890/PocketSparrow/benchmarks/) and [`core/cpp/tests/`](file:///home/gjgameryt-0890/PocketSparrow/core/cpp/tests/)):
 
-<div align="center">
-
-<table width="100%">
-<thead>
-<tr style="background:#18181B;">
-  <th align="left">Constraint Target</th>
-  <th align="center">Hard Specification</th>
-  <th align="center">Measured Repository Result</th>
-  <th align="center">SLA Margin &amp; Status</th>
-  <th align="left">Verification Method / Test Suite</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-  <td><b>⚡ Response Latency (P99)</b></td>
-  <td align="center"><img src="https://img.shields.io/badge/TARGET-%3C%2050.0%20ms-0284C7?style=flat-square"/></td>
-  <td align="center"><code>0.047 ms</code> (C++) / <code>0.006 ms</code> (Rust)</td>
-  <td align="center"><img src="https://img.shields.io/badge/%E2%9C%85%20PASS-1%2C000x%20FASTER-00FFA3?style=for-the-badge&logoColor=black"/></td>
-  <td><code>benchmarks/src/main.rs</code> (12,000 iterations)</td>
-</tr>
-<tr>
-  <td><b>🛡️ Tier 1 Heuristic Latency</b></td>
-  <td align="center"><img src="https://img.shields.io/badge/TARGET-%3C%205.0%20ms-00F0FF?style=flat-square"/></td>
-  <td align="center"><code>0.016 ms</code> (16 µs average)</td>
-  <td align="center"><img src="https://img.shields.io/badge/%E2%9C%85%20PASS-300x%20FASTER-00FFA3?style=for-the-badge&logoColor=black"/></td>
-  <td><code>core/cpp/tests/benchmark_detection_engine.cpp</code></td>
-</tr>
-<tr>
-  <td><b>🧠 Tier 2 Transformer Latency</b></td>
-  <td align="center"><img src="https://img.shields.io/badge/TARGET-%3C%2040.0%20ms-A855F7?style=flat-square"/></td>
-  <td align="center"><code>0.220 ms</code> (P99 CPU INT8)</td>
-  <td align="center"><img src="https://img.shields.io/badge/%E2%9C%85%20PASS-180x%20FASTER-00FFA3?style=for-the-badge&logoColor=black"/></td>
-  <td><code>ml/benchmarks/benchmark_inference.py</code></td>
-</tr>
-<tr>
-  <td><b>📦 Quantized Model Size</b></td>
-  <td align="center"><img src="https://img.shields.io/badge/TARGET-%E2%89%A4%2035.0%20MB-F59E0B?style=flat-square"/></td>
-  <td align="center"><code>32.00 MB</code> (ONNX) / <code>33.00 MB</code> (TFLite)</td>
-  <td align="center"><img src="https://img.shields.io/badge/%E2%9C%85%20PASS-WITHIN%20BUDGET-00FFA3?style=for-the-badge&logoColor=black"/></td>
-  <td><code>ls -lh ml/models/pocket_sparrow_int8.*</code></td>
-</tr>
-<tr>
-  <td><b>💾 Resident Memory (Peak RSS)</b></td>
-  <td align="center"><img src="https://img.shields.io/badge/TARGET-%3C%20250.0%20MB-EC4899?style=flat-square"/></td>
-  <td align="center"><code>14.88 MB</code> Peak RSS (&gt;235 MB headroom)</td>
-  <td align="center"><img src="https://img.shields.io/badge/%E2%9C%85%20PASS-94%25%20HEADROOM-00FFA3?style=for-the-badge&logoColor=black"/></td>
-  <td><code>python3 benchmarks/memory_audit.py</code></td>
-</tr>
-<tr>
-  <td><b>🔒 WAN Network Telemetry</b></td>
-  <td align="center"><img src="https://img.shields.io/badge/TARGET-0%20BYTES%20WAN-E11D48?style=flat-square"/></td>
-  <td align="center"><code>0 Outbound Bytes</code> (Kernel Socket Audited)</td>
-  <td align="center"><img src="https://img.shields.io/badge/%E2%9C%85%20PASS-AIRGAP%20VERIFIED-00FFA3?style=for-the-badge&logoColor=black"/></td>
-  <td><code>python3 benchmarks/zero_network_audit.py</code></td>
-</tr>
-<tr>
-  <td><b>✈️ Airplane Mode Operation</b></td>
-  <td align="center"><img src="https://img.shields.io/badge/TARGET-MANDATORY-6366F1?style=flat-square"/></td>
-  <td align="center"><code>100% Operational Offline</code> (Test Cases A, B, C)</td>
-  <td align="center"><img src="https://img.shields.io/badge/%E2%9C%85%20PASS-DEMO%20CERTIFIED-00F0FF?style=for-the-badge&logoColor=black"/></td>
-  <td><code>bash demo/run_airplane_demo.sh</code></td>
-</tr>
-</tbody>
-</table>
-
-</div>
+| Constraint Target | Hard Specification | Measured Repository Result | Margin & Status | Verification Method / Test Suite |
+| :--- | :---: | :---: | :---: | :--- |
+| **⚡ Response Latency (P99)** | `TARGET < 50.0 ms` | **`0.047 ms`** (C++) / **`0.006 ms`** (Rust) | ![Pass](https://img.shields.io/badge/%E2%9C%85_PASS-1%2C000x_Faster-00FFA3?style=flat-square) | [`benchmarks/src/main.rs`](file:///home/gjgameryt-0890/PocketSparrow/benchmarks/src/main.rs) (12,000 cycles) |
+| **🛡️ Tier 1 Heuristics** | `TARGET < 5.0 ms` | **`0.016 ms`** (16 µs average) | ![Pass](https://img.shields.io/badge/%E2%9C%85_PASS-300x_Faster-00FFA3?style=flat-square) | [`benchmark_detection_engine.cpp`](file:///home/gjgameryt-0890/PocketSparrow/core/cpp/tests/benchmark_detection_engine.cpp) |
+| **🧠 Tier 2 MobileBERT** | `TARGET < 40.0 ms` | **`0.220 ms`** (P99 CPU INT8) | ![Pass](https://img.shields.io/badge/%E2%9C%85_PASS-180x_Faster-00FFA3?style=flat-square) | [`benchmark_inference.py`](file:///home/gjgameryt-0890/PocketSparrow/ml/benchmarks/benchmark_inference.py) |
+| **📦 Model Size (INT8)** | `TARGET ≤ 35.0 MB` | **`32.00 MB`** (ONNX) / **`33.00 MB`** (TFLite) | ![Pass](https://img.shields.io/badge/%E2%9C%85_PASS-Within_Budget-00FFA3?style=flat-square) | `ml/models/pocket_sparrow_int8.*` |
+| **💾 Resident Memory** | `TARGET < 250.0 MB` | **`14.88 MB`** Peak RSS (>235 MB headroom) | ![Pass](https://img.shields.io/badge/%E2%9C%85_PASS-94%25_Headroom-00FFA3?style=flat-square) | [`memory_audit.py`](file:///home/gjgameryt-0890/PocketSparrow/benchmarks/memory_audit.py) |
+| **🔒 WAN Telemetry** | `TARGET 0 BYTES` | **`0 Outbound Bytes`** (Kernel Audited) | ![Pass](https://img.shields.io/badge/%E2%9C%85_PASS-Airgap_Verified-00FFA3?style=flat-square) | [`zero_network_audit.py`](file:///home/gjgameryt-0890/PocketSparrow/benchmarks/zero_network_audit.py) |
+| **✈️ Airplane Mode** | `MANDATORY` | **`100% Operational Offline`** (A, B, C) | ![Pass](https://img.shields.io/badge/%E2%9C%85_PASS-Demo_Certified-00F0FF?style=flat-square) | [`run_airplane_demo.sh`](file:///home/gjgameryt-0890/PocketSparrow/demo/run_airplane_demo.sh) |
 
 ---
 
@@ -250,58 +193,13 @@ sequenceDiagram
     Note over Host,XAI: 🔒 100% Offline • 0 Outbound WAN Bytes • AES-256 SQLCipher Encrypted
 ```
 
-<div align="center">
-
-<table width="100%">
-<thead>
-<tr style="background:#18181B;">
-  <th align="left">Pipeline Inspection Stage</th>
-  <th align="center">Target SLA Ceiling</th>
-  <th align="center">Measured P99 Execution</th>
-  <th align="center">Performance Margin</th>
-  <th align="left">Hardware Execution Path</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-  <td><b>🛡️ Tier 1 Heuristics</b></td>
-  <td align="center"><code>&lt; 5.000 ms</code></td>
-  <td align="center"><code>0.016 ms (16 µs)</code></td>
-  <td align="center"><img src="https://img.shields.io/badge/312x%20FASTER-00FFA3?style=flat-square"/></td>
-  <td>Shannon Entropy + Homoglyph Unmasker + Trie in C++17/Rust</td>
-</tr>
-<tr>
-  <td><b>🔀 Dual-Tier Routing</b></td>
-  <td align="center"><code>&lt; 0.500 ms</code></td>
-  <td align="center"><code>0.002 ms (2 µs)</code></td>
-  <td align="center"><img src="https://img.shields.io/badge/250x%20FASTER-00FFA3?style=flat-square"/></td>
-  <td>Zero-copy confidence threshold gate &amp; whitelist bypass</td>
-</tr>
-<tr>
-  <td><b>🧠 Tier 2 MobileBERT INT8</b></td>
-  <td align="center"><code>&lt; 40.000 ms</code></td>
-  <td align="center"><code>0.220 ms (220 µs)</code></td>
-  <td align="center"><img src="https://img.shields.io/badge/181x%20FASTER-00FFA3?style=flat-square"/></td>
-  <td>WordPiece Tokenizer + ONNX Runtime / TFLite NNAPI INT8</td>
-</tr>
-<tr>
-  <td><b>🔒 Forensic Vault Logging</b></td>
-  <td align="center"><code>&lt; 4.500 ms</code></td>
-  <td align="center"><code>0.029 ms (29 µs)</code></td>
-  <td align="center"><img src="https://img.shields.io/badge/155x%20FASTER-00FFA3?style=flat-square"/></td>
-  <td>SQLCipher AES-256 local encrypted ledger commit</td>
-</tr>
-<tr style="background:#09090B;">
-  <td><b>⚡ End-to-End P99 Total</b></td>
-  <td align="center"><b><code>&lt; 50.000 ms</code></b></td>
-  <td align="center"><b><code>0.047 ms (47 µs)</code></b></td>
-  <td align="center"><img src="https://img.shields.io/badge/1%2C063x%20FASTER-00F0FF?style=for-the-badge&logoColor=black"/></td>
-  <td><b>Full Hardware Air-Gapped Pipeline (0 Cloud Egress)</b></td>
-</tr>
-</tbody>
-</table>
-
-</div>
+| Pipeline Inspection Stage | Target SLA Ceiling | Measured P99 Execution | Performance Margin | Hardware Execution Path |
+| :--- | :---: | :---: | :---: | :--- |
+| **🛡️ Tier 1 Heuristics** | `< 5.000 ms` | **`0.016 ms`** (16 µs) | ![Pass](https://img.shields.io/badge/312x_FASTER-00FFA3?style=flat-square) | Shannon Entropy + Homoglyph Unmasker + Trie in C++17/Rust |
+| **🔀 Dual-Tier Routing** | `< 0.500 ms` | **`0.002 ms`** (2 µs) | ![Pass](https://img.shields.io/badge/250x_FASTER-00FFA3?style=flat-square) | Zero-copy confidence threshold gate &amp; whitelist bypass |
+| **🧠 Tier 2 MobileBERT INT8** | `< 40.000 ms` | **`0.220 ms`** (220 µs) | ![Pass](https://img.shields.io/badge/181x_FASTER-00FFA3?style=flat-square) | WordPiece Tokenizer + ONNX Runtime / TFLite NNAPI INT8 |
+| **🔒 Forensic Vault Logging** | `< 4.500 ms` | **`0.029 ms`** (29 µs) | ![Pass](https://img.shields.io/badge/155x_FASTER-00FFA3?style=flat-square) | SQLCipher AES-256 local encrypted ledger commit |
+| **⚡ End-to-End Total (P99)** | **`< 50.000 ms`** | **`0.047 ms`** (47 µs) | ![Pass](https://img.shields.io/badge/1%2C063x_FASTER-00F0FF?style=flat-square) | **Full Hardware Air-Gapped Pipeline (0 Cloud Egress)** |
 
 ---
 
@@ -342,64 +240,15 @@ mindmap
 
 <br/>
 
-<div align="center">
-
-<table width="100%">
-<thead>
-<tr style="background:#18181B;">
-  <th align="left">Module Directory</th>
-  <th align="left">Technology Stack</th>
-  <th align="center">Size / Footprint</th>
-  <th align="left">Core Deliverables &amp; Responsibilities</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-  <td><b>🧠 <code>ml/</code></b></td>
-  <td>PyTorch, Transformers, ONNX, TFLite</td>
-  <td align="center"><code>32MB</code> ONNX / <code>33MB</code> TFLite</td>
-  <td>Synthetic datasets, fine-tuning scripts, INT8 PTQ exporters, WordPiece vocab</td>
-</tr>
-<tr>
-  <td><b>⚙️ <code>core/</code></b></td>
-  <td>C++17, Rust 2021, CMake, Cargo</td>
-  <td align="center"><code>&lt; 2MB</code> Binary</td>
-  <td>Dual Tier-1/Tier-2 engine, Shannon entropy, homoglyph detector, C-ABI FFI</td>
-</tr>
-<tr>
-  <td><b>💻 <code>desktop/</code></b></td>
-  <td>Tauri 2.0, Rust, React 18, Tailwind</td>
-  <td align="center"><code>14.88MB</code> Peak RSS</td>
-  <td>Tauri daemon, loopback HTTP bridge (<code>127.0.0.1:41789</code>), enterprise dashboard</td>
-</tr>
-<tr>
-  <td><b>🛡️ <code>browser-extension/</code></b></td>
-  <td>Manifest V3, WebNavigation API</td>
-  <td align="center"><code>&lt; 50KB</code> Bundle</td>
-  <td>Pre-navigation link hook querying local daemon in <code>&lt; 5ms</code></td>
-</tr>
-<tr>
-  <td><b>📱 <code>android/</code></b></td>
-  <td>Kotlin, NDK C++, Jetpack Compose, Room</td>
-  <td align="center">Bundled INT8 Model</td>
-  <td><code>NotificationScanService</code>, CameraX QR scanner, APK auditor, zero-internet manifest</td>
-</tr>
-<tr>
-  <td><b>📊 <code>benchmarks/</code></b></td>
-  <td>Rust, Python, Linux <code>/proc/net</code></td>
-  <td align="center">Automated Harness</td>
-  <td>12,000-cycle latency profiler, peak RSS validator, socket airgap assertion</td>
-</tr>
-<tr>
-  <td><b>🎬 <code>demo/</code></b></td>
-  <td>Bash, JSON, SVG, Dummy APK</td>
-  <td align="center"><code>&lt; 5MB</code> Fixture Kit</td>
-  <td>3-minute Airplane Mode Live Demo runner, Test Cases A, B, and C</td>
-</tr>
-</tbody>
-</table>
-
-</div>
+| Module Directory | Technology Stack | Size / Footprint | Core Deliverables &amp; Responsibilities |
+| :--- | :--- | :---: | :--- |
+| **🧠 `ml/`** | PyTorch, Transformers, ONNX, TFLite | `32MB` ONNX / `33MB` TFLite | Synthetic datasets, fine-tuning scripts, INT8 PTQ exporters, WordPiece vocab |
+| **⚙️ `core/`** | C++17, Rust 2021, CMake, Cargo | `&lt; 2MB` Binary | Dual Tier-1/Tier-2 engine, Shannon entropy, homoglyph detector, C-ABI FFI |
+| **💻 `desktop/`** | Tauri 2.0, Rust, React 18, Tailwind | `14.88MB` Peak RSS | Tauri daemon, loopback HTTP bridge (`127.0.0.1:41789`), enterprise dashboard |
+| **🛡️ `browser-extension/`** | Manifest V3, WebNavigation API | `&lt; 50KB` Bundle | Pre-navigation link hook querying local daemon in `&lt; 5ms` |
+| **📱 `android/`** | Kotlin, NDK C++, Jetpack Compose, Room | Bundled INT8 Model | `NotificationScanService`, CameraX QR scanner, APK auditor, zero-internet manifest |
+| **📊 `benchmarks/`** | Rust, Python, Linux `/proc/net` | Automated Harness | 12,000-cycle latency profiler, peak RSS validator, socket airgap assertion |
+| **🎬 `demo/`** | Bash, JSON, SVG, Dummy APK | `&lt; 5MB` Fixture Kit | 3-minute Airplane Mode Live Demo runner, Test Cases A, B, and C |
 
 ---
 
@@ -589,58 +438,13 @@ mindmap
 
 ## ⏱️ 07 · 48-Hour Execution Plan & Milestones
 
-<div align="center">
-
-<table width="100%">
-<thead>
-<tr style="background:#18181B;">
-  <th align="center">Phase</th>
-  <th align="left">Milestone Deliverable</th>
-  <th align="left">Key Artifacts &amp; Implementation Details</th>
-  <th align="center">Status Badge</th>
-  <th align="center">Completion</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-  <td align="center"><b>Phase 1</b></td>
-  <td><b>Machine Learning &amp; INT8 Quantization</b></td>
-  <td>Synthetic phishing/smishing datasets, MobileBERT PTQ, 1,139-token WordPiece vocab, 32MB ONNX/TFLite export</td>
-  <td align="center"><img src="https://img.shields.io/badge/PHASE%201-COMPLETE-00FFA3?style=flat-square"/></td>
-  <td align="center"><progress value="100" max="100"></progress><br/><code>100%</code></td>
-</tr>
-<tr>
-  <td align="center"><b>Phase 2</b></td>
-  <td><b>Shared Core Detection Engine</b></td>
-  <td>C++17 &amp; Rust 2021 dual-tier core, Shannon entropy calculator, homoglyph trie, QR parser, unit tests (25/25 passed)</td>
-  <td align="center"><img src="https://img.shields.io/badge/PHASE%202-COMPLETE-00FFA3?style=flat-square"/></td>
-  <td align="center"><progress value="100" max="100"></progress><br/><code>100%</code></td>
-</tr>
-<tr>
-  <td align="center"><b>Phase 3</b></td>
-  <td><b>Desktop Application &amp; Extension</b></td>
-  <td>Tauri 2.0 daemon, loopback socket (<code>127.0.0.1:41789</code>), MV3 extension, Enterprise React HUD, Process Auditor</td>
-  <td align="center"><img src="https://img.shields.io/badge/PHASE%203-COMPLETE-00FFA3?style=flat-square"/></td>
-  <td align="center"><progress value="100" max="100"></progress><br/><code>100%</code></td>
-</tr>
-<tr>
-  <td align="center"><b>Phase 4</b></td>
-  <td><b>Android Native Application</b></td>
-  <td>Kotlin app, zero-internet manifest, NotificationListenerService, CameraX QR scanner, APK auditor, Room SQLCipher</td>
-  <td align="center"><img src="https://img.shields.io/badge/PHASE%204-COMPLETE-00FFA3?style=flat-square"/></td>
-  <td align="center"><progress value="100" max="100"></progress><br/><code>100%</code></td>
-</tr>
-<tr>
-  <td align="center"><b>Phase 5</b></td>
-  <td><b>SLA Verification &amp; Live Demo Kit</b></td>
-  <td>12,000-cycle latency harness, memory RSS profiler (&lt;250MB), zero-network socket audit (0B WAN), 3-min demo runner</td>
-  <td align="center"><img src="https://img.shields.io/badge/PHASE%205-COMPLETE-00FFA3?style=flat-square"/></td>
-  <td align="center"><progress value="100" max="100"></progress><br/><code>100%</code></td>
-</tr>
-</tbody>
-</table>
-
-</div>
+| Phase | Milestone Deliverable | Key Artifacts &amp; Implementation Details | Status Badge | Completion |
+| :---: | :--- | :--- | :---: | :---: |
+| **Phase 1** | **Machine Learning &amp; INT8 Quantization** | Synthetic phishing/smishing datasets, MobileBERT PTQ, 1,139-token WordPiece vocab, 32MB ONNX/TFLite export | ![Complete](https://img.shields.io/badge/PHASE%201-COMPLETE-00FFA3?style=flat-square) | `100%` |
+| **Phase 2** | **Shared Core Detection Engine** | C++17 &amp; Rust 2021 dual-tier core, Shannon entropy calculator, homoglyph trie, QR parser, unit tests (25/25 passed) | ![Complete](https://img.shields.io/badge/PHASE%202-COMPLETE-00FFA3?style=flat-square) | `100%` |
+| **Phase 3** | **Desktop Application &amp; Extension** | Tauri 2.0 daemon, loopback socket (`127.0.0.1:41789`), MV3 extension, Enterprise React HUD, Process Auditor | ![Complete](https://img.shields.io/badge/PHASE%203-COMPLETE-00FFA3?style=flat-square) | `100%` |
+| **Phase 4** | **Android Native Application** | Kotlin app, zero-internet manifest, NotificationListenerService, CameraX QR scanner, APK auditor, Room SQLCipher | ![Complete](https://img.shields.io/badge/PHASE%204-COMPLETE-00FFA3?style=flat-square) | `100%` |
+| **Phase 5** | **SLA Verification &amp; Live Demo Kit** | 12,000-cycle latency harness, memory RSS profiler (&lt;250MB), zero-network socket audit (0B WAN), 3-min demo runner | ![Complete](https://img.shields.io/badge/PHASE%205-COMPLETE-00FFA3?style=flat-square) | `100%` |
 
 ---
 
@@ -656,58 +460,13 @@ bash demo/run_airplane_demo.sh
 
 ### Demonstration Scenarios (Test Cases A, B, and C)
 
-<div align="center">
-
-<table width="100%">
-<thead>
-<tr style="background:#18181B;">
-  <th align="center">Timeline</th>
-  <th align="left">Attack Vector</th>
-  <th align="left">Live Input Payload</th>
-  <th align="center">Measured Verdict</th>
-  <th align="left">Plain-English Explainable AI (XAI) Output</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-  <td align="center"><b><code>00:00 - 00:20</code></b></td>
-  <td><b>Hardware Airgap Audit</b></td>
-  <td>Airplane Mode active, Wi-Fi &amp; Cellular disabled</td>
-  <td align="center"><img src="https://img.shields.io/badge/VERDICT-0_WAN_BYTES-00FFA3?style=for-the-badge&logoColor=black"/></td>
-  <td>Socket monitoring of <code>/proc/net/dev</code> confirmed exactly 0 outbound WAN bytes sent.</td>
-</tr>
-<tr>
-  <td align="center"><b><code>00:20 - 01:00</code></b></td>
-  <td><b>Cyrillic Homoglyph &amp; Urgency SMS</b></td>
-  <td><code>https://secure-pаypal.com/verify</code><br/><i>(Cyrillic 'а' substituted)</i></td>
-  <td align="center"><img src="https://img.shields.io/badge/VERDICT-BLOCKED-E11D48?style=for-the-badge&logoColor=white"/><br/><code>0.038 ms Latency</code></td>
-  <td><i>"Cyrillic homoglyph detected (Unicode \u0430 substituted for 'a'). High-urgency financial freeze phrasing identified."</i></td>
-</tr>
-<tr>
-  <td align="center"><b><code>01:00 - 01:50</code></b></td>
-  <td><b>Malicious Quishing QR Code</b></td>
-  <td><code>demo/test_case_b_quishing.svg</code><br/>High-entropy redirect link</td>
-  <td align="center"><img src="https://img.shields.io/badge/VERDICT-BLOCKED-E11D48?style=for-the-badge&logoColor=white"/><br/><code>0.041 ms Latency</code></td>
-  <td><i>"High Shannon entropy (H = 4.62) paired with high-risk TLD (.click) and embedded credential harvesting intent."</i></td>
-</tr>
-<tr>
-  <td align="center"><b><code>01:50 - 02:40</code></b></td>
-  <td><b>Sideloaded Banking Trojan APK</b></td>
-  <td><code>dummy_banking_trojan.apk</code><br/>SMS + Overlay Permissions</td>
-  <td align="center"><img src="https://img.shields.io/badge/DANGER-100%2F100-E11D48?style=for-the-badge&logoColor=white"/><br/><code>Trojan.Banker</code></td>
-  <td><i>"High-risk combination of SMS interception + overlay window permissions abused by banking credential hijackers."</i></td>
-</tr>
-<tr>
-  <td align="center"><b><code>02:40 - 03:00</code></b></td>
-  <td><b>Automated SLA Performance Audit</b></td>
-  <td>12,000 continuous benchmark cycles</td>
-  <td align="center"><img src="https://img.shields.io/badge/STATUS-ALL_PASSED-00FFA3?style=for-the-badge&logoColor=black"/></td>
-  <td>Peak RAM: <b>14.88 MB</b> (&lt;250MB). Latency: <b>0.016 ms</b> (&lt;50ms). Outbound WAN bytes: <b>0 Bytes</b>.</td>
-</tr>
-</tbody>
-</table>
-
-</div>
+| Timeline | Attack Vector | Live Input Payload | Measured Verdict | Plain-English Explainable AI (XAI) Output |
+| :---: | :--- | :--- | :---: | :--- |
+| **`00:00 - 00:20`** | **Hardware Airgap Audit** | Airplane Mode active, Wi-Fi & Cellular disabled | ![Pass](https://img.shields.io/badge/VERDICT-0_WAN_BYTES-00FFA3?style=flat-square) | Socket monitoring of `/proc/net/dev` confirmed exactly 0 outbound WAN bytes sent. |
+| **`00:20 - 01:00`** | **Cyrillic Homoglyph & Urgency SMS** | `https://secure-pаypal.com/verify`<br/>*(Cyrillic 'а' substituted)* | ![Blocked](https://img.shields.io/badge/VERDICT-BLOCKED-E11D48?style=flat-square)<br/>`0.038 ms Latency` | *"Cyrillic homoglyph detected (Unicode \u0430 substituted for 'a'). High-urgency financial freeze phrasing identified."* |
+| **`01:00 - 01:50`** | **Malicious Quishing QR Code** | `demo/test_case_b_quishing.svg`<br/>High-entropy redirect link | ![Blocked](https://img.shields.io/badge/VERDICT-BLOCKED-E11D48?style=flat-square)<br/>`0.041 ms Latency` | *"High Shannon entropy (H = 4.62) paired with high-risk TLD (.click) and embedded credential harvesting intent."* |
+| **`01:50 - 02:40`** | **Sideloaded Banking Trojan APK** | `dummy_banking_trojan.apk`<br/>SMS + Overlay Permissions | ![Danger](https://img.shields.io/badge/DANGER-100%2F100-E11D48?style=flat-square)<br/>`Trojan.Banker` | *"High-risk combination of SMS interception + overlay window permissions abused by banking credential hijackers."* |
+| **`02:40 - 03:00`** | **Automated SLA Performance Audit** | 12,000 continuous benchmark cycles | ![Pass](https://img.shields.io/badge/STATUS-ALL_PASSED-00FFA3?style=flat-square) | Peak RAM: **14.88 MB** (&lt;250MB). Latency: **0.016 ms** (&lt;50ms). Outbound WAN bytes: **0 Bytes**. |
 
 ---
 
@@ -716,52 +475,13 @@ bash demo/run_airplane_demo.sh
 > [!TIP]
 > **Interactive Module Selector**: Click any dropdown below to expand step-by-step instructions for installation, development execution, test suites, and production packaging:
 
-<div align="center">
-
-<table width="100%">
-<thead>
-<tr style="background:#18181B;">
-  <th align="center">Target Component</th>
-  <th align="center">Prerequisites</th>
-  <th align="center">Default Port / Mode</th>
-  <th align="left">Quick Command</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-  <td><b>⚡ Live Demo Runner</b></td>
-  <td align="center"><kbd>Bash</kbd> • <kbd>Python 3.10+</kbd></td>
-  <td align="center"><code>100% Airplane Mode</code></td>
-  <td><code>bash demo/run_airplane_demo.sh</code></td>
-</tr>
-<tr>
-  <td><b>💻 Tauri Desktop HUD</b></td>
-  <td align="center"><kbd>Node 18+</kbd> • <kbd>Rust 1.75+</kbd></td>
-  <td align="center"><code>127.0.0.1:41789</code></td>
-  <td><code>cd desktop && npm run tauri dev</code></td>
-</tr>
-<tr>
-  <td><b>📱 Android Mobile App</b></td>
-  <td align="center"><kbd>JDK 17</kbd> • <kbd>NDK r25+</kbd></td>
-  <td align="center"><code>Zero-Internet Manifest</code></td>
-  <td><code>cd android && ./gradlew installDebug</code></td>
-</tr>
-<tr>
-  <td><b>⚙️ Shared Detection Core</b></td>
-  <td align="center"><kbd>Rust</kbd> • <kbd>C++17</kbd> • <kbd>CMake</kbd></td>
-  <td align="center"><code>Zero-Copy C-ABI</code></td>
-  <td><code>cd core && cargo test --verbose</code></td>
-</tr>
-<tr>
-  <td><b>🧠 ML &amp; INT8 Pipeline</b></td>
-  <td align="center"><kbd>PyTorch</kbd> • <kbd>ONNX</kbd> • <kbd>TFLite</kbd></td>
-  <td align="center"><code>CPU &amp; NNAPI PTQ</code></td>
-  <td><code>cd ml && bash run_pipeline.sh</code></td>
-</tr>
-</tbody>
-</table>
-
-</div>
+| Target Component | Prerequisites | Default Port / Mode | Quick Command |
+| :--- | :---: | :---: | :--- |
+| **⚡ Live Demo Runner** | <kbd>Bash</kbd> &bull; <kbd>Python 3.10+</kbd> | `100% Airplane Mode` | `bash demo/run_airplane_demo.sh` |
+| **💻 Tauri Desktop HUD** | <kbd>Node 18+</kbd> &bull; <kbd>Rust 1.75+</kbd> | `127.0.0.1:41789` | `cd desktop && npm run tauri dev` |
+| **📱 Android Mobile App** | <kbd>JDK 17</kbd> &bull; <kbd>NDK r25+</kbd> | `Zero-Internet Manifest` | `cd android && ./gradlew installDebug` |
+| **⚙️ Shared Detection Core** | <kbd>Rust</kbd> &bull; <kbd>C++17</kbd> &bull; <kbd>CMake</kbd> | `Zero-Copy C-ABI` | `cd core && cargo test --verbose` |
+| **🧠 ML &amp; INT8 Pipeline** | <kbd>PyTorch</kbd> &bull; <kbd>ONNX</kbd> &bull; <kbd>TFLite</kbd> | `CPU &amp; NNAPI PTQ` | `cd ml && bash run_pipeline.sh` |
 
 <br/>
 
