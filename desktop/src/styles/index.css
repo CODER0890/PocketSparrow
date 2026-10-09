@@ -8,54 +8,42 @@
   }
 
   body {
-    @apply bg-[#030712] text-slate-100 antialiased font-mono;
+    background-color: #09090B;
+    color: #FAFAFA;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     margin: 0;
     padding: 0;
     overflow-x: hidden;
   }
 }
 
-/* Custom Cyber Scrollbars */
+/* Linear/Vercel subtle glass surface */
+.glass-surface {
+  background: rgba(19, 19, 24, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.glass-surface-hover:hover {
+  background: rgba(25, 25, 32, 0.85);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+/* Minimalist scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #030712;
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #06b6d4;
-}
-
-/* Cyber Glow Accents */
-.cyber-glow-cyan {
-  box-shadow: 0 0 25px rgba(6, 182, 212, 0.25);
-}
-.cyber-glow-emerald {
-  box-shadow: 0 0 25px rgba(16, 185, 129, 0.25);
-}
-.cyber-glow-rose {
-  box-shadow: 0 0 25px rgba(244, 63, 94, 0.3);
-}
-.cyber-card {
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(51, 65, 85, 0.6);
-}
-.cyber-card:hover {
-  border-color: rgba(56, 189, 248, 0.5);
-  box-shadow: 0 0 20px rgba(56, 189, 248, 0.15);
-}
-
-/* Cyber Pulse Animation */
-@keyframes cyber-pulse {
-  0%, 100% { opacity: 1; filter: drop-shadow(0 0 8px rgba(6, 182, 212, 0.6)); }
-  50% { opacity: 0.6; filter: drop-shadow(0 0 2px rgba(6, 182, 212, 0.2)); }
-}
-.animate-cyber-pulse {
-  animation: cyber-pulse 2.5s infinite ease-in-out;
+  background: rgba(255, 255, 255, 0.22);
 }

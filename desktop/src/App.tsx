@@ -1,37 +1,35 @@
 import React, { useState } from "react";
-import { Navbar } from "./components/Navbar";
-import { MetricsHUD } from "./components/MetricsHUD";
-import { ThreatAlertCard, ScanResultPayload } from "./components/ThreatAlertCard";
+import { Sidebar, NavTab } from "./components/Sidebar";
+import { TopBar } from "./components/TopBar";
+import { MetricsGrid } from "./components/MetricsGrid";
 import { ThreatInspector } from "./components/ThreatInspector";
-import { ProcessAuditor, ProcessAuditItem } from "./components/ProcessAuditor";
-import { AuditLogs, LogEntry } from "./components/AuditLogs";
-import { Shield } from "lucide-react";
+import { ProcessAuditorTable, ProcessAuditItem } from "./components/ProcessAuditorTable";
+import { AuditVaultTable, LogEntry } from "./components/AuditVaultTable";
+import { XaiDrawer, ScanResultPayload } from "./components/XaiDrawer";
+import { Sliders } from "lucide-react";
 
 export const App: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<NavTab>("dashboard");
   const [airplaneMode] = useState<boolean>(true);
   const [wanBytes] = useState<number>(0);
   const [lastLatencyUs, setLastLatencyUs] = useState<number>(18);
   const [totalScans, setTotalScans] = useState<number>(14);
   const [threatsBlocked, setThreatsBlocked] = useState<number>(8);
   const [peakRamMb] = useState<number>(14.9);
-  const [activeAlert, setActiveAlert] = useState<ScanResultPayload | null>({
-    verdict: "Malicious",
-    tier_triggered: "Tier1Heuristic",
-    confidence: 0.98,
-    latency_us: 18,
-    category: "HOMOGRAPH",
-    xai_reason: "Do not open this link. The domain disguises foreign characters to look identical to a trusted website. (Engine confidence: 98%)",
-    should_block: true,
-  });
+  const [activeAlert, setActiveAlert] = useState<ScanResultPayload | null>(null);
+
+  // Engine configuration settings
+  const [entropyThreshold, setEntropyThreshold] = useState<number>(4.5);
+  const [activeDelegate, setActiveDelegate] = useState<string>("CPU (x86_64 INT8 AVX2)");
 
   const [logs, setLogs] = useState<LogEntry[]>([
     {
       id: "log_1",
       timestamp: "15:52:12",
       type: "URL",
-      payload_snippet: "https://secure-pаypal.com/login",
+      payload_snippet: "https://secure-p\u0430ypal.com/verify-account",
       verdict: "Malicious",
-      category: "HOMOGRAPH",
+      category: "HOMOGRAPH_PUNYCODE",
       latency_us: 18,
     },
     {
@@ -56,10 +54,10 @@ export const App: React.FC = () => {
       id: "log_4",
       timestamp: "15:40:19",
       type: "URL",
-      payload_snippet: "https://www.google.com/search?q=rust",
+      payload_snippet: "https://en.wikipedia.org/wiki/Information_security",
       verdict: "Safe",
-      category: "SAFE",
-      latency_us: 7169,
+      category: "SAFE_AUTHORITATIVE",
+      latency_us: 89,
     },
   ]);
 
@@ -164,7 +162,7 @@ export const App: React.FC = () => {
         latency_us: Math.round((performance.now() - t0) * 1000) + 40,
         category: "MALICIOUS_QR_SCHEME",
         xai_reason:
-          "Blocked immediately. Executable JavaScript code was embedded inside the link/QR code designed to compromise your browser.",
+          "Blocked immediately on-device. Executable JavaScript code was embedded inside the link/QR code designed to hijack authentication cookies.",
         should_block: true,
       };
     }
@@ -186,10 +184,10 @@ export const App: React.FC = () => {
         category: lower.includes("wire")
           ? "URGENT_WIRE_TRANSFER"
           : lower.includes("\u0430") || lower.includes("\u0440")
-          ? "HOMOGRAPH"
+          ? "HOMOGRAPH_PUNYCODE"
           : "CREDENTIAL_HARVESTING",
         xai_reason:
-          "Deceptive indicators detected: lookalike typosquatted domain paired with high-urgency financial or account-locking coercion.",
+          "Deceptive indicators detected: visual spoofing homoglyph substitution paired with financial or account-locking coercion.",
         should_block: true,
       };
     }
@@ -199,73 +197,168 @@ export const App: React.FC = () => {
       tier_triggered: "Tier1Heuristic",
       confidence: 0.99,
       latency_us: Math.round((performance.now() - t0) * 1000) + 35,
-      category: "SAFE",
+      category: "SAFE_AUTHORITATIVE",
       xai_reason:
-        "Passed all on-device Tier 1 heuristics and Tier 2 transformer checks. Authentic DNS properties and normal entropy.",
+        "Passed all on-device Tier 1 heuristics and Tier 2 transformer checks. Authentic DNS properties, balanced entropy, and trusted structure.",
       should_block: false,
     };
   };
 
   return (
-    <div className="min-h-screen bg-[#030712] text-slate-100 flex flex-col font-mono selection:bg-cyan-500 selection:text-black">
-      <Navbar airplaneMode={airplaneMode} wanBytes={wanBytes} />
+    <div className="flex h-screen bg-background text-brand-text font-sans antialiased overflow-hidden">
+      {/* 1. Persistent Left Navigation Sidebar */}
+      <Sidebar
+        activeTab={activeTab}
+        onSelectTab={setActiveTab}
+        airplaneMode={airplaneMode}
+        wanBytes={wanBytes}
+      />
 
-      <main className="flex-1 max-w-6xl w-full mx-auto p-4 md:p-6 space-y-5">
-        {/* Performance & Air-Gap HUD */}
-        <MetricsHUD
-          totalScans={totalScans}
-          threatsBlocked={threatsBlocked}
-          lastLatencyUs={lastLatencyUs}
-          peakRamMb={peakRamMb}
-          zeroBytesProof={true}
+      {/* 2. Main Application Workspace Area */}
+      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+        {/* Top Header Bar */}
+        <TopBar
+          activeTab={activeTab}
+          latencyUs={lastLatencyUs}
+          wanBytes={wanBytes}
+          onOpenInspector={() => setActiveTab("inspector")}
         />
 
-        {/* Explainable AI Warning Card (Appears on threat) */}
-        {activeAlert && (
-          <ThreatAlertCard result={activeAlert} onDismiss={() => setActiveAlert(null)} />
-        )}
+        {/* Scrollable Main Grid Content */}
+        <main className="flex-1 overflow-y-auto p-6 space-y-6">
+          {activeTab === "dashboard" && (
+            <>
+              {/* Top Row: 12-Column High-Level Metrics */}
+              <MetricsGrid
+                totalScans={totalScans}
+                threatsBlocked={threatsBlocked}
+                lastLatencyUs={lastLatencyUs}
+                peakRamMb={peakRamMb}
+                wanBytes={wanBytes}
+              />
 
-        {/* Live Threat Inspector (Airplane mode test cases) */}
-        <ThreatInspector onScan={handleScan} />
+              {/* Middle Row: Live Threat Inspector Terminal */}
+              <ThreatInspector onScan={handleScan} />
 
-        {/* Process Behavior Auditor */}
-        <ProcessAuditor
-          processes={processes}
-          onRefresh={() => {
-            setProcesses((prev) => [...prev]);
-          }}
-        />
+              {/* Bottom Row: Detailed Tables Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <ProcessAuditorTable
+                  processes={processes}
+                  onRefresh={() => setProcesses((prev) => [...prev])}
+                />
+                <AuditVaultTable
+                  logs={logs}
+                  onSelectLog={(result) => setActiveAlert(result)}
+                />
+              </div>
+            </>
+          )}
 
-        {/* Encrypted Local Audit Logs (SQLCipher) */}
-        <AuditLogs
-          logs={logs}
-          onSelectLog={(log) => {
-            setActiveAlert({
-              verdict: log.verdict,
-              tier_triggered: "Tier1Heuristic",
-              confidence: 0.98,
-              latency_us: log.latency_us,
-              category: log.category,
-              xai_reason: `Historical audit log event recorded at ${log.timestamp}. Target payload: ${log.payload_snippet}`,
-              should_block: log.verdict === "Malicious",
-            });
-          }}
-        />
-      </main>
+          {activeTab === "inspector" && (
+            <div className="space-y-6 max-w-5xl">
+              <ThreatInspector onScan={handleScan} />
+              <AuditVaultTable
+                logs={logs}
+                onSelectLog={(result) => setActiveAlert(result)}
+              />
+            </div>
+          )}
 
-      <footer className="border-t border-slate-900 bg-slate-950/80 px-6 py-3.5 text-center text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-2 max-w-6xl mx-auto w-full">
-        <div className="flex items-center gap-1.5 text-slate-400">
-          <Shield className="w-3.5 h-3.5 text-cyan-400" />
-          <span>Pocket Sparrow Cross-Platform • 100% On-Device Threat Detection</span>
-        </div>
-        <div className="flex items-center gap-2 text-[11px] text-slate-500">
-          <span>Zero Cloud Telemetry</span>
-          <span>•</span>
-          <span className="text-emerald-400">Airplane Mode Certified</span>
-          <span>•</span>
-          <span className="text-cyan-400">&lt;50ms Response SLA</span>
-        </div>
-      </footer>
+          {activeTab === "processes" && (
+            <div className="space-y-6 max-w-5xl">
+              <ProcessAuditorTable
+                processes={processes}
+                onRefresh={() => setProcesses((prev) => [...prev])}
+              />
+            </div>
+          )}
+
+          {activeTab === "logs" && (
+            <div className="space-y-6 max-w-5xl">
+              <AuditVaultTable
+                logs={logs}
+                onSelectLog={(result) => setActiveAlert(result)}
+              />
+            </div>
+          )}
+
+          {activeTab === "settings" && (
+            <div className="space-y-6 max-w-3xl">
+              <div className="rounded-xl border border-surface-border bg-background-elevated p-6 shadow-card space-y-5">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2.5 rounded-lg bg-surface border border-surface-border text-accent">
+                    <Sliders className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h2 className="text-base font-semibold text-brand-text">
+                      On-Device Engine Configuration
+                    </h2>
+                    <p className="text-xs text-brand-muted mt-0.5">
+                      Adjust runtime thresholds for local heuristic models and INT8 delegates.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-4 pt-3 border-t border-surface-border text-xs font-mono">
+                  {/* Shannon Entropy Threshold */}
+                  <div className="flex items-center justify-between p-3.5 rounded-lg bg-surface border border-surface-border">
+                    <div>
+                      <div className="font-semibold text-brand-text">Shannon Entropy Threshold</div>
+                      <div className="text-[11px] text-brand-muted">
+                        Flags algorithmic randomness in DGA subdomains (Default: 4.5)
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="number"
+                        step="0.1"
+                        value={entropyThreshold}
+                        onChange={(e) => setEntropyThreshold(parseFloat(e.target.value) || 4.5)}
+                        className="w-16 p-1 rounded bg-background border border-surface-border text-center text-accent"
+                      />
+                    </div>
+                  </div>
+
+                  {/* INT8 Execution Delegate */}
+                  <div className="flex items-center justify-between p-3.5 rounded-lg bg-surface border border-surface-border">
+                    <div>
+                      <div className="font-semibold text-brand-text">Transformer INT8 Delegate</div>
+                      <div className="text-[11px] text-brand-muted">
+                        Hardware acceleration provider for MobileBERT
+                      </div>
+                    </div>
+                    <select
+                      value={activeDelegate}
+                      onChange={(e) => setActiveDelegate(e.target.value)}
+                      className="p-1.5 rounded bg-background border border-surface-border text-brand-text text-xs font-mono"
+                    >
+                      <option>CPU (x86_64 INT8 AVX2)</option>
+                      <option>Android NNAPI Delegate</option>
+                      <option>Vulkan / DirectML</option>
+                    </select>
+                  </div>
+
+                  {/* Encrypted DB Path */}
+                  <div className="flex items-center justify-between p-3.5 rounded-lg bg-surface border border-surface-border">
+                    <div>
+                      <div className="font-semibold text-brand-text">Encrypted Vault Storage</div>
+                      <div className="text-[11px] text-brand-muted">
+                        AES-256 SQLCipher local database path
+                      </div>
+                    </div>
+                    <span className="text-[11px] text-brand-muted">
+                      ~/.pocket_sparrow/vault.db
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </main>
+      </div>
+
+      {/* 3. Explainable AI Forensic Slide-out Drawer */}
+      <XaiDrawer result={activeAlert} onClose={() => setActiveAlert(null)} />
     </div>
   );
 };
