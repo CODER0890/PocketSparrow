@@ -1,0 +1,12 @@
+# Pocket Sparrow ML Pipeline Dependencies
+torch>=2.2.0
+transformers>=4.38.0
+datasets>=2.17.0
+accelerate>=0.27.0
+onnx>=1.15.0
+onnxruntime>=1.17.0
+tensorflow>=2.15.0
+tf-keras>=2.15.0
+numpy>=1.24.0,<2.0.0
+scikit-learn>=1.4.0
+tqdm>=4.66.0

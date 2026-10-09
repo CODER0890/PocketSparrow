@@ -1,0 +1,442 @@
+[
+  {
+    "id": "benign_msg_0",
+    "text": "Hey, are we still meeting for lunch today at 1 PM?",
+    "content_type": "SMS_TEXT",
+    "label": 0,
+    "category": "SAFE",
+    "xai_explanation": "Standard conversational message with no deceptive urgency or credential requests."
+  },
+  {
+    "id": "benign_msg_1",
+    "text": "Your appointment with Dr. Patel is confirmed for tomorrow at 10:30 AM.",
+    "content_type": "SMS_TEXT",
+    "label": 0,
+    "category": "SAFE",
+    "xai_explanation": "Standard conversational message with no deceptive urgency or credential requests."
+  },
+  {
+    "id": "benign_msg_2",
+    "text": "Can you please send me the meeting notes from yesterday's sync?",
+    "content_type": "SMS_TEXT",
+    "label": 0,
+    "category": "SAFE",
+    "xai_explanation": "Standard conversational message with no deceptive urgency or credential requests."
+  },
+  {
+    "id": "benign_msg_3",
+    "text": "Reminder: Grocery list - milk, eggs, sourdough bread, apples.",
+    "content_type": "SMS_TEXT",
+    "label": 0,
+    "category": "SAFE",
+    "xai_explanation": "Standard conversational message with no deceptive urgency or credential requests."
+  },
+  {
+    "id": "benign_msg_4",
+    "text": "Your package from Order #92834 has been delivered to your front porch.",
+    "content_type": "SMS_TEXT",
+    "label": 0,
+    "category": "SAFE",
+    "xai_explanation": "Standard conversational message with no deceptive urgency or credential requests."
+  },
+  {
+    "id": "benign_msg_5",
+    "text": "Hey! Just checking in to see how your weekend went.",
+    "content_type": "SMS_TEXT",
+    "label": 0,
+    "category": "SAFE",
+    "xai_explanation": "Standard conversational message with no deceptive urgency or credential requests."
+  },
+  {
+    "id": "benign_msg_6",
+    "text": "The code review is approved. Merging into main branch now.",
+    "content_type": "SMS_TEXT",
+    "label": 0,
+    "category": "SAFE",
+    "xai_explanation": "Standard conversational message with no deceptive urgency or credential requests."
+  },
+  {
+    "id": "benign_msg_7",
+    "text": "Don't forget tomorrow is Mom's birthday dinner at 7 PM.",
+    "content_type": "SMS_TEXT",
+    "label": 0,
+    "category": "SAFE",
+    "xai_explanation": "Standard conversational message with no deceptive urgency or credential requests."
+  },
+  {
+    "id": "benign_msg_8",
+    "text": "Flight AA412 is on schedule. Gate B12 departs in 45 minutes.",
+    "content_type": "SMS_TEXT",
+    "label": 0,
+    "category": "SAFE",
+    "xai_explanation": "Standard conversational message with no deceptive urgency or credential requests."
+  },
+  {
+    "id": "benign_msg_9",
+    "text": "Team standup starts in 5 minutes on Google Meet.",
+    "content_type": "SMS_TEXT",
+    "label": 0,
+    "category": "SAFE",
+    "xai_explanation": "Standard conversational message with no deceptive urgency or credential requests."
+  },
+  {
+    "id": "benign_msg_10",
+    "text": "Thanks for the coffee! Let's catch up again next week.",
+    "content_type": "SMS_TEXT",
+    "label": 0,
+    "category": "SAFE",
+    "xai_explanation": "Standard conversational message with no deceptive urgency or credential requests."
+  },
+  {
+    "id": "benign_msg_11",
+    "text": "Your library books are due back in 3 days. Renew online anytime.",
+    "content_type": "SMS_TEXT",
+    "label": 0,
+    "category": "SAFE",
+    "xai_explanation": "Standard conversational message with no deceptive urgency or credential requests."
+  },
+  {
+    "id": "benign_msg_12",
+    "text": "Hey, could you forward me the PDF report when you get a chance?",
+    "content_type": "SMS_TEXT",
+    "label": 0,
+    "category": "SAFE",
+    "xai_explanation": "Standard conversational message with no deceptive urgency or credential requests."
+  },
+  {
+    "id": "benign_msg_13",
+    "text": "Dinner was great tonight, thanks for hosting!",
+    "content_type": "SMS_TEXT",
+    "label": 0,
+    "category": "SAFE",
+    "xai_explanation": "Standard conversational message with no deceptive urgency or credential requests."
+  },
+  {
+    "id": "benign_msg_14",
+    "text": "Your weekly screen time report is ready to review.",
+    "content_type": "SMS_TEXT",
+    "label": 0,
+    "category": "SAFE",
+    "xai_explanation": "Standard conversational message with no deceptive urgency or credential requests."
+  },
+  {
+    "id": "benign_url_15",
+    "text": "https://www.google.com/search?q=weather+today",
+    "content_type": "URL",
+    "label": 0,
+    "category": "SAFE",
+    "xai_explanation": "Legitimate top-level domain with natural entropy and authentic DNS identity."
+  },
+  {
+    "id": "benign_url_16",
+    "text": "https://en.wikipedia.org/wiki/Information_security",
+    "content_type": "URL",
+    "label": 0,
+    "category": "SAFE",
+    "xai_explanation": "Legitimate top-level domain with natural entropy and authentic DNS identity."
+  },
+  {
+    "id": "benign_url_17",
+    "text": "https://github.com/torvalds/linux",
+    "content_type": "URL",
+    "label": 0,
+    "category": "SAFE",
+    "xai_explanation": "Legitimate top-level domain with natural entropy and authentic DNS identity."
+  },
+  {
+    "id": "benign_url_18",
+    "text": "https://developer.android.com/reference/kotlin/packages",
+    "content_type": "URL",
+    "label": 0,
+    "category": "SAFE",
+    "xai_explanation": "Legitimate top-level domain with natural entropy and authentic DNS identity."
+  },
+  {
+    "id": "benign_url_19",
+    "text": "https://www.apple.com/macos/sonoma",
+    "content_type": "URL",
+    "label": 0,
+    "category": "SAFE",
+    "xai_explanation": "Legitimate top-level domain with natural entropy and authentic DNS identity."
+  },
+  {
+    "id": "benign_url_20",
+    "text": "https://doc.rust-lang.org/book/title-page.html",
+    "content_type": "URL",
+    "label": 0,
+    "category": "SAFE",
+    "xai_explanation": "Legitimate top-level domain with natural entropy and authentic DNS identity."
+  },
+  {
+    "id": "benign_url_21",
+    "text": "https://www.nytimes.com/section/technology",
+    "content_type": "URL",
+    "label": 0,
+    "category": "SAFE",
+    "xai_explanation": "Legitimate top-level domain with natural entropy and authentic DNS identity."
+  },
+  {
+    "id": "benign_url_22",
+    "text": "https://news.ycombinator.com/item?id=3849201",
+    "content_type": "URL",
+    "label": 0,
+    "category": "SAFE",
+    "xai_explanation": "Legitimate top-level domain with natural entropy and authentic DNS identity."
+  },
+  {
+    "id": "benign_url_23",
+    "text": "https://stackoverflow.com/questions/tagged/rust",
+    "content_type": "URL",
+    "label": 0,
+    "category": "SAFE",
+    "xai_explanation": "Legitimate top-level domain with natural entropy and authentic DNS identity."
+  },
+  {
+    "id": "benign_url_24",
+    "text": "https://www.reddit.com/r/privacy",
+    "content_type": "URL",
+    "label": 0,
+    "category": "SAFE",
+    "xai_explanation": "Legitimate top-level domain with natural entropy and authentic DNS identity."
+  },
+  {
+    "id": "benign_url_25",
+    "text": "https://crates.io/crates/serde",
+    "content_type": "URL",
+    "label": 0,
+    "category": "SAFE",
+    "xai_explanation": "Legitimate top-level domain with natural entropy and authentic DNS identity."
+  },
+  {
+    "id": "benign_url_26",
+    "text": "https://flutter.dev/docs/development/ui",
+    "content_type": "URL",
+    "label": 0,
+    "category": "SAFE",
+    "xai_explanation": "Legitimate top-level domain with natural entropy and authentic DNS identity."
+  },
+  {
+    "id": "benign_url_27",
+    "text": "https://www.bbc.com/news/world",
+    "content_type": "URL",
+    "label": 0,
+    "category": "SAFE",
+    "xai_explanation": "Legitimate top-level domain with natural entropy and authentic DNS identity."
+  },
+  {
+    "id": "benign_url_28",
+    "text": "https://developer.mozilla.org/en-US/docs/Web/JavaScript",
+    "content_type": "URL",
+    "label": 0,
+    "category": "SAFE",
+    "xai_explanation": "Legitimate top-level domain with natural entropy and authentic DNS identity."
+  },
+  {
+    "id": "benign_url_29",
+    "text": "https://arxiv.org/abs/2301.00001",
+    "content_type": "URL",
+    "label": 0,
+    "category": "SAFE",
+    "xai_explanation": "Legitimate top-level domain with natural entropy and authentic DNS identity."
+  },
+  {
+    "id": "suspicious_30",
+    "text": "Your temporary verification passcode is 492019. Valid for 10 minutes. Do not share.",
+    "content_type": "SMS_TEXT",
+    "label": 1,
+    "category": "SUSPICIOUS",
+    "xai_explanation": "Standard OTP message, neutral tone."
+  },
+  {
+    "id": "suspicious_31",
+    "text": "Hi John, here is the shared Dropbox folder with project slides: https://dropbox-share.net/s/9a8b7c",
+    "content_type": "SMS_TEXT",
+    "label": 1,
+    "category": "SUSPICIOUS",
+    "xai_explanation": "Unverified third-party file sharing link with potential risk."
+  },
+  {
+    "id": "suspicious_32",
+    "text": "https://bit.ly/3xY9Ab2",
+    "content_type": "URL",
+    "label": 1,
+    "category": "SUSPICIOUS",
+    "xai_explanation": "Generic URL shortener concealing the final destination hostname."
+  },
+  {
+    "id": "suspicious_33",
+    "text": "https://tinyurl.com/meeting-agenda-2026",
+    "content_type": "URL",
+    "label": 1,
+    "category": "SUSPICIOUS",
+    "xai_explanation": "Shortened redirect link requiring unmasking."
+  },
+  {
+    "id": "suspicious_34",
+    "text": "Click here to claim your survey rewards points before expiration: https://points-rewards.store/claim",
+    "content_type": "SMS_TEXT",
+    "label": 1,
+    "category": "SUSPICIOUS",
+    "xai_explanation": "Promotional rewards message with mild urgency cues."
+  },
+  {
+    "id": "malicious_url_35",
+    "text": "https://g00gle-security-check.cfd/auth/verify?id=9281",
+    "content_type": "URL",
+    "label": 2,
+    "category": "HOMOGRAPH",
+    "xai_explanation": "Uses deceptive lookalike domain 'g00gle' with high-risk TLD .cfd"
+  },
+  {
+    "id": "malicious_url_36",
+    "text": "https://chase-bank-secure-login.top/account/suspend?ref=urgent",
+    "content_type": "URL",
+    "label": 2,
+    "category": "CREDENTIAL_HARVESTING",
+    "xai_explanation": "Subdomain nesting and high-risk TLD .top with banking keywords"
+  },
+  {
+    "id": "malicious_url_37",
+    "text": "https://paypal.com.verify-billing-update.xyz/login.php",
+    "content_type": "URL",
+    "label": 2,
+    "category": "SUBDOMAIN_DECEPTION",
+    "xai_explanation": "Spoofs paypal.com in subdomains with actual parent domain verify-billing-update.xyz"
+  },
+  {
+    "id": "malicious_url_38",
+    "text": "https://wellsfargo-verify-wire.live/portal/authenticate",
+    "content_type": "URL",
+    "label": 2,
+    "category": "URGENT_WIRE_TRANSFER",
+    "xai_explanation": "Fake banking portal designed to intercept two-factor codes"
+  },
+  {
+    "id": "malicious_url_39",
+    "text": "https://apple-id-verify.support-device.rest/recover",
+    "content_type": "URL",
+    "label": 2,
+    "category": "CREDENTIAL_HARVESTING",
+    "xai_explanation": "Brand impersonation targeting Apple ID credentials with .rest TLD"
+  },
+  {
+    "id": "malicious_url_40",
+    "text": "https://usps-tracking-redelivery.shop/address/confirm",
+    "content_type": "URL",
+    "label": 2,
+    "category": "DELIVERY_SCAM",
+    "xai_explanation": "Parcel delivery scam designed to harvest credit card for redelivery fee"
+  },
+  {
+    "id": "malicious_url_41",
+    "text": "https://netflix-billing-update.club/membership/renewal",
+    "content_type": "URL",
+    "label": 2,
+    "category": "CREDENTIAL_HARVESTING",
+    "xai_explanation": "Subscription phishing portal harvesting payment details"
+  },
+  {
+    "id": "malicious_url_42",
+    "text": "https://amaz0n-security-hub.loan/prime/order-cancel",
+    "content_type": "URL",
+    "label": 2,
+    "category": "HOMOGRAPH",
+    "xai_explanation": "Typosquatted domain with high-risk loan TLD attempting order cancellation scam"
+  },
+  {
+    "id": "malicious_url_43",
+    "text": "https://secure-login-chase.top/online/wire-transfer.html",
+    "content_type": "URL",
+    "label": 2,
+    "category": "URGENT_WIRE_TRANSFER",
+    "xai_explanation": "High entropy path with misleading banking branding"
+  },
+  {
+    "id": "malicious_url_44",
+    "text": "https://рaypal.com/verify-account",
+    "content_type": "URL",
+    "label": 2,
+    "category": "HOMOGRAPH",
+    "xai_explanation": "Cyrillic homograph 'р' (U+0440) disguising as latin 'p' in paypal.com"
+  },
+  {
+    "id": "malicious_sms_45",
+    "text": "URGENT: Your Chase account ending in 4102 has been suspended due to suspicious activity. Verify identity immediately: https://wellsfargo-verify-wire.live/portal/authenticate",
+    "content_type": "SMS_TEXT",
+    "label": 2,
+    "category": "URGENT_WIRE_TRANSFER",
+    "xai_explanation": "High-urgency coercive prompt impersonating reputable service coupled with an unverified credential harvesting domain."
+  },
+  {
+    "id": "malicious_sms_46",
+    "text": "USPS Alert: Your package could not be delivered due to an incorrect address. Update delivery address within 24 hours: https://amaz0n-security-hub.loan/prime/order-cancel",
+    "content_type": "SMS_TEXT",
+    "label": 2,
+    "category": "DELIVERY_SCAM",
+    "xai_explanation": "High-urgency coercive prompt impersonating reputable service coupled with an unverified credential harvesting domain."
+  },
+  {
+    "id": "malicious_sms_47",
+    "text": "BANK ALERT: Unusual wire transfer of $2,450.00 initiated to unknown recipient. If this was not you, cancel transaction now: https://amaz0n-security-hub.loan/prime/order-cancel",
+    "content_type": "SMS_TEXT",
+    "label": 2,
+    "category": "URGENT_WIRE_TRANSFER",
+    "xai_explanation": "High-urgency coercive prompt impersonating reputable service coupled with an unverified credential harvesting domain."
+  },
+  {
+    "id": "malicious_sms_48",
+    "text": "IRS Final Notice: An outstanding tax penalty of $1,820 is due immediately. Avoid legal action by settling balance: https://paypal.com.verify-billing-update.xyz/login.php",
+    "content_type": "SMS_TEXT",
+    "label": 2,
+    "category": "GOV_IMPERSONATION",
+    "xai_explanation": "High-urgency coercive prompt impersonating reputable service coupled with an unverified credential harvesting domain."
+  },
+  {
+    "id": "malicious_sms_49",
+    "text": "Netflix Payment Failed: Your membership has been paused. Update your billing details today to resume streaming: https://apple-id-verify.support-device.rest/recover",
+    "content_type": "SMS_TEXT",
+    "label": 2,
+    "category": "CREDENTIAL_HARVESTING",
+    "xai_explanation": "High-urgency coercive prompt impersonating reputable service coupled with an unverified credential harvesting domain."
+  },
+  {
+    "id": "malicious_sms_50",
+    "text": "Wells Fargo Security: A new device logged into your online banking from IP 192.168.1.1. Lock account now: https://usps-tracking-redelivery.shop/address/confirm",
+    "content_type": "SMS_TEXT",
+    "label": 2,
+    "category": "CREDENTIAL_HARVESTING",
+    "xai_explanation": "High-urgency coercive prompt impersonating reputable service coupled with an unverified credential harvesting domain."
+  },
+  {
+    "id": "malicious_sms_51",
+    "text": "Apple ID Alert: Your account was locked for security reasons. Confirm your password to unlock: https://amaz0n-security-hub.loan/prime/order-cancel",
+    "content_type": "SMS_TEXT",
+    "label": 2,
+    "category": "CREDENTIAL_HARVESTING",
+    "xai_explanation": "High-urgency coercive prompt impersonating reputable service coupled with an unverified credential harvesting domain."
+  },
+  {
+    "id": "malicious_sms_52",
+    "text": "PayPal Notification: You sent $899.99 to crypto-exchange. If unauthorized, dispute charge within 60 minutes: https://secure-login-chase.top/online/wire-transfer.html",
+    "content_type": "SMS_TEXT",
+    "label": 2,
+    "category": "URGENT_WIRE_TRANSFER",
+    "xai_explanation": "High-urgency coercive prompt impersonating reputable service coupled with an unverified credential harvesting domain."
+  },
+  {
+    "id": "malicious_sms_53",
+    "text": "HR Dept: Please sign the updated direct deposit authorization form before end of business day: https://wellsfargo-verify-wire.live/portal/authenticate",
+    "content_type": "SMS_TEXT",
+    "label": 2,
+    "category": "WORKPLACE_IMPERSONATION",
+    "xai_explanation": "High-urgency coercive prompt impersonating reputable service coupled with an unverified credential harvesting domain."
+  },
+  {
+    "id": "malicious_sms_54",
+    "text": "Amazon Prime Notice: Your order for iPhone 15 Pro ($1,199.00) is processing. If you did not place this, click here: https://рaypal.com/verify-account",
+    "content_type": "SMS_TEXT",
+    "label": 2,
+    "category": "ECOMMERCE_SCAM",
+    "xai_explanation": "High-urgency coercive prompt impersonating reputable service coupled with an unverified credential harvesting domain."
+  }
+]

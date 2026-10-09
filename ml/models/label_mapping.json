@@ -1,0 +1,29 @@
+{
+  "id2label": {
+    "0": "SAFE",
+    "1": "SUSPICIOUS",
+    "2": "MALICIOUS"
+  },
+  "label2id": {
+    "SAFE": 0,
+    "SUSPICIOUS": 1,
+    "MALICIOUS": 2
+  },
+  "threat_categories": {
+    "SAFE": {
+      "display_name": "Verified Safe",
+      "action": "ALLOW",
+      "description": "Standard authentic communication or legitimate domain."
+    },
+    "SUSPICIOUS": {
+      "display_name": "Potential Threat / Ambiguous Context",
+      "action": "ALERT",
+      "description": "Content exhibits ambiguous security tokens or unverified redirects requiring cautious handling."
+    },
+    "MALICIOUS": {
+      "display_name": "Malicious Threat Detected",
+      "action": "BLOCK",
+      "description": "High-confidence credential harvesting, fraudulent wire transfer lure, or lookalike homoglyph."
+    }
+  }
+}

@@ -1,0 +1,74 @@
+[
+  {
+    "id": "benign_msg_6",
+    "text": "The code review is approved. Merging into main branch now.",
+    "content_type": "SMS_TEXT",
+    "label": 0,
+    "category": "SAFE",
+    "xai_explanation": "Standard conversational message with no deceptive urgency or credential requests."
+  },
+  {
+    "id": "benign_msg_8",
+    "text": "Flight AA412 is on schedule. Gate B12 departs in 45 minutes.",
+    "content_type": "SMS_TEXT",
+    "label": 0,
+    "category": "SAFE",
+    "xai_explanation": "Standard conversational message with no deceptive urgency or credential requests."
+  },
+  {
+    "id": "benign_msg_14",
+    "text": "Your weekly screen time report is ready to review.",
+    "content_type": "SMS_TEXT",
+    "label": 0,
+    "category": "SAFE",
+    "xai_explanation": "Standard conversational message with no deceptive urgency or credential requests."
+  },
+  {
+    "id": "benign_url_15",
+    "text": "https://www.google.com/search?q=weather+today",
+    "content_type": "URL",
+    "label": 0,
+    "category": "SAFE",
+    "xai_explanation": "Legitimate top-level domain with natural entropy and authentic DNS identity."
+  },
+  {
+    "id": "benign_url_17",
+    "text": "https://github.com/torvalds/linux",
+    "content_type": "URL",
+    "label": 0,
+    "category": "SAFE",
+    "xai_explanation": "Legitimate top-level domain with natural entropy and authentic DNS identity."
+  },
+  {
+    "id": "malicious_sms_47",
+    "text": "BANK ALERT: Unusual wire transfer of $2,450.00 initiated to unknown recipient. If this was not you, cancel transaction now: https://amaz0n-security-hub.loan/prime/order-cancel",
+    "content_type": "SMS_TEXT",
+    "label": 2,
+    "category": "URGENT_WIRE_TRANSFER",
+    "xai_explanation": "High-urgency coercive prompt impersonating reputable service coupled with an unverified credential harvesting domain."
+  },
+  {
+    "id": "benign_msg_1",
+    "text": "Your appointment with Dr. Patel is confirmed for tomorrow at 10:30 AM.",
+    "content_type": "SMS_TEXT",
+    "label": 0,
+    "category": "SAFE",
+    "xai_explanation": "Standard conversational message with no deceptive urgency or credential requests."
+  },
+  {
+    "id": "benign_msg_7",
+    "text": "Don't forget tomorrow is Mom's birthday dinner at 7 PM.",
+    "content_type": "SMS_TEXT",
+    "label": 0,
+    "category": "SAFE",
+    "xai_explanation": "Standard conversational message with no deceptive urgency or credential requests."
+  },
+  {
+    "id": "malicious_url_40",
+    "text": "https://usps-tracking-redelivery.shop/address/confirm",
+    "content_type": "URL",
+    "label": 2,
+    "category": "DELIVERY_SCAM",
+    "xai_explanation": "Parcel delivery scam designed to harvest credit card for redelivery fee"
+  }
+]

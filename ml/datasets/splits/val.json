@@ -1,0 +1,66 @@
+[
+  {
+    "id": "malicious_sms_45",
+    "text": "URGENT: Your Chase account ending in 4102 has been suspended due to suspicious activity. Verify identity immediately: https://wellsfargo-verify-wire.live/portal/authenticate",
+    "content_type": "SMS_TEXT",
+    "label": 2,
+    "category": "URGENT_WIRE_TRANSFER",
+    "xai_explanation": "High-urgency coercive prompt impersonating reputable service coupled with an unverified credential harvesting domain."
+  },
+  {
+    "id": "malicious_sms_52",
+    "text": "PayPal Notification: You sent $899.99 to crypto-exchange. If unauthorized, dispute charge within 60 minutes: https://secure-login-chase.top/online/wire-transfer.html",
+    "content_type": "SMS_TEXT",
+    "label": 2,
+    "category": "URGENT_WIRE_TRANSFER",
+    "xai_explanation": "High-urgency coercive prompt impersonating reputable service coupled with an unverified credential harvesting domain."
+  },
+  {
+    "id": "benign_msg_2",
+    "text": "Can you please send me the meeting notes from yesterday's sync?",
+    "content_type": "SMS_TEXT",
+    "label": 0,
+    "category": "SAFE",
+    "xai_explanation": "Standard conversational message with no deceptive urgency or credential requests."
+  },
+  {
+    "id": "benign_url_27",
+    "text": "https://www.bbc.com/news/world",
+    "content_type": "URL",
+    "label": 0,
+    "category": "SAFE",
+    "xai_explanation": "Legitimate top-level domain with natural entropy and authentic DNS identity."
+  },
+  {
+    "id": "malicious_url_37",
+    "text": "https://paypal.com.verify-billing-update.xyz/login.php",
+    "content_type": "URL",
+    "label": 2,
+    "category": "SUBDOMAIN_DECEPTION",
+    "xai_explanation": "Spoofs paypal.com in subdomains with actual parent domain verify-billing-update.xyz"
+  },
+  {
+    "id": "benign_msg_5",
+    "text": "Hey! Just checking in to see how your weekend went.",
+    "content_type": "SMS_TEXT",
+    "label": 0,
+    "category": "SAFE",
+    "xai_explanation": "Standard conversational message with no deceptive urgency or credential requests."
+  },
+  {
+    "id": "suspicious_34",
+    "text": "Click here to claim your survey rewards points before expiration: https://points-rewards.store/claim",
+    "content_type": "SMS_TEXT",
+    "label": 1,
+    "category": "SUSPICIOUS",
+    "xai_explanation": "Promotional rewards message with mild urgency cues."
+  },
+  {
+    "id": "malicious_url_43",
+    "text": "https://secure-login-chase.top/online/wire-transfer.html",
+    "content_type": "URL",
+    "label": 2,
+    "category": "URGENT_WIRE_TRANSFER",
+    "xai_explanation": "High entropy path with misleading banking branding"
+  }
+]
