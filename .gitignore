@@ -5,6 +5,8 @@ core/build/
 desktop/dist/
 desktop/src-tauri/target/
 *.apk
+*.deb
+*.exe
 
 # Gradle & Android
 .gradle/
