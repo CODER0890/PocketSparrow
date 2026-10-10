@@ -258,6 +258,12 @@ pub async fn scan_incoming_email(
 }
 
 #[tauri::command]
+pub async fn clear_email_history(state: State<'_, AppState>) -> Result<bool, String> {
+    state.email_scanner.clear_history();
+    Ok(true)
+}
+
+#[tauri::command]
 pub async fn evaluate_email_shield(
     signals: EmailSignals,
     state: State<'_, AppState>,

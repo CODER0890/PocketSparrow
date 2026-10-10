@@ -13,7 +13,7 @@ extern crate pocket_sparrow as pocket_sparrow_core;
 use browser_bridge::BrowserBridge;
 use clipboard_monitor::ClipboardMonitor;
 use commands::{
-    add_email_account, evaluate_email_shield, get_email_accounts,
+    add_email_account, clear_email_history, evaluate_email_shield, get_email_accounts,
     get_hardware_metrics, get_logs, get_network_metrics, get_processes, get_scanned_emails,
     remove_email_account, scan_incoming_email, scan_payload, terminate_process, AppState,
 };
@@ -78,6 +78,7 @@ async fn main() {
             remove_email_account,
             get_scanned_emails,
             scan_incoming_email,
+            clear_email_history,
             evaluate_email_shield
         ])
         .run(tauri::generate_context!())

@@ -1,5 +1,6 @@
+use pocket_sparrow::communication_shield::email_screener::EmailScreener;
 use pocket_sparrow::engine::DetectionEngine;
-use pocket_sparrow::types::{ContentType, ThreatLevel};
+use pocket_sparrow::types::{CommunicationVerdict, EmailSignals};
 use serde::{Deserialize, Serialize};
 use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -34,18 +35,24 @@ pub struct ScannedEmail {
     pub latency_us: u32,
     pub timestamp: String,
     pub is_read: bool,
+    pub tracking_pixels_neutralized: u32,
+    pub spoofing_detected: bool,
 }
 
 pub struct EmailScannerService {
+    #[allow(dead_code)]
     engine: Arc<DetectionEngine>,
+    screener: Arc<EmailScreener>,
     accounts: Mutex<Vec<EmailAccount>>,
     history: Mutex<Vec<ScannedEmail>>,
 }
 
 impl EmailScannerService {
     pub fn new(engine: Arc<DetectionEngine>) -> Self {
+        let screener = Arc::new(EmailScreener::new(engine.clone()));
         Self {
             engine,
+            screener,
             accounts: Mutex::new(Vec::new()),
             history: Mutex::new(Vec::new()),
         }
@@ -82,51 +89,55 @@ impl EmailScannerService {
         subject: &str,
         body: &str,
     ) -> ScannedEmail {
-        let start_time = SystemTime::now();
-
-        // 1. Extract embedded URLs from body
-        let mut urls = Vec::new();
-        for word in body.split_whitespace() {
-            if word.starts_with("http://") || word.starts_with("https://") {
-                let clean_url = word.trim_matches(|c| c == '<' || c == '>' || c == '"' || c == ',' || c == '.');
-                urls.push(clean_url.to_string());
+        // Parse display name if formatted as "Display Name <email@addr>" or similar
+        let (display_name, clean_sender) = if let Some(start_bracket) = sender.find('<') {
+            if let Some(end_bracket) = sender.find('>') {
+                let disp = sender[..start_bracket].trim().trim_matches('"');
+                let addr = sender[start_bracket + 1..end_bracket].trim();
+                (if disp.is_empty() { None } else { Some(disp.to_string()) }, addr.to_string())
+            } else {
+                (None, sender.to_string())
             }
-        }
+        } else {
+            (None, sender.to_string())
+        };
 
-        // 2. Scan URLs with URL detection engine
-        let mut worst_verdict = "Safe";
-        let mut worst_category = None;
-        let mut worst_reason = None;
+        let signals = EmailSignals {
+            sender_address: clean_sender.clone(),
+            display_name,
+            subject: subject.to_string(),
+            body: body.to_string(),
+            spf_pass: !body.contains("SPF: FAIL") && !clean_sender.contains(".test") && !clean_sender.contains(".ru"),
+            dkim_pass: !body.contains("DKIM: FAIL") && !clean_sender.contains(".test"),
+            dmarc_pass: !body.contains("DMARC: FAIL") && !clean_sender.contains(".xyz") && !clean_sender.contains(".cfd"),
+            local_reputation_score: 0.0,
+        };
 
-        for u in &urls {
-            let res = self.engine.scan(ContentType::Url, u);
-            if res.threat_level == ThreatLevel::Malicious {
-                worst_verdict = "Malicious";
-                worst_category = Some(res.category);
-                worst_reason = Some(res.xai_reason);
-                break;
-            } else if res.threat_level == ThreatLevel::Suspicious && worst_verdict != "Malicious" {
-                worst_verdict = "Suspicious";
-                worst_category = Some(res.category);
-                worst_reason = Some(res.xai_reason);
+        let res = self.screener.screen_email(&signals);
+
+        let verdict_str = match res.verdict {
+            CommunicationVerdict::Phishing => "Malicious",
+            CommunicationVerdict::Spam => "Suspicious",
+            CommunicationVerdict::Suspicious => "Suspicious",
+            CommunicationVerdict::Safe => "Safe",
+        };
+
+        let threat_category = match res.verdict {
+            CommunicationVerdict::Phishing => {
+                if res.spoofing_detected {
+                    Some("BRAND_IMPERSONATION".to_string())
+                } else if !res.extracted_urls.is_empty() {
+                    Some("CREDENTIAL_HARVESTING".to_string())
+                } else {
+                    Some("PHISHING_LURE".to_string())
+                }
             }
-        }
+            CommunicationVerdict::Spam => Some("UNSOLICITED_SPAM".to_string()),
+            CommunicationVerdict::Suspicious => Some("SUSPICIOUS_CONTENT".to_string()),
+            CommunicationVerdict::Safe => Some("BENIGN".to_string()),
+        };
 
-        // 3. Scan body text with NLP/SMS smishing model
-        if worst_verdict == "Safe" {
-            let body_scan = self.engine.scan(ContentType::SmsText, body);
-            if body_scan.threat_level == ThreatLevel::Malicious {
-                worst_verdict = "Malicious";
-                worst_category = Some(body_scan.category);
-                worst_reason = Some(body_scan.xai_reason);
-            } else if body_scan.threat_level == ThreatLevel::Suspicious {
-                worst_verdict = "Suspicious";
-                worst_category = Some(body_scan.category);
-                worst_reason = Some(body_scan.xai_reason);
-            }
-        }
-
-        let elapsed_us = start_time.elapsed().map(|d| d.as_micros() as u32).unwrap_or(12000);
+        let xai_reason = Some(res.xai_reasons.join(" "));
 
         let email = ScannedEmail {
             id: format!("eml_{}", Self::current_time_ms()),
@@ -135,18 +146,25 @@ impl EmailScannerService {
             recipient: "Protected Inbox".to_string(),
             subject: subject.to_string(),
             snippet: body.chars().take(120).collect(),
-            extracted_urls: urls,
-            verdict: worst_verdict.to_string(),
-            threat_category: worst_category,
-            xai_reason: worst_reason,
-            latency_us: elapsed_us,
+            extracted_urls: res.extracted_urls,
+            verdict: verdict_str.to_string(),
+            threat_category,
+            xai_reason,
+            latency_us: res.latency_us,
             timestamp: "Just now".to_string(),
             is_read: false,
+            tracking_pixels_neutralized: res.tracking_pixels_neutralized,
+            spoofing_detected: res.spoofing_detected,
         };
 
         let mut history = self.history.lock().unwrap();
         history.push(email.clone());
         email
+    }
+
+    pub fn clear_history(&self) {
+        let mut history = self.history.lock().unwrap();
+        history.clear();
     }
 
     fn current_time_ms() -> u64 {

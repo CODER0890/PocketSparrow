@@ -48,42 +48,14 @@ class EmailScannerService : Service() {
 
     fun scanIncomingEmail(sender: String, subject: String, body: String) {
         serviceScope.launch {
-            // 1. Extract URLs from body
-            val urlPattern = Pattern.compile("https?://\\S+")
-            val matcher = urlPattern.matcher(body)
-            val urls = mutableListOf<String>()
-            while (matcher.find()) {
-                urls.add(matcher.group())
-            }
-
-            var isMalicious = false
-            var threatCategory = "BENIGN"
-            var xaiReason = "Verified safe."
-
-            // 2. Scan URLs via Tier 1 / Tier 2
-            for (url in urls) {
-                val res = NativeBridge.scan(NativeBridge.CONTENT_TYPE_URL, url)
-                if (res.threatLevel == 2) {
-                    isMalicious = true
-                    threatCategory = res.category
-                    xaiReason = res.xaiReason
-                    break
-                }
-            }
-
-            // 3. Scan body text via NLP
-            if (!isMalicious) {
-                val bodyRes = NativeBridge.scan(NativeBridge.CONTENT_TYPE_SMS_TEXT, body)
-                if (bodyRes.threatLevel == 2) {
-                    isMalicious = true
-                    threatCategory = bodyRes.category
-                    xaiReason = bodyRes.xaiReason
-                }
-            }
-
-            // 4. Alert if malicious
-            if (isMalicious) {
-                postThreatNotification(sender, subject, threatCategory, xaiReason)
+            val verdict = com.pocketsparrow.scanners.EmailPhishingAuditor.auditEmail(sender, subject, body)
+            if (verdict.verdict == "Malicious" || verdict.verdict == "Suspicious") {
+                postThreatNotification(
+                    sender = sender,
+                    subject = subject,
+                    category = verdict.category,
+                    reason = verdict.xaiReasons.firstOrNull() ?: "Phishing indicators detected on-device."
+                )
             }
         }
     }
@@ -99,7 +71,8 @@ class EmailScannerService : Service() {
 
         val alertNotification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("Threat Blocked: $category")
-            .setContentText("From $sender: $reason")
+            .setContentText("[$subject] $reason")
+            .setSubText(sender)
             .setSmallIcon(android.R.drawable.stat_notify_error)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setContentIntent(pendingIntent)

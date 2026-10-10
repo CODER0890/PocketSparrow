@@ -177,3 +177,45 @@ fn test_communication_shield_latency_sla_under_50ms() {
     assert!(ev.latency_us < 50_000, "Email evaluation must be < 50ms");
     assert!(elapsed.as_millis() < 50, "Combined 3-channel evaluation must be < 50ms");
 }
+
+#[test]
+fn test_email_screening_free_webmail_impersonation() {
+    let shield = setup_shield();
+    let signals = EmailSignals {
+        sender_address: "chase-fraud-team92@gmail.com".to_string(),
+        display_name: Some("Chase Security Service".to_string()),
+        subject: "Account Alert: Urgent Verification Required".to_string(),
+        body: "Your account is temporarily suspended. Please visit https://secure-auth.test to unlock.".to_string(),
+        spf_pass: true,
+        dkim_pass: true,
+        dmarc_pass: false,
+        local_reputation_score: 0.0,
+    };
+
+    let verdict = shield.evaluate_email(&signals);
+    assert_eq!(verdict.verdict, CommunicationVerdict::Phishing);
+    assert!(verdict.should_quarantine);
+    assert!(verdict.spoofing_detected);
+    assert!(verdict.xai_reasons.iter().any(|r| r.contains("impersonation")));
+}
+
+#[test]
+fn test_email_screening_dangerous_attachment_payload() {
+    let shield = setup_shield();
+    let signals = EmailSignals {
+        sender_address: "supplier@unknown-vendor.xyz".to_string(),
+        display_name: Some("Invoicing Department".to_string()),
+        subject: "Overdue Invoice: Remittance Slip".to_string(),
+        body: "Please review the attached invoice details in Invoice_September_2026.pdf.exe immediately.".to_string(),
+        spf_pass: false,
+        dkim_pass: false,
+        dmarc_pass: false,
+        local_reputation_score: 0.0,
+    };
+
+    let verdict = shield.evaluate_email(&signals);
+    assert_eq!(verdict.verdict, CommunicationVerdict::Phishing);
+    assert!(verdict.should_quarantine);
+    assert!(verdict.xai_reasons.iter().any(|r| r.contains("Dangerous executable payload")));
+}
+
