@@ -184,12 +184,17 @@ class DashboardScreen extends StatelessWidget {
             title: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(AppSpacing.sm),
+                  width: 34,
+                  height: 34,
+                  padding: const EdgeInsets.all(2),
                   decoration: BoxDecoration(
                     color: AppColors.primaryLight,
                     borderRadius: AppRadius.button,
                   ),
-                  child: const Icon(LucideIcons.shield_check, color: AppColors.primary, size: 20),
+                  child: Image.asset(
+                    'assets/icons/app_logo.png',
+                    fit: BoxFit.contain,
+                  ),
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(

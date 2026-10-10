@@ -5,6 +5,10 @@
   <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=1,2,3,4&color1=09090B&color2=1E1B4B&color3=0284C7&color4=10B981&height=250&section=header&text=Pocket%20Sparrow&fontSize=52&fontColor=ffffff&fontAlignY=36&desc=%E2%9A%A1%20Autonomous%20%E2%80%A2%20100%25%20On-Device%20%E2%80%A2%20Zero-Cloud%20Threat%20Defense%20%E2%9A%A1&descSize=20&descAlignY=62&descAlign=50" alt="Pocket Sparrow Animated Header" width="100%"/>
 </p>
 
+<p align="center">
+  <img src="assets/logo.png" alt="Pocket Sparrow Official Shield Logo" width="150" />
+</p>
+
 <!-- ===================================================================== -->
 <!-- 2. ANIMATED TYPING SVG BANNER                                         -->
 <!-- ===================================================================== -->

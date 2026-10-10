@@ -5,12 +5,12 @@ import {
   Cpu,
   Database,
   Sliders,
-  Shield,
   WifiOff,
   Plane,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { MOTION_DURATION } from "../styles/motion";
+import logoImg from "../assets/logo.png";
 
 export type NavTab = "dashboard" | "inspector" | "processes" | "logs" | "settings";
 
@@ -48,8 +48,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Workspace / Product Header */}
         <div className="h-16 px-6 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="h-8 w-8 rounded-lg bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center text-zinc-900 dark:text-zinc-100">
-              <Shield className="w-4 h-4 text-zinc-700 dark:text-zinc-200" />
+            <div className="h-9 w-9 rounded-lg bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center overflow-hidden p-1 shadow-sm">
+              <img src={logoImg} alt="Pocket Sparrow Logo" className="w-full h-full object-contain" />
             </div>
             <div>
               <div className="font-semibold text-zinc-900 dark:text-zinc-100 text-sm tracking-tight">

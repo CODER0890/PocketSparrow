@@ -68,16 +68,21 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Logo Shield
+              // Official Brand Logo
               Container(
-                padding: const EdgeInsets.all(AppSpacing.xl),
+                width: 120,
+                height: 120,
+                padding: const EdgeInsets.all(AppSpacing.md),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: AppColors.surface,
                   border: Border.all(color: AppColors.border),
                   boxShadow: AppShadows.card,
                 ),
-                child: const PulseShield(isActive: true, size: 84),
+                child: Image.asset(
+                  'assets/icons/app_logo.png',
+                  fit: BoxFit.contain,
+                ),
               ),
 
               const SizedBox(height: AppSpacing.xxl),

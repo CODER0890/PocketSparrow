@@ -3,6 +3,7 @@ import { ChevronRight, Search, Zap, Sun, Moon, Plane } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { NavTab } from "./Sidebar";
 import { MOTION_EASING, MOTION_DURATION } from "../styles/motion";
+import logoImg from "../assets/logo.png";
 
 interface TopBarProps {
   activeTab: NavTab;
@@ -44,6 +45,7 @@ export const TopBar: React.FC<TopBarProps> = ({
     <header className="h-16 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 px-8 flex items-center justify-between sticky top-0 z-30 select-none transition-colors">
       {/* Breadcrumbs */}
       <div className="flex items-center space-x-2 text-sm">
+        <img src={logoImg} alt="Pocket Sparrow" className="w-5 h-5 object-contain" />
         <span className="text-zinc-500 dark:text-zinc-400">Pocket Sparrow</span>
         <ChevronRight className="w-4 h-4 text-zinc-300 dark:text-zinc-600" />
         <span className="font-medium text-zinc-900 dark:text-zinc-100">{getTabLabel(activeTab)}</span>
