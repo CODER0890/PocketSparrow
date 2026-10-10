@@ -198,3 +198,108 @@ impl From<ScanResult> for CScanResult {
         }
     }
 }
+
+// =========================================================================
+// Communication Shield Data Types (Module A)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum CommunicationVerdict {
+    Safe,
+    Suspicious,
+    Spam,
+    Phishing,
+}
+
+impl CommunicationVerdict {
+    pub fn to_str(&self) -> &'static str {
+        match self {
+            CommunicationVerdict::Safe => "SAFE",
+            CommunicationVerdict::Suspicious => "SUSPICIOUS",
+            CommunicationVerdict::Spam => "SPAM",
+            CommunicationVerdict::Phishing => "PHISHING",
+        }
+    }
+
+    pub fn should_block(&self) -> bool {
+        matches!(self, CommunicationVerdict::Spam | CommunicationVerdict::Phishing)
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum StirShakenStatus {
+    Verified,
+    Partial,
+    Failed,
+    NotAvailable,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CallSignals {
+    pub phone_number: String,
+    pub contact_match: bool,
+    pub stir_shaken_status: StirShakenStatus,
+    pub local_reputation_score: f32, // -1.0 (blocked) to 1.0 (trusted)
+    pub call_frequency: u32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CallVerdict {
+    pub phone_number: String,
+    pub verdict: CommunicationVerdict,
+    pub confidence: f32,
+    pub xai_reasons: Vec<String>,
+    pub tier: u8,
+    pub latency_us: u32,
+    pub should_block: bool,
+    pub stir_attested: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SmsSignals {
+    pub sender: String,
+    pub body: String,
+    pub local_reputation_score: f32,
+    pub is_contact: bool,
+    pub campaign_repetition_count: u32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SmsVerdict {
+    pub sender: String,
+    pub verdict: CommunicationVerdict,
+    pub confidence: f32,
+    pub xai_reasons: Vec<String>,
+    pub tier: u8,
+    pub latency_us: u32,
+    pub extracted_urls: Vec<String>,
+    pub should_quarantine: bool,
+    pub is_campaign: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct EmailSignals {
+    pub sender_address: String,
+    pub display_name: Option<String>,
+    pub subject: String,
+    pub body: String,
+    pub spf_pass: bool,
+    pub dkim_pass: bool,
+    pub dmarc_pass: bool,
+    pub local_reputation_score: f32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct EmailVerdict {
+    pub sender_address: String,
+    pub verdict: CommunicationVerdict,
+    pub confidence: f32,
+    pub xai_reasons: Vec<String>,
+    pub tier: u8,
+    pub latency_us: u32,
+    pub extracted_urls: Vec<String>,
+    pub tracking_pixels_neutralized: u32,
+    pub should_quarantine: bool,
+    pub spoofing_detected: bool,
+}
+

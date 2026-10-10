@@ -5,14 +5,27 @@ import {
   Cpu,
   Database,
   Sliders,
-  WifiOff,
-  Plane,
+  Mail,
+  Zap,
+  Activity,
+  ShieldAlert,
+  Radio,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { MOTION_DURATION } from "../styles/motion";
 import logoImg from "../assets/logo.png";
 
-export type NavTab = "dashboard" | "inspector" | "processes" | "logs" | "settings";
+export type NavTab =
+  | "dashboard"
+  | "live_shield"
+  | "inspector"
+  | "network"
+  | "comm_shield"
+  | "email"
+  | "hardware"
+  | "processes"
+  | "logs"
+  | "settings";
 
 interface SidebarProps {
   activeTab: NavTab;
@@ -20,18 +33,32 @@ interface SidebarProps {
   airplaneMode: boolean;
   wanBytes: number;
   suspiciousCount?: number;
+  emailThreatCount?: number;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   activeTab,
   onSelectTab,
-  airplaneMode,
-  wanBytes,
   suspiciousCount = 0,
+  emailThreatCount = 0,
 }) => {
   const navItems = [
     { id: "dashboard" as NavTab, label: "Overview", icon: LayoutDashboard },
+    { id: "live_shield" as NavTab, label: "Live Shield", icon: Radio },
     { id: "inspector" as NavTab, label: "Payload Inspector", icon: Search },
+    { id: "network" as NavTab, label: "Network Interceptor", icon: Activity },
+    {
+      id: "comm_shield" as NavTab,
+      label: "Communication Shield",
+      icon: ShieldAlert,
+    },
+    {
+      id: "email" as NavTab,
+      label: "Email Shield",
+      icon: Mail,
+      badge: emailThreatCount > 0 ? `${emailThreatCount} Threat` : undefined,
+    },
+    { id: "hardware" as NavTab, label: "Hardware Accel", icon: Zap },
     {
       id: "processes" as NavTab,
       label: "Process Monitor",
@@ -43,7 +70,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   ];
 
   return (
-    <aside className="w-64 border-r border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 flex flex-col justify-between select-none h-screen sticky top-0 shrink-0 z-40 transition-colors">
+    <aside className="w-64 border-r border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 flex flex-col justify-between select-none h-screen sticky top-0 shrink-0 z-40 transition-colors overflow-y-auto">
       <div>
         {/* Workspace / Product Header */}
         <div className="h-16 px-6 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
@@ -64,7 +91,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Navigation Links with Layout Sliding Indicator */}
-        <div className="px-3 py-6">
+        <div className="px-3 py-5">
           <div className="px-3 pb-2 text-xs font-medium uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
             Platform
           </div>
@@ -104,7 +131,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   {item.badge && (
                     <motion.span
                       animate={
-                        item.badge.includes("Alert")
+                        item.badge.includes("Alert") || item.badge.includes("Threat")
                           ? { opacity: [0.8, 1, 0.8] }
                           : undefined
                       }
@@ -125,33 +152,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
       </div>
 
-      {/* Footer Status Panel */}
-      <div className="p-4 border-t border-zinc-200 dark:border-zinc-800">
-        <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/40 p-3.5 space-y-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2 text-xs text-zinc-700 dark:text-zinc-300 font-medium">
-              {airplaneMode ? (
-                <Plane className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-              ) : (
-                <WifiOff className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-              )}
-              <span>{airplaneMode ? "Hardware Airplane" : "Zero-WAN Air-Gap"}</span>
-            </div>
-            <span className="inline-flex items-center gap-1.5 text-[11px] text-emerald-700 dark:text-emerald-400 font-medium">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              {airplaneMode ? "Offline" : "Enforced"}
-            </span>
-          </div>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
-            {airplaneMode
-              ? "Device is operating in physical hardware isolation. Zero external network link."
-              : "All models execute locally on-device. Zero network packets sent to WAN."}
-          </p>
-          <div className="pt-2 border-t border-zinc-200/60 dark:border-zinc-800/60 flex items-center justify-between text-xs text-zinc-600 dark:text-zinc-400 font-mono">
-            <span>WAN Egress:</span>
-            <span className="text-zinc-900 dark:text-zinc-200 font-medium">{wanBytes} Bytes</span>
-          </div>
+      {/* Clean Status Footer */}
+      <div className="p-4 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400">
+        <div className="flex items-center space-x-2">
+          <span className="w-2 h-2 rounded-full bg-emerald-500" />
+          <span className="font-medium text-[11px]">Air-Gap Active</span>
         </div>
+        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700">
+          0 WAN B
+        </span>
       </div>
     </aside>
   );

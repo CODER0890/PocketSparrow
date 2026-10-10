@@ -9,7 +9,12 @@ import { XaiDrawer, ScanResultPayload } from "./components/XaiDrawer";
 import { ProtectionCard } from "./components/ProtectionCard";
 import { QuickActionsGrid } from "./components/QuickActionsGrid";
 import { RecentThreatsList } from "./components/RecentThreatsList";
-import { Sliders } from "lucide-react";
+import { EmailShield } from "./components/EmailShield";
+import { CommunicationShieldDashboard } from "./components/CommunicationShieldDashboard";
+import { HardwareAcceleratorDashboard } from "./components/HardwareAcceleratorDashboard";
+import { NetworkInterceptorDashboard } from "./components/NetworkInterceptorDashboard";
+import { LiveShield } from "./components/LiveShield";
+import { Sliders, AlertTriangle } from "lucide-react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { getPageVariants } from "./styles/motion";
 
@@ -40,6 +45,7 @@ export const App: React.FC = () => {
   const [lastLatencyUs, setLastLatencyUs] = useState<number>(18);
   const [peakRamMb] = useState<number>(14.9);
   const [activeAlert, setActiveAlert] = useState<ScanResultPayload | null>(null);
+  const [wanViolationAlert, setWanViolationAlert] = useState<string | null>(null);
 
   // Protection & Inspector states (clean defaults)
   const [clipboardShield, setClipboardShield] = useState<boolean>(true);
@@ -224,6 +230,7 @@ export const App: React.FC = () => {
       result = simulateScan(type, payload);
     }
 
+    result.payload = payload;
     setActiveAlert(result);
     setLastLatencyUs(result.latency_us);
 
@@ -354,6 +361,22 @@ export const App: React.FC = () => {
             onOpenInspector={() => setActiveTab("inspector")}
           />
 
+          {/* Module 2: Full-width Rose Alert Banner on WAN Egress Violation */}
+          {wanViolationAlert && (
+            <div className="w-full bg-rose-600 text-white px-6 py-2.5 text-xs font-semibold flex items-center justify-between shadow-md z-30 shrink-0">
+              <div className="flex items-center space-x-2">
+                <AlertTriangle className="w-4 h-4 shrink-0" />
+                <span>{wanViolationAlert}</span>
+              </div>
+              <button
+                onClick={() => setWanViolationAlert(null)}
+                className="underline hover:opacity-80 text-[11px]"
+              >
+                Acknowledge &amp; Reset
+              </button>
+            </div>
+          )}
+
           {/* Main Content Area with Page Transitions */}
           <main className="flex-1 overflow-y-auto p-8 space-y-8">
             <AnimatePresence mode="wait">
@@ -420,6 +443,12 @@ export const App: React.FC = () => {
                   </div>
                 )}
 
+                {activeTab === "live_shield" && (
+                  <div className="space-y-8 max-w-6xl mx-auto">
+                    <LiveShield />
+                  </div>
+                )}
+
                 {activeTab === "inspector" && (
                   <div className="space-y-8 max-w-5xl mx-auto">
                     <ThreatInspector
@@ -450,6 +479,36 @@ export const App: React.FC = () => {
                       logs={logs}
                       onSelectLog={(result) => setActiveAlert(result)}
                     />
+                  </div>
+                )}
+
+                {activeTab === "network" && (
+                  <div className="space-y-8 max-w-6xl mx-auto">
+                    <NetworkInterceptorDashboard
+                      onWanViolation={(bytes) =>
+                        setWanViolationAlert(
+                          `AIR-GAP VIOLATION ALERT: ${bytes} bytes WAN egress detected. Zero-trust isolation enforced.`
+                        )
+                      }
+                    />
+                  </div>
+                )}
+
+                {activeTab === "comm_shield" && (
+                  <div className="space-y-8 max-w-7xl mx-auto">
+                    <CommunicationShieldDashboard />
+                  </div>
+                )}
+
+                {activeTab === "email" && (
+                  <div className="space-y-8 max-w-6xl mx-auto">
+                    <EmailShield onSelectThreat={(result) => setActiveAlert(result)} />
+                  </div>
+                )}
+
+                {activeTab === "hardware" && (
+                  <div className="space-y-8 max-w-6xl mx-auto">
+                    <HardwareAcceleratorDashboard />
                   </div>
                 )}
 
@@ -507,11 +566,11 @@ export const App: React.FC = () => {
                           <select
                             value={activeDelegate}
                             onChange={(e) => setActiveDelegate(e.target.value)}
-                            className="p-1.5 rounded bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-200 text-xs focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-700"
+                            className="p-2 rounded-lg bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
                           >
-                            <option>CPU (x86_64 INT8 AVX2)</option>
-                            <option>Android NNAPI Delegate</option>
-                            <option>Vulkan / DirectML</option>
+                            <option className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 py-1">CPU (x86_64 INT8 AVX2)</option>
+                            <option className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 py-1">Android NNAPI Delegate</option>
+                            <option className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 py-1">Vulkan / DirectML</option>
                           </select>
                         </div>
 

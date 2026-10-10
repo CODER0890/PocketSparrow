@@ -10,6 +10,8 @@ desktop/src-tauri/target/
 .gradle/
 android/.gradle/
 android/app/build/
+android/app/.cxx/
+.cxx/
 local.properties
 .idea/
 *.iml

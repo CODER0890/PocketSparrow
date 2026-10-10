@@ -4,12 +4,23 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import net.sqlcipher.database.SQLiteDatabase
-import net.sqlcipher.database.SupportFactory
+import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
 
-@Database(entities = [ScanLogEntity::class], version = 1, exportSchema = false)
+@Database(
+    entities = [
+        ScanLogEntity::class,
+        SpamNumberEntity::class,
+        SpamSenderEntity::class,
+        SpamPatternEntity::class,
+        UserReportEntity::class,
+        QuarantinedMessageEntity::class
+    ],
+    version = 2,
+    exportSchema = false
+)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun scanLogDao(): ScanLogDao
+    abstract fun spamDao(): SpamDao
 
     companion object {
         @Volatile
@@ -20,7 +31,7 @@ abstract class AppDatabase : RoomDatabase() {
 
         fun getDatabase(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
-                val factory = SupportFactory(PASSPHRASE)
+                val factory = SupportOpenHelperFactory(PASSPHRASE)
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,

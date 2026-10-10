@@ -7,9 +7,12 @@ import {
   Check,
   Search,
   Loader2,
+  FileLock,
 } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 import { ScanResultPayload } from "./XaiDrawer";
+import { ThreatDnaVisualizer } from "./ThreatDnaVisualizer";
+import { ForensicExportModal } from "./ForensicExportModal";
 import { MOTION_EASING, MOTION_DURATION } from "../styles/motion";
 
 interface ThreatInspectorProps {
@@ -30,6 +33,8 @@ export const ThreatInspector: React.FC<ThreatInspectorProps> = ({
   const [inputPayload, setInputPayload] = useState(initialPayload || "");
   const [isScanning, setIsScanning] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [lastResult, setLastResult] = useState<ScanResultPayload | null>(null);
+  const [showExportModal, setShowExportModal] = useState(false);
 
   React.useEffect(() => {
     if (selectedType) setContentType(selectedType);
@@ -43,7 +48,8 @@ export const ThreatInspector: React.FC<ThreatInspectorProps> = ({
     if (!inputPayload.trim() || isScanning) return;
     setIsScanning(true);
     try {
-      await onScan(contentType, inputPayload);
+      const res = await onScan(contentType, inputPayload);
+      setLastResult(res);
     } finally {
       setIsScanning(false);
     }
@@ -83,41 +89,55 @@ export const ThreatInspector: React.FC<ThreatInspectorProps> = ({
           </p>
         </div>
 
-        {/* Vector Tabs */}
-        <div className="inline-flex p-1 rounded-md bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 self-start sm:self-auto text-xs">
-          <button
-            onClick={() => setContentType("Url")}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded transition-colors ${
-              contentType === "Url"
-                ? "bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-medium shadow-sm"
-                : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
-            }`}
+        <div className="flex flex-wrap items-center gap-2.5 self-start sm:self-auto">
+          {/* Vector Tabs */}
+          <div className="inline-flex p-1 rounded-md bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-xs">
+            <button
+              onClick={() => setContentType("Url")}
+              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded transition-colors ${
+                contentType === "Url"
+                  ? "bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-medium shadow-sm"
+                  : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
+              }`}
+            >
+              <Globe className="w-3.5 h-3.5" />
+              <span>URL</span>
+            </button>
+            <button
+              onClick={() => setContentType("SmsText")}
+              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded transition-colors ${
+                contentType === "SmsText"
+                  ? "bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-medium shadow-sm"
+                  : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
+              }`}
+            >
+              <MessageSquare className="w-3.5 h-3.5" />
+              <span>SMS / Message</span>
+            </button>
+            <button
+              onClick={() => setContentType("QrPayload")}
+              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded transition-colors ${
+                contentType === "QrPayload"
+                  ? "bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-medium shadow-sm"
+                  : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
+              }`}
+            >
+              <QrCode className="w-3.5 h-3.5" />
+              <span>QR Code</span>
+            </button>
+          </div>
+
+          {/* Module 3: Export Forensic Report Button */}
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setShowExportModal(true)}
+            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-md text-xs font-medium border border-zinc-200 dark:border-zinc-800 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-900/60 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition-colors shadow-2xs"
+            title="Export offline AES-256 encrypted forensic audit archive"
           >
-            <Globe className="w-3.5 h-3.5" />
-            <span>URL</span>
-          </button>
-          <button
-            onClick={() => setContentType("SmsText")}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded transition-colors ${
-              contentType === "SmsText"
-                ? "bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-medium shadow-sm"
-                : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
-            }`}
-          >
-            <MessageSquare className="w-3.5 h-3.5" />
-            <span>SMS / Message</span>
-          </button>
-          <button
-            onClick={() => setContentType("QrPayload")}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded transition-colors ${
-              contentType === "QrPayload"
-                ? "bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-medium shadow-sm"
-                : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
-            }`}
-          >
-            <QrCode className="w-3.5 h-3.5" />
-            <span>QR Code</span>
-          </button>
+            <FileLock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+            <span>Export Forensic Report</span>
+          </motion.button>
         </div>
       </div>
 
@@ -200,6 +220,25 @@ export const ThreatInspector: React.FC<ThreatInspectorProps> = ({
           </motion.button>
         </div>
       </div>
+
+      {/* Module 1: Threat DNA Attention Heatmap Visualizer */}
+      {inputPayload.trim() && (
+        <ThreatDnaVisualizer
+          payload={inputPayload}
+          category={lastResult?.category}
+        />
+      )}
+
+      {/* Module 3: Offline Encrypted Forensic Export Modal */}
+      <ForensicExportModal
+        isOpen={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        payload={inputPayload || "https://example.test"}
+        verdict={lastResult?.verdict}
+        category={lastResult?.category}
+        xaiReason={lastResult?.xai_reason}
+        latencyUs={lastResult?.latency_us}
+      />
     </div>
   );
 };

@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { MOTION_EASING, MOTION_DURATION } from "../styles/motion";
+import { ThreatDnaVisualizer } from "./ThreatDnaVisualizer";
 
 export interface ScanResultPayload {
   verdict: "Safe" | "Suspicious" | "Malicious";
@@ -17,6 +18,7 @@ export interface ScanResultPayload {
   category: string;
   xai_reason: string;
   should_block: boolean;
+  payload?: string;
 }
 
 interface XaiDrawerProps {
@@ -110,6 +112,15 @@ export const XaiDrawer: React.FC<XaiDrawerProps> = ({ result, onClose }) => {
 
             {/* Forensic Analysis Section */}
             <div className="mt-6 space-y-6">
+              {result.payload && (
+                <div>
+                  <ThreatDnaVisualizer
+                    payload={result.payload}
+                    category={result.category}
+                  />
+                </div>
+              )}
+
               <div>
                 <h4 className="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                   Forensic Analysis

@@ -19,13 +19,18 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.window.Dialog
 import com.pocketsparrow.core.ScanResult
+import com.pocketsparrow.ui.components.ForensicExportDialog
+import com.pocketsparrow.ui.components.ThreatDnaVisualizer
 import com.pocketsparrow.ui.theme.*
 
 @Composable
 fun XaiWarningDialog(
     result: ScanResult,
+    payload: String = "",
     onDismiss: () -> Unit,
     onProceedAnyway: (() -> Unit)? = null
 ) {
@@ -33,6 +38,7 @@ fun XaiWarningDialog(
     val headerColor = if (isMalicious) CyberRose else CyberAmber
     val confPct = (result.confidence * 100).toInt()
     val reducedMotion = isReducedMotion()
+    var showForensicExport by remember { mutableStateOf(false) }
 
     // Threat attention shake on entrance for malicious threats
     val shakeOffset = remember { Animatable(0f) }
@@ -68,7 +74,9 @@ fun XaiWarningDialog(
                 }
         ) {
             Column(
-                modifier = Modifier.padding(20.dp),
+                modifier = Modifier
+                    .padding(20.dp)
+                    .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.Start
             ) {
                 // Header
@@ -128,6 +136,15 @@ fun XaiWarningDialog(
                     }
                 }
 
+                // Threat DNA Attention Heatmap
+                if (payload.isNotBlank()) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    ThreatDnaVisualizer(
+                        payload = payload,
+                        category = result.category
+                    )
+                }
+
                 Spacer(modifier = Modifier.height(12.dp))
 
                 // Latency and Engine metadata
@@ -143,26 +160,49 @@ fun XaiWarningDialog(
                 // Action Buttons
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (onProceedAnyway != null) {
-                        TextButton(onClick = onProceedAnyway) {
-                            Text("Proceed (Unsafe)", color = Color(0xFF94A3B8), fontSize = 12.sp)
-                        }
-                        Spacer(modifier = Modifier.width(8.dp))
+                    OutlinedButton(
+                        onClick = { showForensicExport = true },
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = CyberCyan),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, CyberCyan.copy(alpha = 0.5f))
+                    ) {
+                        Text("Export Audit", fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
                     }
 
-                    Button(
-                        onClick = onDismiss,
-                        interactionSource = buttonInteraction,
-                        modifier = Modifier.scale(buttonScale),
-                        colors = ButtonDefaults.buttonColors(containerColor = headerColor),
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
-                        Text("Block & Dismiss", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        if (onProceedAnyway != null) {
+                            TextButton(onClick = onProceedAnyway) {
+                                Text("Proceed (Unsafe)", color = Color(0xFF94A3B8), fontSize = 12.sp)
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                        }
+
+                        Button(
+                            onClick = onDismiss,
+                            interactionSource = buttonInteraction,
+                            modifier = Modifier.scale(buttonScale),
+                            colors = ButtonDefaults.buttonColors(containerColor = headerColor),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text("Block & Dismiss", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                        }
                     }
                 }
             }
+        }
+
+        if (showForensicExport) {
+            ForensicExportDialog(
+                payload = payload.ifBlank { result.category },
+                verdict = if (isMalicious) "MALICIOUS" else "SUSPICIOUS",
+                category = result.category,
+                xaiReason = result.xaiReason,
+                latencyMicros = result.latencyMicros,
+                onDismiss = { showForensicExport = false }
+            )
         }
     }
 }

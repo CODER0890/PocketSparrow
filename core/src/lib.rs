@@ -1,3 +1,4 @@
+pub mod communication_shield;
 pub mod engine;
 pub mod jni;
 pub mod qr;
@@ -6,6 +7,7 @@ pub mod tier2;
 pub mod types;
 pub mod xai;
 
+pub use communication_shield::CommunicationShield;
 pub use engine::DetectionEngine;
 pub use types::{
     CScanResult, ContentType, HeuristicResult, ModelResult, PermissionAuditResult, ScanResult,

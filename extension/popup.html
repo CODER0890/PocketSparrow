@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Pocket Sparrow Shield</title>
+  <style>
+    body {
+      width: 300px;
+      margin: 0;
+      padding: 14px;
+      background: #09090b;
+      color: #f4f4f5;
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 12px;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #27272a;
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+    }
+    .title {
+      font-weight: 600;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .connected {
+      background: rgba(16, 185, 129, 0.1);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #10b981;
+    }
+    .stat-card {
+      background: #18181b;
+      border: 1px solid #27272a;
+      border-radius: 8px;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .stat-val {
+      font-size: 18px;
+      font-weight: 700;
+      color: #f43f5e;
+      font-family: monospace;
+    }
+    .allowlist-section {
+      background: #18181b;
+      border: 1px solid #27272a;
+      border-radius: 8px;
+      padding: 10px;
+    }
+    .allowlist-title {
+      font-weight: 600;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .domain-list {
+      max-height: 90px;
+      overflow-y: auto;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .domain-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 3px 0;
+      font-family: monospace;
+      font-size: 11px;
+      color: #a1a1aa;
+      border-bottom: 1px solid #27272a;
+    }
+    .remove-btn {
+      background: none;
+      border: none;
+      color: #ef4444;
+      cursor: pointer;
+      font-size: 10px;
+    }
+    .footer {
+      margin-top: 10px;
+      text-align: center;
+      color: #71717a;
+      font-size: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="title">
+      <span>Pocket Sparrow</span>
+    </div>
+    <div class="status-pill connected" id="status-pill">
+      <span class="dot"></span>
+      <span id="status-text">127.0.0.1:41789</span>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div>
+      <div style="font-weight: 500;">Threats Blocked Today</div>
+      <div style="font-size: 11px; color: #a1a1aa;">Real-time on-device protection</div>
+    </div>
+    <div class="stat-val" id="threat-count">0</div>
+  </div>
+
+  <div class="allowlist-section">
+    <div class="allowlist-title">
+      <span>Trusted Domains</span>
+      <span style="font-size: 10px; color: #71717a;" id="allowlist-count">0 domains</span>
+    </div>
+    <ul class="domain-list" id="domain-list">
+      <li class="domain-item">Loading...</li>
+    </ul>
+  </div>
+
+  <div class="footer">
+    100% On-Device Engine • Zero Telemetry
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

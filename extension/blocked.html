@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Threat Blocked • Pocket Sparrow Defense</title>
+  <link rel="stylesheet" href="blocked.css">
+</head>
+<body class="bg-zinc-950 text-zinc-100 min-h-screen flex items-center justify-center p-6">
+  <div class="card max-w-xl w-full bg-zinc-900/90 border border-zinc-800 rounded-xl shadow-2xl p-7 space-y-6">
+    
+    <!-- Header -->
+    <div class="flex items-start justify-between border-b border-zinc-800 pb-5">
+      <div class="flex items-center space-x-3.5">
+        <div class="icon-wrap bg-rose-500/10 border border-rose-500/20 text-rose-400 p-2.5 rounded-lg">
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="text-base font-semibold text-zinc-100 tracking-tight" id="verdict-title">
+              Malicious Threat Blocked
+            </h1>
+            <span class="badge font-mono text-[11px] px-2 py-0.5 rounded bg-zinc-800 border border-zinc-700 text-zinc-300" id="category-badge">
+              URL_PHISHING
+            </span>
+          </div>
+          <p class="text-xs text-zinc-400 mt-0.5" id="latency-text">
+            Intercepted on-device in 18.4 ms • Zero WAN telemetry
+          </p>
+        </div>
+      </div>
+      <span class="text-[10px] font-mono text-zinc-500 px-1.5 py-0.5 rounded bg-zinc-800/80 border border-zinc-700/60">
+        127.0.0.1:41789
+      </span>
+    </div>
+
+    <!-- Targeted URL Banner -->
+    <div class="space-y-1.5">
+      <div class="text-[11px] font-medium uppercase tracking-wider text-zinc-400">
+        Blocked Target Vector:
+      </div>
+      <div class="font-mono text-xs p-3 rounded-lg bg-zinc-950 border border-zinc-800 text-rose-400 break-all select-all" id="target-url">
+        Loading...
+      </div>
+    </div>
+
+    <!-- Threat DNA Heatmap Preview -->
+    <div class="space-y-2">
+      <div class="flex items-center justify-between text-[11px]">
+        <span class="font-medium uppercase tracking-wider text-zinc-400">Threat DNA Attention Map:</span>
+        <span class="text-zinc-500 font-mono text-[10px]">Cool (Safe) → Rose (Threat)</span>
+      </div>
+      <div class="p-3 bg-zinc-950 rounded-lg border border-zinc-800/80 font-mono text-xs leading-relaxed flex flex-wrap gap-1" id="dna-container">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+    <!-- XAI Forensic Breakdown -->
+    <div class="space-y-2">
+      <div class="text-[11px] font-medium uppercase tracking-wider text-zinc-400">
+        Explainable AI (XAI) Reason:
+      </div>
+      <p class="text-xs text-zinc-300 leading-relaxed bg-zinc-950/60 p-3.5 rounded-lg border border-zinc-800/80" id="xai-reason">
+        Analyzing trigger markers...
+      </p>
+    </div>
+
+    <!-- Privacy Shield Assurance -->
+    <div class="flex items-center space-x-2 text-xs text-zinc-400 bg-zinc-950/40 p-2.5 rounded-lg border border-zinc-800/60">
+      <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+      </svg>
+      <span>Evaluated locally on host hardware. Zero queries or URLs sent to remote servers.</span>
+    </div>
+
+    <!-- Actions & Secondary Controls -->
+    <div class="pt-4 border-t border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+      <div class="flex items-center space-x-3 text-zinc-400">
+        <button id="btn-trust" class="hover:text-zinc-200 transition-colors underline underline-offset-2">
+          Trust this domain
+        </button>
+        <span>•</span>
+        <button id="btn-export" class="hover:text-zinc-200 transition-colors underline underline-offset-2">
+          Export forensic report
+        </button>
+      </div>
+
+      <div class="flex items-center space-x-2">
+        <button id="btn-bypass" class="px-3 py-1.5 rounded text-zinc-400 hover:text-zinc-200 transition-colors">
+          Proceed anyway (unsafe)
+        </button>
+        <button id="btn-back" class="px-4 py-1.5 rounded-md bg-zinc-100 hover:bg-zinc-200 text-zinc-900 font-medium transition-colors">
+          Return to Safety
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="blocked.js"></script>
+</body>
+</html>

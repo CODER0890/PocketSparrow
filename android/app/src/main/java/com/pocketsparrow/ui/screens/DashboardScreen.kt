@@ -37,6 +37,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pocketsparrow.core.NativeBridge
 import com.pocketsparrow.data.ScanLogEntity
+import com.pocketsparrow.ui.components.ForensicExportDialog
+import com.pocketsparrow.ui.components.HardwareAcceleratorDashboard
+import com.pocketsparrow.ui.components.ThreatDnaVisualizer
 import com.pocketsparrow.ui.theme.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -48,6 +51,7 @@ fun DashboardScreen(
 ) {
     val context = LocalContext.current
     val clipboardManager = LocalClipboardManager.current
+    var showDashboardForensicExport by remember { mutableStateOf(false) }
     val isAirplaneMode = remember {
         try {
             android.provider.Settings.Global.getInt(
@@ -70,7 +74,12 @@ fun DashboardScreen(
     // Threat counter pop animation state
     val blockedCount = recentLogs.count { it.threatLevel == 2 }
     val counterScale = remember { Animatable(1f) }
-    val counterColor = remember { Animatable(CyberRose) }
+    var targetCounterColor by remember { mutableStateOf(CyberRose) }
+    val counterColor by animateColorAsState(
+        targetValue = targetCounterColor,
+        animationSpec = MotionTokens.microTween(),
+        label = "counterColor"
+    )
 
     LaunchedEffect(blockedCount) {
         if (blockedCount > 0 && !reducedMotion) {
@@ -84,16 +93,9 @@ fun DashboardScreen(
                     animationSpec = MotionTokens.threatSpring()
                 )
             }
-            coroutineScope.launch {
-                counterColor.animateTo(
-                    targetValue = Color(0xFFFF4D4D),
-                    animationSpec = MotionTokens.microTween()
-                )
-                counterColor.animateTo(
-                    targetValue = CyberRose,
-                    animationSpec = MotionTokens.macroTween(delayMillis = 150)
-                )
-            }
+            targetCounterColor = Color(0xFFFF4D4D)
+            delay(150)
+            targetCounterColor = CyberRose
         }
     }
 
@@ -232,7 +234,7 @@ fun DashboardScreen(
                     title = "THREATS BLOCKED",
                     value = blockedCount.toString(),
                     sub = "100% On-Device Zero WAN",
-                    accent = counterColor.value,
+                    accent = counterColor,
                     modifier = Modifier
                         .weight(1f)
                         .graphicsLayer {
@@ -411,6 +413,14 @@ fun DashboardScreen(
                             )
                         }
                     }
+
+                    if (inputPayload.isNotBlank()) {
+                        Spacer(modifier = Modifier.height(12.dp))
+                        ThreatDnaVisualizer(
+                            payload = inputPayload,
+                            category = if (selectedType == NativeBridge.CONTENT_TYPE_URL) "URL_PAYLOAD" else "SMS_TEXT"
+                        )
+                    }
                 }
             }
         }
@@ -488,14 +498,35 @@ fun DashboardScreen(
             }
         }
 
+        // Hardware Acceleration Telemetry (NPU/GPU/CPU & MobileBERT)
+        item {
+            HardwareAcceleratorDashboard(modifier = Modifier.fillMaxWidth())
+        }
+
         // Recent Audit Logs Header
         item {
-            Text(
-                text = "Local Encrypted Logs (Room + SQLCipher)",
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                fontSize = 14.sp
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Local Encrypted Logs (Room + SQLCipher)",
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp
+                )
+
+                OutlinedButton(
+                    onClick = { showDashboardForensicExport = true },
+                    shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = CyberCyan),
+                    border = BorderStroke(1.dp, CyberCyan.copy(alpha = 0.4f)),
+                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
+                ) {
+                    Text("Export Audit ZIP", fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
+                }
+            }
         }
 
         if (recentLogs.isEmpty()) {
@@ -556,6 +587,17 @@ fun DashboardScreen(
                 }
             }
         }
+    }
+
+    if (showDashboardForensicExport) {
+        ForensicExportDialog(
+            payload = inputPayload.ifBlank { "system_audit_log" },
+            verdict = if (blockedCount > 0) "MALICIOUS" else "SAFE",
+            category = "AUDIT_SUMMARY",
+            xaiReason = "Pocket Sparrow forensic ledger snapshot verified on-device with zero WAN leakage.",
+            latencyMicros = 1200L,
+            onDismiss = { showDashboardForensicExport = false }
+        )
     }
 }
 

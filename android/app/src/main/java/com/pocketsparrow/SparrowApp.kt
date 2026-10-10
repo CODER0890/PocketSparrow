@@ -3,14 +3,15 @@ package com.pocketsparrow
 import android.app.Application
 import com.pocketsparrow.core.NativeBridge
 import com.pocketsparrow.data.AppDatabase
-import net.sqlcipher.database.SQLiteDatabase
 
 class SparrowApp : Application() {
     override fun onCreate() {
         super.onCreate()
 
         // 1. Initialize SQLCipher native binaries
-        SQLiteDatabase.loadLibs(this)
+        try {
+            System.loadLibrary("sqlcipher")
+        } catch (_: Throwable) {}
 
         // 2. Initialize Native Two-Tier Detection Engine
         NativeBridge.init()

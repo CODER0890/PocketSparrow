@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "Pocket Sparrow Threat Shield",
+  "version": "1.0.0",
+  "description": "100% on-device real-time phishing and malicious payload defense connected to local Pocket Sparrow engine.",
+  "permissions": [
+    "webNavigation",
+    "storage"
+  ],
+  "host_permissions": [
+    "http://127.0.0.1:41789/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Pocket Sparrow Threat Shield"
+  }
+}

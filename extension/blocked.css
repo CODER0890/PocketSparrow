@@ -1,0 +1,72 @@
+/* Pocket Sparrow Extension - Blocked Warning Card Styles */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  background-color: #09090b;
+  color: #f4f4f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 1.5rem;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+}
+
+.card {
+  max-width: 38rem;
+  width: 100%;
+  background: rgba(24, 24, 27, 0.95);
+  border: 1px solid #27272a;
+  border-radius: 0.75rem;
+  padding: 1.75rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  animation: shakeWarning 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes shakeWarning {
+  0% { transform: scale(0.96) translateY(8px); opacity: 0; }
+  60% { transform: scale(1.01) translateY(-2px); opacity: 1; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.dna-token {
+  display: inline-block;
+  padding: 0.15rem 0.35rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  border: 1px solid transparent;
+  transition: transform 0.15s ease;
+}
+
+.dna-token:hover {
+  transform: scale(1.05);
+}
+
+.token-rose {
+  background: rgba(244, 63, 94, 0.25);
+  color: #fda4af;
+  border-color: rgba(244, 63, 94, 0.5);
+  font-weight: 600;
+}
+
+.token-amber {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fcd34d;
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+.token-cool {
+  background: rgba(2, 132, 199, 0.12);
+  color: #7dd3fc;
+  border-color: rgba(2, 132, 199, 0.25);
+}
