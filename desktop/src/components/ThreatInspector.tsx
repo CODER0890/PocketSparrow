@@ -67,7 +67,7 @@ export const ThreatInspector: React.FC<ThreatInspectorProps> = ({
       case "Url":
         return "Enter suspicious URL or domain to evaluate (e.g., https://...)...";
       case "SmsText":
-        return "Paste incoming SMS text message or communication payload to inspect for social engineering...";
+        return "Paste incoming text message or payload to inspect for social engineering...";
       case "QrPayload":
         return "Enter decoded QR payload, data URI, or executable scheme (e.g., javascript:, smsto:)...";
     }

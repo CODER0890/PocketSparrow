@@ -10,7 +10,6 @@ import { ProtectionCard } from "./components/ProtectionCard";
 import { QuickActionsGrid } from "./components/QuickActionsGrid";
 import { RecentThreatsList } from "./components/RecentThreatsList";
 import { EmailShield } from "./components/EmailShield";
-import { CommunicationShieldDashboard } from "./components/CommunicationShieldDashboard";
 import { HardwareAcceleratorDashboard } from "./components/HardwareAcceleratorDashboard";
 import { NetworkInterceptorDashboard } from "./components/NetworkInterceptorDashboard";
 import { LiveShield } from "./components/LiveShield";
@@ -491,12 +490,6 @@ export const App: React.FC = () => {
                         )
                       }
                     />
-                  </div>
-                )}
-
-                {activeTab === "comm_shield" && (
-                  <div className="space-y-8 max-w-7xl mx-auto">
-                    <CommunicationShieldDashboard />
                   </div>
                 )}
 

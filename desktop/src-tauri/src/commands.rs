@@ -2,7 +2,6 @@ use crate::db::{EncryptedDatabase, EncryptedLogRecord};
 use crate::email_scanner::{EmailAccount, EmailScannerService, ScannedEmail};
 use crate::network_guard::{NetworkGuard, NetworkMetrics};
 use crate::process_monitor::{DesktopProcessInfo, ProcessMonitor};
-use crate::spam_db::{CommunicationStats, SpamDatabase, SpamPattern, UserReport};
 use pocket_sparrow::communication_shield::CommunicationShield;
 use pocket_sparrow::engine::DetectionEngine;
 use pocket_sparrow::types::{ContentType, EmailSignals, EmailVerdict, TierTriggered};
@@ -58,7 +57,6 @@ pub struct AppState {
     pub process_monitor: ProcessMonitor,
     pub network_guard: Arc<NetworkGuard>,
     pub email_scanner: Arc<EmailScannerService>,
-    pub spam_db: Arc<SpamDatabase>,
     pub comm_shield: Arc<CommunicationShield>,
 }
 
@@ -257,35 +255,6 @@ pub async fn scan_incoming_email(
     state: State<'_, AppState>,
 ) -> Result<ScannedEmail, String> {
     Ok(state.email_scanner.scan_email_message(&account_id, &sender, &subject, &body))
-}
-
-// Module A: Communication Shield Commands
-#[tauri::command]
-pub async fn get_communication_stats(state: State<'_, AppState>) -> Result<CommunicationStats, String> {
-    Ok(state.spam_db.get_stats())
-}
-
-#[tauri::command]
-pub async fn get_spam_patterns(state: State<'_, AppState>) -> Result<Vec<SpamPattern>, String> {
-    Ok(state.spam_db.get_top_patterns())
-}
-
-#[tauri::command]
-pub async fn report_communication_spam(
-    target: String,
-    category: String,
-    reason: String,
-    state: State<'_, AppState>,
-) -> Result<UserReport, String> {
-    Ok(state.spam_db.report_target(&target, &category, &reason))
-}
-
-#[tauri::command]
-pub async fn import_offline_blocklist(
-    content: String,
-    state: State<'_, AppState>,
-) -> Result<u32, String> {
-    Ok(state.spam_db.import_blocklist_txt(&content))
 }
 
 #[tauri::command]

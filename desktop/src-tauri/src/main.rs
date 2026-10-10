@@ -7,17 +7,15 @@ mod db;
 mod email_scanner;
 mod network_guard;
 mod process_monitor;
-mod spam_db;
 
 extern crate pocket_sparrow as pocket_sparrow_core;
 
 use browser_bridge::BrowserBridge;
 use clipboard_monitor::ClipboardMonitor;
 use commands::{
-    add_email_account, evaluate_email_shield, get_communication_stats, get_email_accounts,
+    add_email_account, evaluate_email_shield, get_email_accounts,
     get_hardware_metrics, get_logs, get_network_metrics, get_processes, get_scanned_emails,
-    get_spam_patterns, import_offline_blocklist, remove_email_account, report_communication_spam,
-    scan_incoming_email, scan_payload, terminate_process, AppState,
+    remove_email_account, scan_incoming_email, scan_payload, terminate_process, AppState,
 };
 use db::EncryptedDatabase;
 use email_scanner::EmailScannerService;
@@ -25,7 +23,6 @@ use network_guard::NetworkGuard;
 use pocket_sparrow::communication_shield::CommunicationShield;
 use pocket_sparrow::engine::DetectionEngine;
 use process_monitor::ProcessMonitor;
-use spam_db::SpamDatabase;
 use std::path::PathBuf;
 use std::sync::Arc;
 
@@ -56,7 +53,6 @@ async fn main() {
     let process_monitor = ProcessMonitor::new();
     let network_guard = Arc::new(NetworkGuard::new());
     let email_scanner = Arc::new(EmailScannerService::new(engine.clone()));
-    let spam_db = Arc::new(SpamDatabase::new());
     let comm_shield = Arc::new(CommunicationShield::new(engine.clone()));
 
     let state = AppState {
@@ -65,7 +61,6 @@ async fn main() {
         process_monitor,
         network_guard,
         email_scanner,
-        spam_db,
         comm_shield,
     };
 
@@ -83,10 +78,6 @@ async fn main() {
             remove_email_account,
             get_scanned_emails,
             scan_incoming_email,
-            get_communication_stats,
-            get_spam_patterns,
-            report_communication_spam,
-            import_offline_blocklist,
             evaluate_email_shield
         ])
         .run(tauri::generate_context!())

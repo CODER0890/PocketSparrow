@@ -8,7 +8,6 @@ import {
   Mail,
   Zap,
   Activity,
-  ShieldAlert,
   Radio,
 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -20,7 +19,6 @@ export type NavTab =
   | "live_shield"
   | "inspector"
   | "network"
-  | "comm_shield"
   | "email"
   | "hardware"
   | "processes"
@@ -47,11 +45,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: "live_shield" as NavTab, label: "Live Shield", icon: Radio },
     { id: "inspector" as NavTab, label: "Payload Inspector", icon: Search },
     { id: "network" as NavTab, label: "Network Interceptor", icon: Activity },
-    {
-      id: "comm_shield" as NavTab,
-      label: "Communication Shield",
-      icon: ShieldAlert,
-    },
     {
       id: "email" as NavTab,
       label: "Email Shield",
