@@ -33,9 +33,24 @@ class NotificationScanService : NotificationListenerService() {
         createNotificationChannel()
     }
 
+    // Notification posting tracker to detect update events with identical content
+    private val recentNotificationPostings = java.util.Collections.synchronizedMap(
+        object : java.util.LinkedHashMap<String, String>(100, 0.75f, true) {
+            override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, String>?): Boolean {
+                return size > 500
+            }
+        }
+    )
+
     override fun onNotificationPosted(sbn: StatusBarNotification?) {
         super.onNotificationPosted(sbn)
         if (sbn == null) return
+
+        val notif = sbn.notification ?: return
+        // 0. Filter out group summary notifications immediately
+        if ((notif.flags and android.app.Notification.FLAG_GROUP_SUMMARY) != 0) {
+            return
+        }
 
         val startTime = System.nanoTime()
 
@@ -57,13 +72,27 @@ class NotificationScanService : NotificationListenerService() {
         // 4. Extraction (<2ms)
         val extracted = NotificationExtractor.extract(sbn, applicationContext) ?: return
 
-        // 5. 5-Second Debounce Check
+        // 5. Check if notification is an update with unchanged content
+        val notifKey = sbn.key ?: "${sbn.packageName}_${sbn.id}"
+        val lastContentHash = recentNotificationPostings[notifKey]
+        if (lastContentHash != null && lastContentHash == extracted.contentHash) {
+            return
+        }
+        recentNotificationPostings[notifKey] = extracted.contentHash
+
+        // 6. 3-Second Content Debounce Check
+        val contentDebounceKey = "${extracted.packageName}|${extracted.title.trim()}|${extracted.text.trim()}"
+        if (LiveShieldManager.shouldDebounceContent(contentDebounceKey)) {
+            return
+        }
+
+        // 7. Fallback 5-Second Debounce Check
         val debounceKey = "${extracted.packageName}:${extracted.contentHash}"
         if (LiveShieldManager.shouldDebounce(debounceKey)) {
             return
         }
 
-        // 6. Asynchronous Evaluation Pipeline (<50ms SLA)
+        // 8. Asynchronous Evaluation Pipeline (<50ms SLA)
         serviceScope.launch {
             val totalStartNanos = System.nanoTime()
 
@@ -103,6 +132,7 @@ class NotificationScanService : NotificationListenerService() {
                 LiveShieldManager.recordEvent(
                     LiveShieldEvent(
                         id = UUID.randomUUID().toString(),
+                        notificationKey = notifKey,
                         timestamp = System.currentTimeMillis(),
                         packageName = extracted.packageName,
                         appName = extracted.appName,
@@ -110,6 +140,7 @@ class NotificationScanService : NotificationListenerService() {
                         snippet = extracted.fullCombinedText.take(120),
                         threatLevel = scanResult.threatLevel,
                         category = scanResult.category,
+                        confidence = scanResult.confidence,
                         xaiReason = scanResult.xaiReason,
                         latencyMicros = totalLatencyMicros,
                         actionTaken = "ALLOWED_ONCE",
@@ -124,6 +155,7 @@ class NotificationScanService : NotificationListenerService() {
                 LiveShieldManager.recordEvent(
                     LiveShieldEvent(
                         id = UUID.randomUUID().toString(),
+                        notificationKey = notifKey,
                         timestamp = System.currentTimeMillis(),
                         packageName = extracted.packageName,
                         appName = extracted.appName,
@@ -131,6 +163,7 @@ class NotificationScanService : NotificationListenerService() {
                         snippet = extracted.fullCombinedText.take(120),
                         threatLevel = 0,
                         category = "SAFE",
+                        confidence = scanResult.confidence,
                         xaiReason = scanResult.xaiReason,
                         latencyMicros = totalLatencyMicros,
                         actionTaken = "PASSED",
@@ -174,6 +207,7 @@ class NotificationScanService : NotificationListenerService() {
                 LiveShieldManager.recordEvent(
                     LiveShieldEvent(
                         id = UUID.randomUUID().toString(),
+                        notificationKey = notifKey,
                         timestamp = System.currentTimeMillis(),
                         packageName = extracted.packageName,
                         appName = extracted.appName,
@@ -181,6 +215,7 @@ class NotificationScanService : NotificationListenerService() {
                         snippet = extracted.fullCombinedText.take(120),
                         threatLevel = scanResult.threatLevel,
                         category = scanResult.category,
+                        confidence = scanResult.confidence,
                         xaiReason = scanResult.xaiReason,
                         latencyMicros = totalLatencyMicros,
                         actionTaken = "BLOCKED",

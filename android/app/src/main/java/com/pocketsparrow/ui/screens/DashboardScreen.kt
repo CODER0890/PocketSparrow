@@ -49,6 +49,7 @@ fun DashboardScreen(
     recentLogs: List<ScanLogEntity>,
     onTriggerScan: (contentType: Int, payload: String) -> Unit
 ) {
+    val colors = LocalSparrowColors.current
     val context = LocalContext.current
     val clipboardManager = LocalClipboardManager.current
     var showDashboardForensicExport by remember { mutableStateOf(false) }
@@ -141,7 +142,7 @@ fun DashboardScreen(
 
     // Input border glow animation
     val inputBorderColor by animateColorAsState(
-        targetValue = if (isInputFocused) CyberCyan.copy(alpha = 0.8f) else Color(0xFF1E293B),
+        targetValue = if (isInputFocused) CyberCyan.copy(alpha = 0.8f) else colors.cardBorder,
         animationSpec = MotionTokens.microTween(),
         label = "inputBorderColor"
     )
@@ -158,7 +159,7 @@ fun DashboardScreen(
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(CyberBg)
+            .background(colors.bg)
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -177,13 +178,13 @@ fun DashboardScreen(
                 Column {
                     Text(
                         text = "Pocket Sparrow",
-                        color = Color.White,
+                        color = colors.textPrimary,
                         fontWeight = FontWeight.Bold,
                         fontSize = 18.sp
                     )
                     Text(
                         text = "Zero-Cloud Local Threat Shield",
-                        color = Color(0xFF94A3B8),
+                        color = colors.textSecondary,
                         fontSize = 11.sp
                     )
                 }
@@ -195,8 +196,8 @@ fun DashboardScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFF0F172A), RoundedCornerShape(12.dp))
-                    .border(1.dp, Color(0xFF1E293B), RoundedCornerShape(12.dp))
+                    .background(colors.cardBg, RoundedCornerShape(12.dp))
+                    .border(1.dp, colors.cardBorder, RoundedCornerShape(12.dp))
                     .padding(12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
@@ -278,21 +279,21 @@ fun DashboardScreen(
         item {
             Card(
                 shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF0F172A)),
+                colors = CardDefaults.cardColors(containerColor = colors.cardBg),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(1.dp, Color(0xFF1E293B), RoundedCornerShape(12.dp))
+                    .border(1.dp, colors.cardBorder, RoundedCornerShape(12.dp))
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
                         text = "Live Threat Inspector",
-                        color = Color.White,
+                        color = colors.textPrimary,
                         fontWeight = FontWeight.Bold,
                         fontSize = 15.sp
                     )
                     Text(
                         text = "Evaluate URLs, SMS messages, and QR codes instantly on-device.",
-                        color = Color(0xFF94A3B8),
+                        color = colors.textSecondary,
                         fontSize = 11.sp
                     )
 
@@ -326,7 +327,7 @@ fun DashboardScreen(
                             placeholder = {
                                 Text(
                                     text = if (selectedType == NativeBridge.CONTENT_TYPE_URL) "Enter or paste URL to inspect..." else "Enter or paste SMS text to inspect...",
-                                    color = Color(0xFF64748B),
+                                    color = colors.textMuted,
                                     fontSize = 12.sp,
                                     fontFamily = FontFamily.Monospace
                                 )
@@ -380,9 +381,9 @@ fun DashboardScreen(
                                     }
                                 }
                             },
-                            border = BorderStroke(1.dp, Color(0xFF334155)),
+                            border = BorderStroke(1.dp, colors.cardBorder),
                             shape = RoundedCornerShape(8.dp),
-                            colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = colors.textPrimary)
                         ) {
                             Icon(Icons.Default.ContentPaste, contentDescription = "Paste", modifier = Modifier.size(14.dp))
                             Spacer(modifier = Modifier.width(6.dp))
@@ -403,11 +404,11 @@ fun DashboardScreen(
                             enabled = inputPayload.isNotBlank(),
                             interactionSource = buttonInteractionSource,
                             modifier = Modifier.scale(buttonScale),
-                            colors = ButtonDefaults.buttonColors(containerColor = CyberCyan)
+                            colors = ButtonDefaults.buttonColors(containerColor = colors.primary)
                         ) {
                             Text(
                                 text = if (isScanning) "Scanning Pipeline..." else "Evaluate Threat (<50ms)",
-                                color = Color.Black,
+                                color = if (colors.isDark) Color.Black else Color.White,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 12.sp
                             )
@@ -429,21 +430,21 @@ fun DashboardScreen(
         item {
             Card(
                 shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF0F172A)),
+                colors = CardDefaults.cardColors(containerColor = colors.cardBg),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(1.dp, Color(0xFF1E293B), RoundedCornerShape(12.dp))
+                    .border(1.dp, colors.cardBorder, RoundedCornerShape(12.dp))
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
                         text = "Manual Test Vectors",
-                        color = Color.White,
+                        color = colors.textPrimary,
                         fontWeight = FontWeight.Bold,
                         fontSize = 13.sp
                     )
                     Text(
                         text = "Pre-calibrated scenarios for evaluating local heuristic classification.",
-                        color = Color(0xFF94A3B8),
+                        color = colors.textSecondary,
                         fontSize = 11.sp
                     )
                     Spacer(modifier = Modifier.height(10.dp))
@@ -512,7 +513,7 @@ fun DashboardScreen(
             ) {
                 Text(
                     text = "Local Encrypted Logs (Room + SQLCipher)",
-                    color = Color.White,
+                    color = colors.textPrimary,
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp
                 )
@@ -520,8 +521,8 @@ fun DashboardScreen(
                 OutlinedButton(
                     onClick = { showDashboardForensicExport = true },
                     shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = CyberCyan),
-                    border = BorderStroke(1.dp, CyberCyan.copy(alpha = 0.4f)),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = colors.primary),
+                    border = BorderStroke(1.dp, colors.primary.copy(alpha = 0.4f)),
                     contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
                 ) {
                     Text("Export Audit ZIP", fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
@@ -533,10 +534,10 @@ fun DashboardScreen(
             item {
                 Card(
                     shape = RoundedCornerShape(12.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF0F172A)),
+                    colors = CardDefaults.cardColors(containerColor = colors.cardBg),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(1.dp, Color(0xFF1E293B), RoundedCornerShape(12.dp))
+                        .border(1.dp, colors.cardBorder, RoundedCornerShape(12.dp))
                 ) {
                     Column(
                         modifier = Modifier
@@ -547,27 +548,27 @@ fun DashboardScreen(
                         Box(
                             modifier = Modifier
                                 .size(44.dp)
-                                .background(Color(0xFF1E293B), RoundedCornerShape(22.dp)),
+                                .background(colors.cardBorder, RoundedCornerShape(22.dp)),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Shield,
                                 contentDescription = "Shield",
-                                tint = CyberEmerald,
+                                tint = colors.emerald,
                                 modifier = Modifier.size(24.dp)
                             )
                         }
                         Spacer(modifier = Modifier.height(10.dp))
                         Text(
                             text = "No Threats Detected",
-                            color = Color.White,
+                            color = colors.textPrimary,
                             fontWeight = FontWeight.Bold,
                             fontSize = 14.sp
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = "System is actively monitoring. All on-device inspections are clear.",
-                            color = Color(0xFF64748B),
+                            color = colors.textMuted,
                             fontSize = 11.sp
                         )
                     }
@@ -610,15 +611,16 @@ fun HudMetricCard(
     modifier: Modifier = Modifier,
     valueScale: Float = 1.0f
 ) {
+    val colors = LocalSparrowColors.current
     Card(
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF0F172A)),
-        modifier = modifier.border(1.dp, Color(0xFF1E293B), RoundedCornerShape(12.dp))
+        colors = CardDefaults.cardColors(containerColor = colors.cardBg),
+        modifier = modifier.border(1.dp, colors.cardBorder, RoundedCornerShape(12.dp))
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
             Text(
                 text = title,
-                color = Color(0xFF94A3B8),
+                color = colors.textMuted,
                 fontSize = 9.sp,
                 fontWeight = FontWeight.Bold,
                 fontFamily = FontFamily.Monospace,
@@ -634,7 +636,7 @@ fun HudMetricCard(
                 modifier = Modifier.scale(valueScale)
             )
             Spacer(modifier = Modifier.height(2.dp))
-            Text(text = sub, color = Color(0xFF64748B), fontSize = 9.sp, maxLines = 1)
+            Text(text = sub, color = colors.textSecondary, fontSize = 9.sp, maxLines = 1)
         }
     }
 }
@@ -644,23 +646,24 @@ fun LogItemRow(
     log: ScanLogEntity,
     pulseAlpha: Float = 1.0f
 ) {
+    val colors = LocalSparrowColors.current
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color(0xFF0F172A), RoundedCornerShape(8.dp))
-            .border(1.dp, Color(0xFF1E293B), RoundedCornerShape(8.dp))
+            .background(colors.cardBg, RoundedCornerShape(8.dp))
+            .border(1.dp, colors.cardBorder, RoundedCornerShape(8.dp))
             .padding(10.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = log.payloadSnippet, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Medium, maxLines = 1)
-            Text(text = "${log.category} • ${(log.latencyMicros / 1000.0)} ms", color = Color(0xFF64748B), fontSize = 10.sp, fontFamily = FontFamily.Monospace)
+            Text(text = log.payloadSnippet, color = colors.textPrimary, fontSize = 12.sp, fontWeight = FontWeight.Medium, maxLines = 1)
+            Text(text = "${log.category} • ${(log.latencyMicros / 1000.0)} ms", color = colors.textSecondary, fontSize = 10.sp, fontFamily = FontFamily.Monospace)
         }
         val isMal = log.threatLevel == 2
         Text(
             text = if (isMal) "BLOCKED" else "SAFE",
-            color = if (isMal) CyberRose else CyberEmerald,
+            color = if (isMal) colors.rose else colors.emerald,
             fontSize = 11.sp,
             fontWeight = FontWeight.Bold,
             fontFamily = FontFamily.Monospace,

@@ -42,7 +42,9 @@ class ProcessAuditor(private val context: Context) {
 
     fun scanProcesses(): List<AndroidProcessInfo> {
         val am = context.getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager
+        val pm = context.packageManager
         val list = mutableListOf<AndroidProcessInfo>()
+        val seenNames = mutableSetOf<String>()
 
         // 1. Inspect running application processes via ActivityManager
         val runningProcesses = am?.runningAppProcesses ?: emptyList()
@@ -58,9 +60,10 @@ class ProcessAuditor(private val context: Context) {
             } else if (isSystem) {
                 "Core Android operating system service. Termination prohibited."
             } else {
-                ""
+                "Active foreground/background runtime process."
             }
 
+            seenNames.add(proc.processName)
             list.add(
                 AndroidProcessInfo(
                     pid = proc.pid,
@@ -74,8 +77,61 @@ class ProcessAuditor(private val context: Context) {
             )
         }
 
-        // 2. Direct /proc inspection fallback for native Android daemons
-        if (list.isEmpty()) {
+        // 2. Discover active & background services via PackageManager
+        try {
+            val installedPackages = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                pm.getInstalledPackages(android.content.pm.PackageManager.PackageInfoFlags.of(android.content.pm.PackageManager.GET_SERVICES.toLong()))
+            } else {
+                @Suppress("DEPRECATION")
+                pm.getInstalledPackages(android.content.pm.PackageManager.GET_SERVICES)
+            }
+
+            var pseudoPid = 2000
+            for (pkg in installedPackages) {
+                val services = pkg.services
+                if (services != null && services.isNotEmpty()) {
+                    val pkgName = pkg.packageName
+                    if (seenNames.contains(pkgName)) continue
+                    seenNames.add(pkgName)
+
+                    val appInfo = pkg.applicationInfo
+                    val isSystemPkg = if (appInfo != null) {
+                        (appInfo.flags and android.content.pm.ApplicationInfo.FLAG_SYSTEM) != 0
+                    } else false
+
+                    val isSuspicious = !isSystemPkg && (
+                        pkgName.contains("payload", ignoreCase = true) ||
+                        pkgName.contains("hidden", ignoreCase = true) ||
+                        pkgName.contains("dropper", ignoreCase = true) ||
+                        pkgName.contains("reverse", ignoreCase = true) ||
+                        pkgName.contains("spy", ignoreCase = true)
+                    )
+
+                    val detail = if (isSuspicious) {
+                        "Background service matches deceptive or covert signature."
+                    } else if (isSystemPkg) {
+                        "Core Android system service. Protected."
+                    } else {
+                        "Active background service (${services.size} service endpoints)."
+                    }
+
+                    list.add(
+                        AndroidProcessInfo(
+                            pid = pseudoPid++,
+                            name = pkgName,
+                            path = if (isSystemPkg) "/system/priv-app/$pkgName" else "/data/app/$pkgName",
+                            isSuspicious = isSuspicious,
+                            isSystem = isSystemPkg,
+                            threatDetail = detail,
+                            importance = 0
+                        )
+                    )
+                }
+            }
+        } catch (_: Exception) {}
+
+        // 3. Direct /proc inspection fallback for native Android daemons if accessible
+        if (list.size <= 2) {
             val procDir = File("/proc")
             if (procDir.exists() && procDir.canRead()) {
                 val files = procDir.listFiles() ?: emptyArray()
@@ -89,6 +145,9 @@ class ProcessAuditor(private val context: Context) {
                     } else {
                         "proc-$pid"
                     }
+
+                    if (seenNames.contains(name)) continue
+                    seenNames.add(name)
 
                     val path = if (cmdlineFile.exists()) {
                         cmdlineFile.readText().replace('\u0000', ' ').trim()
@@ -113,7 +172,7 @@ class ProcessAuditor(private val context: Context) {
             }
         }
 
-        // 3. Fallback default host processes if sandbox limits process enumeration
+        // 4. Default host process fallbacks if process enumeration is restricted
         if (list.isEmpty()) {
             list.add(
                 AndroidProcessInfo(
@@ -137,6 +196,10 @@ class ProcessAuditor(private val context: Context) {
             )
         }
 
-        return list.sortedByDescending { it.isSuspicious }
+        return list.sortedWith(
+            compareByDescending<AndroidProcessInfo> { it.isSuspicious }
+                .thenBy { it.isSystem }
+                .thenBy { it.pid }
+        )
     }
 }

@@ -17,10 +17,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.pocketsparrow.ui.theme.CyberCyan
-import com.pocketsparrow.ui.theme.CyberEmerald
-import com.pocketsparrow.ui.theme.CyberRose
-import com.pocketsparrow.ui.theme.CyberSurface
+
+import androidx.compose.ui.text.style.TextOverflow
 
 data class ThreatDnaToken(
     val text: String,
@@ -34,54 +32,64 @@ data class ThreatDnaToken(
 fun ThreatDnaVisualizer(
     payload: String,
     category: String? = null,
+    confidence: Float? = null,
     modifier: Modifier = Modifier
 ) {
     if (payload.isBlank()) return
 
+    val colors = com.pocketsparrow.ui.theme.LocalSparrowColors.current
     val tokens = remember(payload) { tokenize(payload) }
     var selectedToken by remember { mutableStateOf<ThreatDnaToken?>(null) }
 
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        color = CyberSurface.copy(alpha = 0.7f),
-        border = BorderStroke(1.dp, Color(0xFF1E293B))
+        color = colors.cardBg,
+        border = BorderStroke(1.dp, colors.cardBorder)
     ) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             // Header
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Text(
-                        text = "Threat DNA & Attention Map (XAI)",
+                        text = "Threat DNA & Attention Map",
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = colors.textPrimary,
+                        modifier = Modifier.weight(1f, fill = false)
                     )
-                    Text(
-                        text = "Token-level neural attention and heuristic attribution",
-                        fontSize = 11.sp,
-                        color = Color(0xFF94A3B8)
-                    )
-                }
 
-                category?.let {
-                    Surface(
-                        shape = RoundedCornerShape(4.dp),
-                        color = Color(0xFF1E293B)
-                    ) {
-                        Text(
-                            text = it,
-                            fontSize = 10.sp,
-                            fontFamily = FontFamily.Monospace,
-                            color = Color(0xFFE2E8F0),
-                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                        )
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    category?.let {
+                        Surface(
+                            shape = RoundedCornerShape(4.dp),
+                            color = colors.surface,
+                            border = BorderStroke(1.dp, colors.cardBorder)
+                        ) {
+                            val badgeText = if (confidence != null) "$it • ${(confidence * 100).toInt()}%" else it
+                            Text(
+                                text = badgeText,
+                                fontSize = 10.sp,
+                                fontFamily = FontFamily.Monospace,
+                                color = colors.textPrimary,
+                                maxLines = 1,
+                                softWrap = false,
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                            )
+                        }
                     }
                 }
+
+                Text(
+                    text = "Token-level neural attention and heuristic attribution",
+                    fontSize = 11.sp,
+                    color = colors.textSecondary
+                )
             }
 
             // Legend
@@ -91,53 +99,63 @@ fun ThreatDnaVisualizer(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(modifier = Modifier.size(8.dp).background(CyberCyan.copy(alpha = 0.4f), RoundedCornerShape(2.dp)))
+                    Box(modifier = Modifier.size(8.dp).background(colors.primary.copy(alpha = 0.4f), RoundedCornerShape(2.dp)))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Cool (Safe)", fontSize = 10.sp, color = Color(0xFF94A3B8))
+                    Text("Cool (Safe)", fontSize = 10.sp, color = colors.textSecondary)
                 }
                 Spacer(modifier = Modifier.width(12.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(modifier = Modifier.size(8.dp).background(CyberRose.copy(alpha = 0.8f), RoundedCornerShape(2.dp)))
+                    Box(modifier = Modifier.size(8.dp).background(colors.rose.copy(alpha = 0.8f), RoundedCornerShape(2.dp)))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Rose (Threat)", fontSize = 10.sp, color = CyberRose, fontWeight = FontWeight.SemiBold)
+                    Text("Rose (Threat)", fontSize = 10.sp, color = colors.rose, fontWeight = FontWeight.SemiBold)
                 }
             }
 
             // Flow Layout of Tokens
-            FlowRow(
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFF030712), RoundedCornerShape(8.dp))
-                    .padding(12.dp),
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
+                    .padding(horizontal = 4.dp)
             ) {
-                tokens.forEach { token ->
-                    val isHigh = token.weight >= 0.7f
-                    val bgColor = if (isHigh) {
-                        CyberRose.copy(alpha = 0.25f + token.weight * 0.6f)
-                    } else if (token.weight >= 0.4f) {
-                        Color(0xFFF59E0B).copy(alpha = 0.2f + token.weight * 0.4f)
-                    } else {
-                        CyberCyan.copy(alpha = 0.08f + token.weight * 0.2f)
-                    }
+                FlowRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(colors.surface, RoundedCornerShape(8.dp))
+                        .border(1.dp, colors.cardBorder, RoundedCornerShape(8.dp))
+                        .padding(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    tokens.forEach { token ->
+                        val isHigh = token.weight >= 0.7f
+                        val bgColor = if (isHigh) {
+                            colors.rose.copy(alpha = 0.2f + token.weight * 0.4f)
+                        } else if (token.weight >= 0.4f) {
+                            colors.amber.copy(alpha = 0.15f + token.weight * 0.3f)
+                        } else {
+                            colors.primary.copy(alpha = 0.08f + token.weight * 0.15f)
+                        }
 
-                    val borderColor = if (isHigh) CyberRose.copy(alpha = 0.6f) else Color(0xFF1E293B)
+                        val borderColor = if (isHigh) colors.rose.copy(alpha = 0.6f) else colors.cardBorder
 
-                    Box(
-                        modifier = Modifier
-                            .background(bgColor, RoundedCornerShape(4.dp))
-                            .border(1.dp, borderColor, RoundedCornerShape(4.dp))
-                            .clickable { selectedToken = token }
-                            .padding(horizontal = 6.dp, vertical = 3.dp)
-                    ) {
-                        Text(
-                            text = token.text,
-                            fontSize = 11.sp,
-                            fontFamily = FontFamily.Monospace,
-                            fontWeight = if (isHigh) FontWeight.Bold else FontWeight.Normal,
-                            color = if (isHigh) Color.White else Color(0xFFE2E8F0)
-                        )
+                        Box(
+                            modifier = Modifier
+                                .background(bgColor, RoundedCornerShape(4.dp))
+                                .border(1.dp, borderColor, RoundedCornerShape(4.dp))
+                                .clickable { selectedToken = token }
+                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                        ) {
+                            Text(
+                                text = token.text,
+                                fontSize = 11.sp,
+                                fontFamily = FontFamily.Monospace,
+                                fontWeight = if (isHigh) FontWeight.Bold else FontWeight.Normal,
+                                color = if (isHigh) colors.rose else colors.textPrimary,
+                                softWrap = false,
+                                maxLines = 1,
+                                overflow = TextOverflow.Clip
+                            )
+                        }
                     }
                 }
             }
@@ -146,8 +164,8 @@ fun ThreatDnaVisualizer(
             selectedToken?.let { token ->
                 Surface(
                     shape = RoundedCornerShape(6.dp),
-                    color = Color(0xFF0F172A),
-                    border = BorderStroke(1.dp, Color(0xFF334155))
+                    color = colors.cardBg,
+                    border = BorderStroke(1.dp, colors.cardBorder)
                 ) {
                     Column(modifier = Modifier.padding(10.dp)) {
                         Row(
@@ -158,20 +176,20 @@ fun ThreatDnaVisualizer(
                                 text = "Token: \"${token.text}\"",
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color.White
+                                color = colors.textPrimary
                             )
                             Text(
                                 text = "Attention: ${(token.weight * 100).toInt()}%",
                                 fontSize = 11.sp,
                                 fontFamily = FontFamily.Monospace,
-                                color = if (token.weight >= 0.7f) CyberRose else CyberCyan
+                                color = if (token.weight >= 0.7f) colors.rose else colors.primary
                             )
                         }
                         Spacer(modifier = Modifier.height(2.dp))
                         Text(
                             text = token.source,
                             fontSize = 11.sp,
-                            color = Color(0xFFCBD5E1)
+                            color = colors.textSecondary
                         )
                     }
                 }

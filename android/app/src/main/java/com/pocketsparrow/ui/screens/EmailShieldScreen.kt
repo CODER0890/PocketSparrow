@@ -21,10 +21,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pocketsparrow.ui.components.ThreatDnaVisualizer
-import com.pocketsparrow.ui.theme.CyberCyan
-import com.pocketsparrow.ui.theme.CyberEmerald
-import com.pocketsparrow.ui.theme.CyberRose
-import com.pocketsparrow.ui.theme.CyberSurface
 
 data class AndroidScannedEmail(
     val id: String,
@@ -41,6 +37,7 @@ data class AndroidScannedEmail(
 fun EmailShieldScreen(
     modifier: Modifier = Modifier
 ) {
+    val colors = com.pocketsparrow.ui.theme.LocalSparrowColors.current
     var activeFilter by remember { mutableStateOf("all") }
     var selectedDnaEmail by remember { mutableStateOf<AndroidScannedEmail?>(null) }
     var showAddDialog by remember { mutableStateOf(false) }
@@ -73,15 +70,15 @@ fun EmailShieldScreen(
     val filtered = if (activeFilter == "threats") sampleEmails.filter { it.verdict == "Malicious" } else sampleEmails
 
     LazyColumn(
-        modifier = modifier.fillMaxSize().padding(16.dp),
+        modifier = modifier.fillMaxSize().background(colors.bg).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         // Top Header
         item {
             Surface(
                 shape = RoundedCornerShape(12.dp),
-                color = CyberSurface.copy(alpha = 0.8f),
-                border = BorderStroke(1.dp, Color(0xFF1E293B)),
+                color = colors.cardBg,
+                border = BorderStroke(1.dp, colors.cardBorder),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Row(
@@ -91,15 +88,15 @@ fun EmailShieldScreen(
                 ) {
                     Column {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.Mail, contentDescription = null, tint = CyberEmerald, modifier = Modifier.size(20.dp))
+                            Icon(Icons.Default.Mail, contentDescription = null, tint = colors.emerald, modifier = Modifier.size(20.dp))
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Email Background Shield", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                            Text("Email Background Shield", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = colors.textPrimary)
                         }
-                        Text("100% on-device IMAP neural monitoring", fontSize = 12.sp, color = Color(0xFF94A3B8))
+                        Text("100% on-device IMAP neural monitoring", fontSize = 12.sp, color = colors.textSecondary)
                     }
 
                     IconButton(onClick = { showAddDialog = true }) {
-                        Icon(Icons.Default.Add, contentDescription = "Add Account", tint = CyberCyan)
+                        Icon(Icons.Default.Add, contentDescription = "Add Account", tint = colors.primary)
                     }
                 }
             }
@@ -114,36 +111,36 @@ fun EmailShieldScreen(
                 Surface(
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(8.dp),
-                    color = Color(0xFF0F172A),
-                    border = BorderStroke(1.dp, Color(0xFF1E293B))
+                    color = colors.cardBg,
+                    border = BorderStroke(1.dp, colors.cardBorder)
                 ) {
                     Column(modifier = Modifier.padding(12.dp)) {
-                        Text("Scanned Today", fontSize = 11.sp, color = Color(0xFF94A3B8))
-                        Text("${sampleEmails.size}", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                        Text("Scanned Today", fontSize = 11.sp, color = colors.textMuted)
+                        Text("${sampleEmails.size}", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = colors.textPrimary)
                     }
                 }
 
                 Surface(
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(8.dp),
-                    color = Color(0xFF0F172A),
-                    border = BorderStroke(1.dp, Color(0xFF1E293B))
+                    color = colors.cardBg,
+                    border = BorderStroke(1.dp, colors.cardBorder)
                 ) {
                     Column(modifier = Modifier.padding(12.dp)) {
-                        Text("Threats Blocked", fontSize = 11.sp, color = Color(0xFF94A3B8))
-                        Text("${sampleEmails.count { it.verdict == "Malicious" }}", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = CyberRose)
+                        Text("Threats Blocked", fontSize = 11.sp, color = colors.textMuted)
+                        Text("${sampleEmails.count { it.verdict == "Malicious" }}", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = colors.rose)
                     }
                 }
 
                 Surface(
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(8.dp),
-                    color = Color(0xFF0F172A),
-                    border = BorderStroke(1.dp, Color(0xFF1E293B))
+                    color = colors.cardBg,
+                    border = BorderStroke(1.dp, colors.cardBorder)
                 ) {
                     Column(modifier = Modifier.padding(12.dp)) {
-                        Text("Avg Latency", fontSize = 11.sp, color = Color(0xFF94A3B8))
-                        Text("16.2 ms", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = CyberEmerald)
+                        Text("Avg Latency", fontSize = 11.sp, color = colors.textMuted)
+                        Text("16.2 ms", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = colors.emerald)
                     }
                 }
             }
@@ -170,8 +167,8 @@ fun EmailShieldScreen(
             val isMalicious = email.verdict == "Malicious"
             Surface(
                 shape = RoundedCornerShape(10.dp),
-                color = CyberSurface.copy(alpha = 0.6f),
-                border = BorderStroke(1.dp, if (isMalicious) CyberRose.copy(alpha = 0.4f) else Color(0xFF1E293B)),
+                color = colors.cardBg,
+                border = BorderStroke(1.dp, if (isMalicious) colors.rose.copy(alpha = 0.5f) else colors.cardBorder),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -180,37 +177,37 @@ fun EmailShieldScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(email.sender, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
+                        Text(email.sender, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = colors.textPrimary)
                         Surface(
                             shape = RoundedCornerShape(4.dp),
-                            color = if (isMalicious) CyberRose.copy(alpha = 0.2f) else CyberEmerald.copy(alpha = 0.2f),
-                            border = BorderStroke(1.dp, if (isMalicious) CyberRose else CyberEmerald)
+                            color = if (isMalicious) colors.rose.copy(alpha = 0.15f) else colors.emerald.copy(alpha = 0.15f),
+                            border = BorderStroke(1.dp, if (isMalicious) colors.rose else colors.emerald)
                         ) {
                             Text(
                                 text = email.verdict,
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = if (isMalicious) CyberRose else CyberEmerald,
+                                color = if (isMalicious) colors.rose else colors.emerald,
                                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                             )
                         }
                     }
 
-                    Text(email.subject, fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color(0xFFE2E8F0))
-                    Text(email.snippet, fontSize = 11.sp, color = Color(0xFF94A3B8), maxLines = 2)
+                    Text(email.subject, fontSize = 13.sp, fontWeight = FontWeight.Bold, color = colors.textPrimary)
+                    Text(email.snippet, fontSize = 11.sp, color = colors.textSecondary, maxLines = 2)
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(email.timestamp, fontSize = 10.sp, color = Color(0xFF64748B))
+                        Text(email.timestamp, fontSize = 10.sp, color = colors.textMuted)
 
                         TextButton(
                             onClick = { selectedDnaEmail = email },
                             contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp)
                         ) {
-                            Text("View Threat DNA", fontSize = 11.sp, color = CyberCyan)
+                            Text("View Threat DNA →", fontSize = 11.sp, color = colors.primary)
                         }
                     }
                 }
@@ -222,10 +219,10 @@ fun EmailShieldScreen(
     selectedDnaEmail?.let { email ->
         AlertDialog(
             onDismissRequest = { selectedDnaEmail = null },
-            title = { Text("Email Threat DNA", color = Color.White) },
+            title = { Text("Email Threat DNA", color = colors.textPrimary) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Subject & URL Vector:", fontSize = 12.sp, color = Color(0xFF94A3B8))
+                    Text("Subject & URL Vector:", fontSize = 12.sp, color = colors.textSecondary)
                     ThreatDnaVisualizer(
                         payload = email.targetUrl ?: email.subject,
                         category = email.category
@@ -234,10 +231,10 @@ fun EmailShieldScreen(
             },
             confirmButton = {
                 TextButton(onClick = { selectedDnaEmail = null }) {
-                    Text("Close", color = CyberCyan)
+                    Text("Close", color = colors.primary)
                 }
             },
-            containerColor = CyberSurface
+            containerColor = colors.cardBg
         )
     }
 
@@ -248,10 +245,10 @@ fun EmailShieldScreen(
 
         AlertDialog(
             onDismissRequest = { showAddDialog = false },
-            title = { Text("Connect Protected Mailbox", color = Color.White) },
+            title = { Text("Connect Protected Mailbox", color = colors.textPrimary) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Text("Credentials stored in on-device SQLCipher vault.", fontSize = 11.sp, color = Color(0xFF94A3B8))
+                    Text("Credentials stored in on-device SQLCipher vault.", fontSize = 11.sp, color = colors.textSecondary)
                     OutlinedTextField(
                         value = emailInput,
                         onValueChange = { emailInput = it },
@@ -269,17 +266,17 @@ fun EmailShieldScreen(
             confirmButton = {
                 Button(
                     onClick = { showAddDialog = false },
-                    colors = ButtonDefaults.buttonColors(containerColor = CyberEmerald)
+                    colors = ButtonDefaults.buttonColors(containerColor = colors.emerald)
                 ) {
-                    Text("Enable Shield", color = Color.Black)
+                    Text("Enable Shield", color = if (colors.isDark) Color.Black else Color.White)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showAddDialog = false }) {
-                    Text("Cancel", color = Color(0xFF94A3B8))
+                    Text("Cancel", color = colors.textSecondary)
                 }
             },
-            containerColor = CyberSurface
+            containerColor = colors.cardBg
         )
     }
 }

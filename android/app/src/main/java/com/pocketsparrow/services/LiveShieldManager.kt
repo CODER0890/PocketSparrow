@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 data class LiveShieldEvent(
     val id: String,
+    val notificationKey: String = "",
     val timestamp: Long,
     val packageName: String,
     val appName: String,
@@ -16,6 +17,7 @@ data class LiveShieldEvent(
     val snippet: String,
     val threatLevel: Int, // 0: Safe, 1: Suspicious, 2: Malicious
     val category: String,
+    val confidence: Float = 0.98f,
     val xaiReason: String,
     val latencyMicros: Long,
     val actionTaken: String, // "PASSED", "BLOCKED", "ALLOWED_ONCE"
@@ -126,6 +128,26 @@ object LiveShieldManager {
         return false
     }
 
+    // 3-second in-memory LRU cache for content hashes (packageName + "|" + title + "|" + text)
+    private const val CONTENT_DEBOUNCE_WINDOW_MS = 3000L
+    private val contentDebounceCache = Collections.synchronizedMap(
+        object : LinkedHashMap<String, Long>(100, 0.75f, true) {
+            override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, Long>?): Boolean {
+                return size > 500
+            }
+        }
+    )
+
+    fun shouldDebounceContent(contentKey: String): Boolean {
+        val now = System.currentTimeMillis()
+        val lastSeen = contentDebounceCache[contentKey]
+        if (lastSeen != null && (now - lastSeen) < CONTENT_DEBOUNCE_WINDOW_MS) {
+            return true
+        }
+        contentDebounceCache[contentKey] = now
+        return false
+    }
+
     fun getCachedVerdict(contentHash: String): ScanResult? {
         return verdictCache[contentHash]
     }
@@ -142,9 +164,31 @@ object LiveShieldManager {
         temporaryAllowlist.add(identifier)
     }
 
+    private fun normalizeString(s: String): String {
+        return s.replace(Regex("[^a-zA-Z0-9]"), "").lowercase()
+    }
+
     fun recordEvent(event: LiveShieldEvent) {
         val current = _liveEvents.value.toMutableList()
-        current.add(0, event)
+        val now = System.currentTimeMillis()
+
+        // Deduplicate updates within 5s window
+        val existingIndex = current.indexOfFirst { existing ->
+            (now - existing.timestamp < 5000L) && (
+                (event.notificationKey.isNotEmpty() && existing.notificationKey.isNotEmpty() && existing.notificationKey == event.notificationKey) ||
+                (existing.packageName == event.packageName && (
+                    normalizeString(existing.snippet) == normalizeString(event.snippet) ||
+                    normalizeString(existing.title) == normalizeString(event.title)
+                ))
+            )
+        }
+
+        if (existingIndex >= 0) {
+            current[existingIndex] = event.copy(id = current[existingIndex].id)
+        } else {
+            current.add(0, event)
+        }
+
         if (current.size > 50) {
             _liveEvents.value = current.take(50)
         } else {

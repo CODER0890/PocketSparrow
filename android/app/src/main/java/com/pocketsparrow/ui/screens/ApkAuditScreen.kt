@@ -1,10 +1,10 @@
 package com.pocketsparrow.ui.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -15,15 +15,14 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.pocketsparrow.core.NativeBridge
-import com.pocketsparrow.core.ScanResult
-import com.pocketsparrow.scanners.ApkAuditReport
-import com.pocketsparrow.ui.theme.*
+import com.pocketsparrow.ui.theme.LocalSparrowColors
 
 @Composable
 fun ApkAuditScreen(
     onTriggerAudit: (permissions: Array<String>) -> Unit
 ) {
+    val colors = LocalSparrowColors.current
+
     // Malicious permission vectors for security auditing
     val bankingTrojanVector = arrayOf(
         "android.permission.RECEIVE_SMS",
@@ -50,28 +49,38 @@ fun ApkAuditScreen(
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(CyberBg)
+            .background(colors.bg)
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         item {
-            Text(
-                text = "Sideloaded APK Permission Auditor",
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp
-            )
-            Text(
-                text = "Static analysis of APK manifests identifying Banking Trojans, Accessibility exploits, and silent droppers.",
-                color = Color(0xFF94A3B8),
-                fontSize = 12.sp
-            )
+            Card(
+                colors = CardDefaults.cardColors(containerColor = colors.cardBg),
+                shape = RoundedCornerShape(16.dp),
+                border = BorderStroke(1.dp, colors.cardBorder),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(18.dp)) {
+                    Text(
+                        text = "Sideloaded APK Permission Auditor",
+                        color = colors.textPrimary,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp
+                    )
+                    Text(
+                        text = "Static analysis of APK manifests identifying Banking Trojans, Accessibility exploits, and silent droppers.",
+                        color = colors.textSecondary,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
+            }
         }
 
         item {
             Text(
                 text = "Permission Profile Inspection Vectors:",
-                color = CyberCyan,
+                color = colors.primary,
                 fontWeight = FontWeight.Bold,
                 fontSize = 13.sp,
                 fontFamily = FontFamily.Monospace
@@ -84,7 +93,7 @@ fun ApkAuditScreen(
                 title = "Banking Trojan Profile (SMS Intercept + Overlay)",
                 permissions = bankingTrojanVector,
                 expectedRisk = "High Risk Signature",
-                accent = CyberRose,
+                accent = colors.rose,
                 onAudit = { onTriggerAudit(bankingTrojanVector) }
             )
         }
@@ -94,7 +103,7 @@ fun ApkAuditScreen(
                 title = "Accessibility Hijacker Profile (Input Hooking)",
                 permissions = accessibilityVector,
                 expectedRisk = "Critical Risk Signature",
-                accent = CyberRose,
+                accent = colors.rose,
                 onAudit = { onTriggerAudit(accessibilityVector) }
             )
         }
@@ -104,7 +113,7 @@ fun ApkAuditScreen(
                 title = "Silent Dropper Profile (Package Installer)",
                 permissions = dropperVector,
                 expectedRisk = "Elevated Risk Signature",
-                accent = CyberRose,
+                accent = colors.rose,
                 onAudit = { onTriggerAudit(dropperVector) }
             )
         }
@@ -114,7 +123,7 @@ fun ApkAuditScreen(
                 title = "Standard Utility Profile (Baseline)",
                 permissions = cleanControlVector,
                 expectedRisk = "Benign Baseline",
-                accent = CyberEmerald,
+                accent = colors.emerald,
                 onAudit = { onTriggerAudit(cleanControlVector) }
             )
         }
@@ -129,10 +138,11 @@ fun AuditTriggerCard(
     accent: Color,
     onAudit: () -> Unit
 ) {
+    val colors = LocalSparrowColors.current
     Card(
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF0F172A)),
-        modifier = Modifier.fillMaxWidth().border(1.dp, Color(0xFF1E293B), RoundedCornerShape(12.dp))
+        colors = CardDefaults.cardColors(containerColor = colors.cardBg),
+        modifier = Modifier.fillMaxWidth().border(1.dp, colors.cardBorder, RoundedCornerShape(12.dp))
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
@@ -140,15 +150,28 @@ fun AuditTriggerCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = title, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                Text(text = expectedRisk, color = accent, fontSize = 11.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
+                Text(text = title, color = colors.textPrimary, fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.weight(1f))
+                Surface(
+                    shape = RoundedCornerShape(6.dp),
+                    color = accent.copy(alpha = 0.12f),
+                    border = BorderStroke(1.dp, accent.copy(alpha = 0.3f))
+                ) {
+                    Text(
+                        text = expectedRisk,
+                        color = accent,
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = FontFamily.Monospace,
+                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
                 text = "Permissions: ${permissions.joinToString(", ") { it.substringAfterLast(".") }}",
-                color = Color(0xFF94A3B8),
+                color = colors.textSecondary,
                 fontSize = 11.sp,
                 fontFamily = FontFamily.Monospace
             )
@@ -158,10 +181,11 @@ fun AuditTriggerCard(
             Button(
                 onClick = onAudit,
                 modifier = Modifier.align(Alignment.End),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E293B)),
+                colors = ButtonDefaults.buttonColors(containerColor = colors.bg),
+                border = BorderStroke(1.dp, colors.cardBorder),
                 shape = RoundedCornerShape(8.dp)
             ) {
-                Text("Audit Manifest Permissions", color = CyberCyan, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                Text("Audit Manifest Permissions", color = colors.primary, fontSize = 11.sp, fontWeight = FontWeight.Bold)
             }
         }
     }

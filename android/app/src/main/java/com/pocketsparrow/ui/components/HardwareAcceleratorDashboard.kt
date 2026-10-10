@@ -12,10 +12,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.pocketsparrow.ui.theme.CyberCyan
-import com.pocketsparrow.ui.theme.CyberEmerald
-import com.pocketsparrow.ui.theme.CyberRose
-import com.pocketsparrow.ui.theme.CyberSurface
+import com.pocketsparrow.ui.theme.LocalSparrowColors
 
 data class AndroidLayerLatency(
     val name: String,
@@ -27,6 +24,8 @@ data class AndroidLayerLatency(
 fun HardwareAcceleratorDashboard(
     modifier: Modifier = Modifier
 ) {
+    val colors = LocalSparrowColors.current
+
     val activeRuntime = "Android NNAPI Delegate (QNN / NPU)"
     val cpuUtil = 14.8f
     val gpuUtil = 2.4f
@@ -43,12 +42,12 @@ fun HardwareAcceleratorDashboard(
 
     Surface(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        color = CyberSurface.copy(alpha = 0.8f),
-        border = BorderStroke(1.dp, Color(0xFF1E293B))
+        shape = RoundedCornerShape(16.dp),
+        color = colors.cardBg,
+        border = BorderStroke(1.dp, colors.cardBorder)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(18.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // Header
@@ -60,28 +59,29 @@ fun HardwareAcceleratorDashboard(
                 Column {
                     Text(
                         text = "Hardware Acceleration",
-                        fontSize = 14.sp,
+                        fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = colors.textPrimary
                     )
                     Text(
                         text = activeRuntime,
-                        fontSize = 11.sp,
-                        color = CyberEmerald,
+                        fontSize = 12.sp,
+                        color = colors.emerald,
                         fontWeight = FontWeight.SemiBold
                     )
                 }
 
                 Surface(
                     shape = RoundedCornerShape(6.dp),
-                    color = CyberEmerald.copy(alpha = 0.15f),
-                    border = BorderStroke(1.dp, CyberEmerald.copy(alpha = 0.3f))
+                    color = colors.emerald.copy(alpha = 0.12f),
+                    border = BorderStroke(1.dp, colors.emerald.copy(alpha = 0.3f))
                 ) {
                     Text(
                         text = thermalState,
                         fontSize = 10.sp,
                         fontFamily = FontFamily.Monospace,
-                        color = CyberEmerald,
+                        color = colors.emerald,
+                        fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                     )
                 }
@@ -95,19 +95,19 @@ fun HardwareAcceleratorDashboard(
                 // CPU
                 Surface(
                     modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(8.dp),
-                    color = Color(0xFF0F172A),
-                    border = BorderStroke(1.dp, Color(0xFF1E293B))
+                    shape = RoundedCornerShape(10.dp),
+                    color = colors.bg,
+                    border = BorderStroke(1.dp, colors.cardBorder)
                 ) {
                     Column(modifier = Modifier.padding(10.dp)) {
-                        Text("CPU Core", fontSize = 11.sp, color = Color(0xFF94A3B8))
-                        Text("${cpuUtil}%", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                        Spacer(modifier = Modifier.height(4.dp))
+                        Text("CPU Core", fontSize = 10.sp, color = colors.textMuted, fontWeight = FontWeight.Bold)
+                        Text("${cpuUtil}%", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = colors.textPrimary)
+                        Spacer(modifier = Modifier.height(6.dp))
                         LinearProgressIndicator(
                             progress = { cpuUtil / 100f },
                             modifier = Modifier.fillMaxWidth().height(4.dp),
-                            color = CyberCyan,
-                            trackColor = Color(0xFF1E293B)
+                            color = colors.primary,
+                            trackColor = colors.cardBorder
                         )
                     }
                 }
@@ -115,19 +115,19 @@ fun HardwareAcceleratorDashboard(
                 // GPU
                 Surface(
                     modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(8.dp),
-                    color = Color(0xFF0F172A),
-                    border = BorderStroke(1.dp, Color(0xFF1E293B))
+                    shape = RoundedCornerShape(10.dp),
+                    color = colors.bg,
+                    border = BorderStroke(1.dp, colors.cardBorder)
                 ) {
                     Column(modifier = Modifier.padding(10.dp)) {
-                        Text("GPU Del.", fontSize = 11.sp, color = Color(0xFF94A3B8))
-                        Text("${gpuUtil}%", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                        Spacer(modifier = Modifier.height(4.dp))
+                        Text("GPU Del.", fontSize = 10.sp, color = colors.textMuted, fontWeight = FontWeight.Bold)
+                        Text("${gpuUtil}%", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = colors.textPrimary)
+                        Spacer(modifier = Modifier.height(6.dp))
                         LinearProgressIndicator(
                             progress = { gpuUtil / 100f },
                             modifier = Modifier.fillMaxWidth().height(4.dp),
-                            color = CyberEmerald,
-                            trackColor = Color(0xFF1E293B)
+                            color = colors.emerald,
+                            trackColor = colors.cardBorder
                         )
                     }
                 }
@@ -135,31 +135,31 @@ fun HardwareAcceleratorDashboard(
                 // NPU
                 Surface(
                     modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(8.dp),
-                    color = Color(0xFF0F172A),
-                    border = BorderStroke(1.dp, Color(0xFF1E293B))
+                    shape = RoundedCornerShape(10.dp),
+                    color = colors.bg,
+                    border = BorderStroke(1.dp, colors.cardBorder)
                 ) {
                     Column(modifier = Modifier.padding(10.dp)) {
-                        Text("NPU Engine", fontSize = 11.sp, color = Color(0xFF94A3B8))
-                        Text("${npuUtil}%", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = CyberEmerald)
-                        Spacer(modifier = Modifier.height(4.dp))
+                        Text("NPU Engine", fontSize = 10.sp, color = colors.textMuted, fontWeight = FontWeight.Bold)
+                        Text("${npuUtil}%", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = colors.emerald)
+                        Spacer(modifier = Modifier.height(6.dp))
                         LinearProgressIndicator(
                             progress = { npuUtil / 100f },
                             modifier = Modifier.fillMaxWidth().height(4.dp),
-                            color = CyberEmerald,
-                            trackColor = Color(0xFF1E293B)
+                            color = colors.emerald,
+                            trackColor = colors.cardBorder
                         )
                     }
                 }
             }
 
             // Layer-by-Layer Latency Profile
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
                     text = "Inference Time per Layer (MobileBERT INT8)",
-                    fontSize = 12.sp,
+                    fontSize = 13.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = Color(0xFFCBD5E1)
+                    color = colors.textPrimary
                 )
 
                 layerBreakdown.forEach { layer ->
@@ -168,19 +168,20 @@ fun HardwareAcceleratorDashboard(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text(layer.name, fontSize = 11.sp, color = Color(0xFF94A3B8))
+                            Text(layer.name, fontSize = 11.sp, color = colors.textSecondary)
                             Text(
                                 "${layer.latencyMs} ms (${layer.percentage}%)",
                                 fontSize = 10.sp,
                                 fontFamily = FontFamily.Monospace,
-                                color = Color.White
+                                color = colors.textPrimary,
+                                fontWeight = FontWeight.SemiBold
                             )
                         }
                         LinearProgressIndicator(
                             progress = { layer.percentage / 100f },
                             modifier = Modifier.fillMaxWidth().height(3.dp),
-                            color = if (layer.percentage > 50f) CyberRose else CyberCyan,
-                            trackColor = Color(0xFF1E293B)
+                            color = if (layer.percentage > 50f) colors.rose else colors.primary,
+                            trackColor = colors.cardBorder
                         )
                     }
                 }
@@ -188,22 +189,23 @@ fun HardwareAcceleratorDashboard(
 
             // Fallback Events
             Surface(
-                shape = RoundedCornerShape(6.dp),
-                color = Color(0xFF030712),
-                border = BorderStroke(1.dp, Color(0xFF1E293B)),
+                shape = RoundedCornerShape(8.dp),
+                color = colors.bg,
+                border = BorderStroke(1.dp, colors.cardBorder),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Column(modifier = Modifier.padding(10.dp)) {
+                Column(modifier = Modifier.padding(12.dp)) {
                     Text(
                         text = "Fallback Log: NNAPI Provider Active",
-                        fontSize = 11.sp,
+                        fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = colors.textPrimary
                     )
                     Text(
                         text = "Qualcomm Hexagon / MediaTek APU acceleration engaged without CPU fallback.",
-                        fontSize = 10.sp,
-                        color = Color(0xFF94A3B8)
+                        fontSize = 11.sp,
+                        color = colors.textSecondary,
+                        modifier = Modifier.padding(top = 2.dp)
                     )
                 }
             }

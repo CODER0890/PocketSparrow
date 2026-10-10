@@ -34,9 +34,19 @@ fun XaiWarningDialog(
     onDismiss: () -> Unit,
     onProceedAnyway: (() -> Unit)? = null
 ) {
+    val colors = LocalSparrowColors.current
     val isMalicious = result.threatLevel == 2
-    val headerColor = if (isMalicious) CyberRose else CyberAmber
-    val confPct = (result.confidence * 100).toInt()
+    val headerColor = if (isMalicious) colors.rose else colors.amber
+    val parsedConfidence = remember(result) {
+        val regex = Regex("""Confidence:\s*(\d+)%""")
+        val match = regex.find(result.xaiReason)
+        if (match != null) {
+            match.groupValues[1].toFloatOrNull()?.div(100f) ?: result.confidence
+        } else {
+            result.confidence
+        }
+    }
+    val confPct = (parsedConfidence * 100).toInt()
     val reducedMotion = isReducedMotion()
     var showForensicExport by remember { mutableStateOf(false) }
 
@@ -64,7 +74,8 @@ fun XaiWarningDialog(
     Dialog(onDismissRequest = onDismiss) {
         Surface(
             shape = RoundedCornerShape(16.dp),
-            color = Color(0xFF0F172A),
+            color = colors.cardBg,
+            border = androidx.compose.foundation.BorderStroke(1.dp, colors.cardBorder),
             tonalElevation = 8.dp,
             modifier = Modifier
                 .fillMaxWidth()
@@ -94,7 +105,7 @@ fun XaiWarningDialog(
                     )
                     Text(
                         text = "$confPct% CONFIDENCE",
-                        color = CyberCyan,
+                        color = colors.primary,
                         fontSize = 11.sp,
                         fontFamily = FontFamily.Monospace
                     )
@@ -104,7 +115,7 @@ fun XaiWarningDialog(
 
                 Text(
                     text = "Category: ${result.category}",
-                    color = Color.White,
+                    color = colors.textPrimary,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 14.sp
                 )
@@ -115,13 +126,13 @@ fun XaiWarningDialog(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(Color(0xFF030712), RoundedCornerShape(8.dp))
+                        .background(colors.surface, RoundedCornerShape(8.dp))
                         .padding(12.dp)
                 ) {
                     Column {
                         Text(
                             text = "EXPLAINABLE AI DIAGNOSIS:",
-                            color = Color(0xFF94A3B8),
+                            color = colors.textMuted,
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold,
                             fontFamily = FontFamily.Monospace
@@ -129,7 +140,7 @@ fun XaiWarningDialog(
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = result.xaiReason,
-                            color = Color(0xFFE2E8F0),
+                            color = colors.textPrimary,
                             fontSize = 12.sp,
                             lineHeight = 18.sp
                         )
@@ -141,7 +152,8 @@ fun XaiWarningDialog(
                     Spacer(modifier = Modifier.height(12.dp))
                     ThreatDnaVisualizer(
                         payload = payload,
-                        category = result.category
+                        category = result.category,
+                        confidence = parsedConfidence
                     )
                 }
 
@@ -150,7 +162,7 @@ fun XaiWarningDialog(
                 // Latency and Engine metadata
                 Text(
                     text = "Engine: ${if (result.tierTriggered == 1) "Tier 1 Heuristics" else "Tier 2 INT8 MobileBERT"} • Latency: ${result.latencyMicros / 1000.0} ms",
-                    color = Color(0xFF64748B),
+                    color = colors.textSecondary,
                     fontSize = 10.sp,
                     fontFamily = FontFamily.Monospace
                 )
@@ -166,8 +178,8 @@ fun XaiWarningDialog(
                     OutlinedButton(
                         onClick = { showForensicExport = true },
                         shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = CyberCyan),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, CyberCyan.copy(alpha = 0.5f))
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = colors.primary),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, colors.primary.copy(alpha = 0.5f))
                     ) {
                         Text("Export Audit", fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
                     }
@@ -175,7 +187,7 @@ fun XaiWarningDialog(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         if (onProceedAnyway != null) {
                             TextButton(onClick = onProceedAnyway) {
-                                Text("Proceed (Unsafe)", color = Color(0xFF94A3B8), fontSize = 12.sp)
+                                Text("Proceed (Unsafe)", color = colors.textSecondary, fontSize = 12.sp)
                             }
                             Spacer(modifier = Modifier.width(8.dp))
                         }

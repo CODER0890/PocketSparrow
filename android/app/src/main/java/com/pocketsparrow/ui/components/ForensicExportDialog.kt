@@ -21,10 +21,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.pocketsparrow.ui.theme.CyberCyan
-import com.pocketsparrow.ui.theme.CyberEmerald
-import com.pocketsparrow.ui.theme.CyberRose
-import com.pocketsparrow.ui.theme.CyberSurface
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -47,6 +43,7 @@ fun ForensicExportDialog(
     latencyMicros: Long,
     onDismiss: () -> Unit
 ) {
+    val colors = com.pocketsparrow.ui.theme.LocalSparrowColors.current
     val context = LocalContext.current
     val clipboardManager = LocalClipboardManager.current
 
@@ -72,8 +69,8 @@ fun ForensicExportDialog(
     Dialog(onDismissRequest = onDismiss) {
         Surface(
             shape = RoundedCornerShape(16.dp),
-            color = CyberSurface,
-            border = BorderStroke(1.dp, Color(0xFF1E293B)),
+            color = colors.cardBg,
+            border = BorderStroke(1.dp, colors.cardBorder),
             modifier = Modifier.fillMaxWidth().padding(8.dp)
         ) {
             Column(
@@ -85,12 +82,12 @@ fun ForensicExportDialog(
                     text = "Export Forensic Report",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = colors.textPrimary
                 )
                 Text(
                     text = "AES-256-GCM encrypted offline bundle with PBKDF2 key derivation.",
                     fontSize = 12.sp,
-                    color = Color(0xFF94A3B8)
+                    color = colors.textSecondary
                 )
 
                 if (exportedSha256 == null) {
@@ -110,19 +107,19 @@ fun ForensicExportDialog(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text("Password Strength", fontSize = 11.sp, color = Color(0xFF94A3B8))
+                            Text("Password Strength", fontSize = 11.sp, color = colors.textMuted)
                             Text(
                                 text = if (strengthScore >= 70) "Strong" else if (strengthScore >= 50) "Fair" else "Weak",
                                 fontSize = 11.sp,
-                                color = if (strengthScore >= 70) CyberEmerald else if (strengthScore >= 50) Color(0xFFF59E0B) else CyberRose,
+                                color = if (strengthScore >= 70) colors.emerald else if (strengthScore >= 50) colors.amber else colors.rose,
                                 fontWeight = FontWeight.Bold
                             )
                         }
                         LinearProgressIndicator(
                             progress = { strengthScore / 100f },
                             modifier = Modifier.fillMaxWidth().height(4.dp),
-                            color = if (strengthScore >= 70) CyberEmerald else if (strengthScore >= 50) Color(0xFFF59E0B) else CyberRose,
-                            trackColor = Color(0xFF1E293B)
+                            color = if (strengthScore >= 70) colors.emerald else if (strengthScore >= 50) colors.amber else colors.rose,
+                            trackColor = colors.surface
                         )
                     }
 
@@ -141,7 +138,7 @@ fun ForensicExportDialog(
                         horizontalArrangement = Arrangement.End
                     ) {
                         TextButton(onClick = onDismiss) {
-                            Text("Cancel", color = Color(0xFF94A3B8))
+                            Text("Cancel", color = colors.textSecondary)
                         }
                         Spacer(modifier = Modifier.width(8.dp))
                         Button(
@@ -161,23 +158,23 @@ fun ForensicExportDialog(
                                 isExporting = false
                             },
                             enabled = canExport && !isExporting,
-                            colors = ButtonDefaults.buttonColors(containerColor = CyberEmerald)
+                            colors = ButtonDefaults.buttonColors(containerColor = colors.emerald)
                         ) {
-                            Text(if (isExporting) "Encrypting..." else "Generate Encrypted .zip", color = Color.Black)
+                            Text(if (isExporting) "Encrypting..." else "Generate Encrypted .zip", color = if (colors.isDark) Color.Black else Color.White)
                         }
                     }
                 } else {
                     // Success View
                     Surface(
                         shape = RoundedCornerShape(8.dp),
-                        color = Color(0xFF064E3B).copy(alpha = 0.3f),
-                        border = BorderStroke(1.dp, CyberEmerald.copy(alpha = 0.4f)),
+                        color = colors.emerald.copy(alpha = 0.15f),
+                        border = BorderStroke(1.dp, colors.emerald.copy(alpha = 0.5f)),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Column(modifier = Modifier.padding(12.dp)) {
-                            Text("Archive Encrypted & Saved", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = CyberEmerald)
+                            Text("Archive Encrypted & Saved", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = colors.emerald)
                             Spacer(modifier = Modifier.height(4.dp))
-                            Text("Saved to: $exportPath", fontSize = 11.sp, color = Color(0xFFCBD5E1))
+                            Text("Saved to: $exportPath", fontSize = 11.sp, color = colors.textPrimary)
                         }
                     }
 
@@ -187,25 +184,25 @@ fun ForensicExportDialog(
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text("SHA-256 Checksum", fontSize = 11.sp, color = Color(0xFF94A3B8))
+                            Text("SHA-256 Checksum", fontSize = 11.sp, color = colors.textMuted)
                             TextButton(onClick = {
                                 clipboardManager.setText(AnnotatedString(exportedSha256 ?: ""))
                                 Toast.makeText(context, "SHA-256 copied to clipboard", Toast.LENGTH_SHORT).show()
                             }) {
-                                Text("Copy Hash", fontSize = 11.sp, color = CyberCyan)
+                                Text("Copy Hash", fontSize = 11.sp, color = colors.primary)
                             }
                         }
                         Surface(
                             shape = RoundedCornerShape(6.dp),
-                            color = Color(0xFF030712),
-                            border = BorderStroke(1.dp, Color(0xFF1E293B)),
+                            color = colors.surface,
+                            border = BorderStroke(1.dp, colors.cardBorder),
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Text(
                                 text = exportedSha256 ?: "",
                                 fontSize = 10.sp,
                                 fontFamily = FontFamily.Monospace,
-                                color = Color.White,
+                                color = colors.textPrimary,
                                 modifier = Modifier.padding(10.dp)
                             )
                         }
@@ -217,9 +214,9 @@ fun ForensicExportDialog(
                     ) {
                         Button(
                             onClick = onDismiss,
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+                            colors = ButtonDefaults.buttonColors(containerColor = colors.primary)
                         ) {
-                            Text("Done", color = Color.Black)
+                            Text("Done", color = if (colors.isDark) Color.Black else Color.White)
                         }
                     }
                 }

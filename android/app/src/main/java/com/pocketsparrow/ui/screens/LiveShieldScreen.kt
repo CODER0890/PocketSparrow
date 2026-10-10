@@ -49,8 +49,9 @@ import java.util.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LiveShieldScreen(
-    onViewThreatDna: (String, String, String) -> Unit = { _, _, _ -> }
+    onViewThreatDna: (String, String, String, Float) -> Unit = { _, _, _, _ -> }
 ) {
+    val colors = LocalSparrowColors.current
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val reducedMotion = isReducedMotion()
@@ -105,7 +106,7 @@ fun LiveShieldScreen(
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF030712))
+            .background(colors.bg)
             .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
         contentPadding = PaddingValues(vertical = 16.dp)
@@ -113,9 +114,9 @@ fun LiveShieldScreen(
         // 1. Header & Live Status HUD
         item {
             Card(
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF0F172A)),
+                colors = CardDefaults.cardColors(containerColor = colors.cardBg),
                 shape = RoundedCornerShape(16.dp),
-                border = BorderStroke(1.dp, Color(0xFF1E293B)),
+                border = BorderStroke(1.dp, colors.cardBorder),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(modifier = Modifier.padding(18.dp)) {
@@ -134,9 +135,9 @@ fun LiveShieldScreen(
                                     .scale(radarScale.value)
                                     .clip(CircleShape)
                                     .background(
-                                        if (isPaused) Color(0x33F59E0B)
-                                        else if (recentBlocked != null && System.currentTimeMillis() - recentBlocked.timestamp < 10000) Color(0x33F43F5E)
-                                        else Color(0x3310B981)
+                                        if (isPaused) colors.amber.copy(alpha = 0.15f)
+                                        else if (recentBlocked != null && System.currentTimeMillis() - recentBlocked.timestamp < 10000) colors.rose.copy(alpha = 0.15f)
+                                        else colors.emerald.copy(alpha = 0.15f)
                                     ),
                                 contentAlignment = Alignment.Center
                             ) {
@@ -154,7 +155,7 @@ fun LiveShieldScreen(
                             Column {
                                 Text(
                                     text = "Live Shield",
-                                    color = Color.White,
+                                    color = colors.textPrimary,
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold,
                                     letterSpacing = (-0.5).sp
@@ -175,8 +176,8 @@ fun LiveShieldScreen(
                         // Air-gap zero WAN badge
                         Surface(
                             shape = RoundedCornerShape(20.dp),
-                            color = Color(0x1A10B981),
-                            border = BorderStroke(1.dp, Color(0x4D10B981))
+                            color = colors.emerald.copy(alpha = 0.12f),
+                            border = BorderStroke(1.dp, colors.emerald.copy(alpha = 0.3f))
                         ) {
                             Row(
                                 modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
@@ -213,8 +214,10 @@ fun LiveShieldScreen(
                                 else LiveShieldManager.pauseFor15Minutes()
                             },
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = if (isPaused) Color(0xFFD97706) else Color(0xFF1E293B)
+                                containerColor = if (isPaused) colors.amber else if (colors.isDark) Color(0xFF1E293B) else colors.surface,
+                                contentColor = if (isPaused) Color.White else colors.textPrimary
                             ),
+                            border = BorderStroke(1.dp, if (isPaused) colors.amber else colors.cardBorder),
                             shape = RoundedCornerShape(10.dp),
                             modifier = Modifier.weight(1f),
                             contentPadding = PaddingValues(vertical = 10.dp)
@@ -223,14 +226,14 @@ fun LiveShieldScreen(
                                 imageVector = if (isPaused) Icons.Default.PlayArrow else Icons.Default.Pause,
                                 contentDescription = null,
                                 modifier = Modifier.size(16.dp),
-                                tint = Color.White
+                                tint = if (isPaused) Color.White else colors.primary
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
                                 text = if (isPaused) "Resume Now" else "Pause 15m",
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.SemiBold,
-                                color = Color.White
+                                color = if (isPaused) Color.White else colors.textPrimary
                             )
                         }
 
@@ -239,8 +242,10 @@ fun LiveShieldScreen(
                                 LiveShieldManager.setZeroRetentionEnabled(!isZeroRetentionEnabled)
                             },
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = if (isZeroRetentionEnabled) Color(0xFF059669) else Color(0xFF1E293B)
+                                containerColor = if (isZeroRetentionEnabled) colors.emerald else if (colors.isDark) Color(0xFF1E293B) else colors.surface,
+                                contentColor = if (isZeroRetentionEnabled) Color.White else colors.textSecondary
                             ),
+                            border = BorderStroke(1.dp, if (isZeroRetentionEnabled) colors.emerald else colors.cardBorder),
                             shape = RoundedCornerShape(10.dp),
                             modifier = Modifier.weight(1.3f),
                             contentPadding = PaddingValues(vertical = 10.dp)
@@ -249,14 +254,14 @@ fun LiveShieldScreen(
                                 imageVector = Icons.Default.Memory,
                                 contentDescription = null,
                                 modifier = Modifier.size(16.dp),
-                                tint = if (isZeroRetentionEnabled) Color.White else Color(0xFF94A3B8)
+                                tint = if (isZeroRetentionEnabled) Color.White else colors.textSecondary
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
                                 text = if (isZeroRetentionEnabled) "Zero Retention: ON" else "Zero Retention: OFF",
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.SemiBold,
-                                color = if (isZeroRetentionEnabled) Color.White else Color(0xFF94A3B8)
+                                color = if (isZeroRetentionEnabled) Color.White else colors.textSecondary
                             )
                         }
                     }
@@ -265,7 +270,7 @@ fun LiveShieldScreen(
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = "🛡 Zero Retention Active: Threat scans kept ephemeral in volatile RAM. 0 bytes written to SQLite Forensic Vault.",
-                            color = Color(0xFF34D399),
+                            color = if (colors.isDark) Color(0xFF34D399) else colors.emerald,
                             fontSize = 11.sp,
                             lineHeight = 15.sp
                         )
@@ -278,9 +283,11 @@ fun LiveShieldScreen(
         if (!hasNotificationPermission) {
             item {
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF1E1B4B)),
+                    colors = CardDefaults.cardColors(
+                        containerColor = if (colors.isDark) Color(0xFF1E1B4B) else colors.primary.copy(alpha = 0.08f)
+                    ),
                     shape = RoundedCornerShape(14.dp),
-                    border = BorderStroke(1.dp, Color(0xFF4338CA)),
+                    border = BorderStroke(1.dp, if (colors.isDark) Color(0xFF4338CA) else colors.primary.copy(alpha = 0.25f)),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
@@ -291,12 +298,12 @@ fun LiveShieldScreen(
                             Icon(
                                 imageVector = Icons.Default.NotificationsActive,
                                 contentDescription = null,
-                                tint = Color(0xFF818CF8),
+                                tint = colors.primary,
                                 modifier = Modifier.size(24.dp)
                             )
                             Text(
                                 text = "Notification Interception Setup",
-                                color = Color.White,
+                                color = colors.textPrimary,
                                 fontSize = 15.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -304,7 +311,7 @@ fun LiveShieldScreen(
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = "Pocket Sparrow intercepts incoming phishing links and scam text in real-time. Because Pocket Sparrow has 0 internet permission declared, notifications are scanned 100% on-device and never leave your phone.",
-                            color = Color(0xFFC7D2FE),
+                            color = colors.textSecondary,
                             fontSize = 12.sp,
                             lineHeight = 17.sp
                         )
@@ -315,7 +322,10 @@ fun LiveShieldScreen(
                                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                                 context.startActivity(intent)
                             },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4F46E5)),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = colors.primary,
+                                contentColor = if (colors.isDark) Color.Black else Color.White
+                            ),
                             shape = RoundedCornerShape(8.dp),
                             modifier = Modifier.fillMaxWidth()
                         ) {
@@ -333,9 +343,9 @@ fun LiveShieldScreen(
         // 3. Sensitivity Slider & Monitored Apps
         item {
             Card(
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF0F172A)),
+                colors = CardDefaults.cardColors(containerColor = colors.cardBg),
                 shape = RoundedCornerShape(14.dp),
-                border = BorderStroke(1.dp, Color(0xFF1E293B)),
+                border = BorderStroke(1.dp, colors.cardBorder),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
@@ -346,7 +356,7 @@ fun LiveShieldScreen(
                     ) {
                         Text(
                             text = "Threat Sensitivity",
-                            color = Color.White,
+                            color = colors.textPrimary,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.SemiBold
                         )
@@ -357,7 +367,7 @@ fun LiveShieldScreen(
                                 sensitivity >= 0.45f -> "Medium (0.50)"
                                 else -> "Low (0.25)"
                             },
-                            color = CyberCyan,
+                            color = colors.primary,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Medium,
                             fontFamily = FontFamily.Monospace
@@ -370,16 +380,16 @@ fun LiveShieldScreen(
                         valueRange = 0.25f..0.95f,
                         steps = 2,
                         colors = SliderDefaults.colors(
-                            thumbColor = CyberCyan,
-                            activeTrackColor = CyberCyan,
-                            inactiveTrackColor = Color(0xFF334155)
+                            thumbColor = colors.primary,
+                            activeTrackColor = colors.primary,
+                            inactiveTrackColor = colors.cardBorder
                         )
                     )
 
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "Monitored Apps & Channels",
-                        color = Color.White,
+                        color = colors.textPrimary,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -409,14 +419,14 @@ fun LiveShieldScreen(
                                     { Icon(Icons.Default.Check, null, modifier = Modifier.size(12.dp)) }
                                 } else null,
                                 colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = Color(0xFF1E293B),
-                                    selectedLabelColor = Color.White,
-                                    containerColor = Color(0xFF090D16),
-                                    labelColor = Color(0xFF64748B)
+                                    selectedContainerColor = if (colors.isDark) Color(0xFF1E293B) else colors.primary.copy(alpha = 0.12f),
+                                    selectedLabelColor = if (colors.isDark) Color.White else colors.primary,
+                                    containerColor = colors.surface,
+                                    labelColor = colors.textSecondary
                                 ),
                                 border = FilterChipDefaults.filterChipBorder(
-                                    borderColor = if (enabled) CyberCyan else Color(0xFF1E293B),
-                                    selectedBorderColor = CyberCyan,
+                                    borderColor = if (enabled) colors.primary else colors.cardBorder,
+                                    selectedBorderColor = colors.primary,
                                     enabled = true,
                                     selected = enabled
                                 )
@@ -430,9 +440,9 @@ fun LiveShieldScreen(
         // 4. Safe Simulation Test Runner
         item {
             Card(
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF0F172A)),
+                colors = CardDefaults.cardColors(containerColor = colors.cardBg),
                 shape = RoundedCornerShape(14.dp),
-                border = BorderStroke(1.dp, Color(0xFF1E293B)),
+                border = BorderStroke(1.dp, colors.cardBorder),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
@@ -443,19 +453,19 @@ fun LiveShieldScreen(
                         Icon(
                             imageVector = Icons.Default.Science,
                             contentDescription = null,
-                            tint = CyberAmber,
+                            tint = colors.amber,
                             modifier = Modifier.size(20.dp)
                         )
                         Text(
                             text = "Safe Threat Simulator (RFC 2606)",
-                            color = Color.White,
+                            color = colors.textPrimary,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold
                         )
                     }
                     Text(
                         text = "Verify on-device interception using safe reserved test domains (.test) and dummy numbers (555). No live attacks or external network calls.",
-                        color = Color(0xFF94A3B8),
+                        color = colors.textSecondary,
                         fontSize = 11.sp,
                         modifier = Modifier.padding(top = 4.dp, bottom = 12.dp)
                     )
@@ -466,8 +476,8 @@ fun LiveShieldScreen(
                         testCases.forEach { testCase ->
                             Surface(
                                 shape = RoundedCornerShape(8.dp),
-                                color = Color(0xFF1E293B),
-                                border = BorderStroke(1.dp, Color(0xFF334155)),
+                                color = colors.bg,
+                                border = BorderStroke(1.dp, colors.cardBorder),
                                 modifier = Modifier.fillMaxWidth()
                             ) {
                                 Row(
@@ -484,7 +494,7 @@ fun LiveShieldScreen(
                                         ) {
                                             Text(
                                                 text = testCase.name,
-                                                color = Color.White,
+                                                color = colors.textPrimary,
                                                 fontSize = 12.sp,
                                                 fontWeight = FontWeight.SemiBold
                                             )
@@ -503,7 +513,7 @@ fun LiveShieldScreen(
                                         }
                                         Text(
                                             text = testCase.snippet,
-                                            color = Color(0xFF94A3B8),
+                                            color = colors.textSecondary,
                                             fontSize = 11.sp,
                                             maxLines = 1
                                         )
@@ -516,7 +526,7 @@ fun LiveShieldScreen(
                                             }
                                         },
                                         colors = ButtonDefaults.buttonColors(
-                                            containerColor = if (testCase.isThreat) Color(0xFFBE123C) else Color(0xFF047857)
+                                            containerColor = if (testCase.isThreat) colors.rose else colors.emerald
                                         ),
                                         shape = RoundedCornerShape(6.dp),
                                         contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp)
@@ -540,13 +550,13 @@ fun LiveShieldScreen(
             ) {
                 Text(
                     text = "Live Intercept Feed (${liveEvents.size})",
-                    color = Color.White,
+                    color = colors.textPrimary,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold
                 )
                 if (liveEvents.isNotEmpty()) {
                     TextButton(onClick = { LiveShieldManager.clearEvents() }) {
-                        Text("Clear", color = Color(0xFF64748B), fontSize = 12.sp)
+                        Text("Clear", color = colors.textMuted, fontSize = 12.sp)
                     }
                 }
             }
@@ -556,8 +566,8 @@ fun LiveShieldScreen(
             item {
                 Surface(
                     shape = RoundedCornerShape(12.dp),
-                    color = Color(0xFF0F172A),
-                    border = BorderStroke(1.dp, Color(0xFF1E293B)),
+                    color = colors.cardBg,
+                    border = BorderStroke(1.dp, colors.cardBorder),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(
@@ -569,19 +579,19 @@ fun LiveShieldScreen(
                         Icon(
                             imageVector = Icons.Default.AllInclusive,
                             contentDescription = null,
-                            tint = Color(0xFF475569),
+                            tint = colors.textMuted,
                             modifier = Modifier.size(32.dp)
                         )
                         Spacer(modifier = Modifier.height(10.dp))
                         Text(
                             text = "Awaiting Notifications",
-                            color = Color(0xFF94A3B8),
+                            color = colors.textPrimary,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Medium
                         )
                         Text(
                             text = "Incoming notifications from WhatsApp, Telegram, Signal, and SMS are evaluated here in <50ms.",
-                            color = Color(0xFF64748B),
+                            color = colors.textSecondary,
                             fontSize = 11.sp,
                             lineHeight = 16.sp,
                             modifier = Modifier.padding(top = 4.dp)
@@ -603,19 +613,20 @@ fun LiveShieldScreen(
 @Composable
 fun LiveEventCard(
     event: LiveShieldEvent,
-    onViewThreatDna: (String, String, String) -> Unit
+    onViewThreatDna: (String, String, String, Float) -> Unit
 ) {
+    val colors = LocalSparrowColors.current
     var expanded by remember { mutableStateOf(false) }
     val timeFormat = remember { SimpleDateFormat("HH:mm:ss", Locale.getDefault()) }
 
     Card(
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF0F172A)),
+        colors = CardDefaults.cardColors(containerColor = colors.cardBg),
         shape = RoundedCornerShape(12.dp),
         border = BorderStroke(
             1.dp,
-            if (event.threatLevel == 2) Color(0x66F43F5E)
-            else if (event.threatLevel == 1) Color(0x66F59E0B)
-            else Color(0xFF1E293B)
+            if (event.threatLevel == 2) colors.rose.copy(alpha = 0.5f)
+            else if (event.threatLevel == 1) colors.amber.copy(alpha = 0.5f)
+            else colors.cardBorder
         ),
         modifier = Modifier
             .fillMaxWidth()
@@ -633,11 +644,11 @@ fun LiveEventCard(
                 ) {
                     Surface(
                         shape = RoundedCornerShape(6.dp),
-                        color = Color(0xFF1E293B)
+                        color = colors.surface
                     ) {
                         Text(
                             text = event.appName,
-                            color = Color(0xFFE2E8F0),
+                            color = colors.textPrimary,
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
@@ -645,7 +656,7 @@ fun LiveEventCard(
                     }
                     Text(
                         text = timeFormat.format(Date(event.timestamp)),
-                        color = Color(0xFF64748B),
+                        color = colors.textMuted,
                         fontSize = 11.sp,
                         fontFamily = FontFamily.Monospace
                     )
@@ -655,16 +666,16 @@ fun LiveEventCard(
                 Surface(
                     shape = RoundedCornerShape(12.dp),
                     color = when (event.actionTaken) {
-                        "BLOCKED" -> Color(0x26F43F5E)
-                        "ALLOWED_ONCE" -> Color(0x26F59E0B)
-                        else -> Color(0x2610B981)
+                        "BLOCKED" -> colors.rose.copy(alpha = 0.15f)
+                        "ALLOWED_ONCE" -> colors.amber.copy(alpha = 0.15f)
+                        else -> colors.emerald.copy(alpha = 0.15f)
                     },
                     border = BorderStroke(
                         1.dp,
                         when (event.actionTaken) {
-                            "BLOCKED" -> Color(0x80F43F5E)
-                            "ALLOWED_ONCE" -> Color(0x80F59E0B)
-                            else -> Color(0x8010B981)
+                            "BLOCKED" -> colors.rose.copy(alpha = 0.6f)
+                            "ALLOWED_ONCE" -> colors.amber.copy(alpha = 0.6f)
+                            else -> colors.emerald.copy(alpha = 0.6f)
                         }
                     )
                 ) {
@@ -679,18 +690,18 @@ fun LiveEventCard(
                                 .clip(CircleShape)
                                 .background(
                                     when (event.actionTaken) {
-                                        "BLOCKED" -> CyberRose
-                                        "ALLOWED_ONCE" -> CyberAmber
-                                        else -> CyberEmerald
+                                        "BLOCKED" -> colors.rose
+                                        "ALLOWED_ONCE" -> colors.amber
+                                        else -> colors.emerald
                                     }
                                 )
                         )
                         Text(
                             text = event.actionTaken,
                             color = when (event.actionTaken) {
-                                "BLOCKED" -> CyberRose
-                                "ALLOWED_ONCE" -> CyberAmber
-                                else -> CyberEmerald
+                                "BLOCKED" -> colors.rose
+                                "ALLOWED_ONCE" -> colors.amber
+                                else -> colors.emerald
                             },
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold
@@ -703,7 +714,7 @@ fun LiveEventCard(
 
             Text(
                 text = event.snippet,
-                color = Color.White,
+                color = colors.textPrimary,
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Medium,
                 maxLines = if (expanded) 8 else 2
@@ -718,7 +729,7 @@ fun LiveEventCard(
             ) {
                 Text(
                     text = "Category: ${event.category} • Latency: ${event.latencyMicros / 1000f}ms",
-                    color = Color(0xFF64748B),
+                    color = colors.textSecondary,
                     fontSize = 10.sp,
                     fontFamily = FontFamily.Monospace
                 )
@@ -726,28 +737,28 @@ fun LiveEventCard(
                 if (event.threatLevel > 0) {
                     TextButton(
                         onClick = {
-                            onViewThreatDna(event.snippet, event.category, event.xaiReason)
+                            onViewThreatDna(event.snippet, event.category, event.xaiReason, event.confidence)
                         },
                         contentPadding = PaddingValues(horizontal = 6.dp, vertical = 0.dp)
                     ) {
-                        Text("View Threat DNA →", color = CyberCyan, fontSize = 11.sp)
+                        Text("View Threat DNA →", color = colors.primary, fontSize = 11.sp)
                     }
                 }
             }
 
             if (expanded) {
                 Spacer(modifier = Modifier.height(8.dp))
-                HorizontalDivider(color = Color(0xFF1E293B))
+                HorizontalDivider(color = colors.cardBorder)
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = "Explainable AI (XAI) Insight:",
-                    color = CyberCyan,
+                    color = colors.primary,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.SemiBold
                 )
                 Text(
                     text = event.xaiReason,
-                    color = Color(0xFFCBD5E1),
+                    color = colors.textSecondary,
                     fontSize = 11.sp,
                     lineHeight = 16.sp,
                     modifier = Modifier.padding(top = 2.dp)
@@ -757,7 +768,7 @@ fun LiveEventCard(
                     Spacer(modifier = Modifier.height(6.dp))
                     Text(
                         text = "Extracted URLs: ${event.urlsFound.joinToString(", ")}",
-                        color = CyberAmber,
+                        color = colors.amber,
                         fontSize = 10.sp,
                         fontFamily = FontFamily.Monospace
                     )

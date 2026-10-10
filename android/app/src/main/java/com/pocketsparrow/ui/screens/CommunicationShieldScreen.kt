@@ -73,72 +73,106 @@ fun CommunicationShieldScreen(
         refreshData()
     }
 
-    Scaffold(
-        topBar = {
+    val colors = com.pocketsparrow.ui.theme.LocalSparrowColors.current
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(colors.bg)
+            .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        contentPadding = PaddingValues(vertical = 16.dp)
+    ) {
+        // Top Header
+        item {
             Surface(
-                color = MaterialTheme.colorScheme.surface,
-                tonalElevation = 2.dp,
-                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+                color = colors.cardBg,
+                shape = RoundedCornerShape(14.dp),
+                border = androidx.compose.foundation.BorderStroke(1.dp, colors.cardBorder)
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                        .padding(horizontal = 12.dp, vertical = 10.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Row(
+                        modifier = Modifier.weight(1f),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        IconButton(onClick = onBack) {
-                            Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
+                        IconButton(
+                            onClick = onBack,
+                            modifier = Modifier.size(36.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowBack,
+                                contentDescription = "Back",
+                                tint = colors.textPrimary,
+                                modifier = Modifier.size(20.dp)
+                            )
                         }
-                        Column {
+                        Column(modifier = Modifier.weight(1f)) {
                             Text(
                                 text = "Communication Shield",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = colors.textPrimary,
+                                maxLines = 1,
+                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                             )
                             Text(
-                                text = "100% On-Device • STIR/SHAKEN • Spam Quarantine",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                fontSize = 11.sp
+                                text = "100% On-Device • STIR/SHAKEN",
+                                color = colors.textSecondary,
+                                fontSize = 10.sp,
+                                maxLines = 1,
+                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                             )
                         }
                     }
 
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        FilledTonalButton(
+                    Spacer(modifier = Modifier.width(6.dp))
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Surface(
                             onClick = { showOnboarding = true },
-                            contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp)
+                            color = colors.surface,
+                            shape = RoundedCornerShape(8.dp),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, colors.cardBorder)
                         ) {
-                            Icon(imageVector = Icons.Default.Settings, contentDescription = null, modifier = Modifier.size(14.dp))
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text("Setup", fontSize = 11.sp)
+                            Row(
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                Icon(Icons.Default.Settings, contentDescription = null, modifier = Modifier.size(13.dp), tint = colors.textPrimary)
+                                Text("Setup", fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = colors.textPrimary)
+                            }
                         }
-                        Button(
+
+                        Surface(
                             onClick = { showReportingDialog = true },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF43F5E)),
-                            contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp)
+                            color = colors.rose.copy(alpha = 0.15f),
+                            shape = RoundedCornerShape(8.dp),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, colors.rose.copy(alpha = 0.5f))
                         ) {
-                            Icon(imageVector = Icons.Default.Warning, contentDescription = null, modifier = Modifier.size(14.dp))
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text("Report", fontSize = 11.sp)
+                            Row(
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                Icon(Icons.Default.Warning, contentDescription = null, modifier = Modifier.size(13.dp), tint = colors.rose)
+                                Text("Report", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = colors.rose)
+                            }
                         }
                     }
                 }
             }
         }
-    ) { padding ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
             // Manifesto Banner
             item {
                 Surface(
@@ -510,7 +544,6 @@ fun CommunicationShieldScreen(
                 }
             }
         }
-    }
 
     if (showOnboarding) {
         PermissionOnboardingSheet(

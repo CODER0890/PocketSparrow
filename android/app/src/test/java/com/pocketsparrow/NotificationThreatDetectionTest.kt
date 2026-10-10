@@ -18,6 +18,9 @@ class NotificationThreatDetectionTest {
 
     @Test
     fun testUrlExtractionPerformanceUnderTwoMillis() {
+        // Warmup to avoid JVM classloading/regex compilation timing artifacts
+        NotificationExtractor.extractUrls("https://warmup.test")
+
         val sampleText = "URGENT: Verify your account immediately at https://security-paypal.test and backup at http://bank-update.test/login"
         val start = System.nanoTime()
         val urls = NotificationExtractor.extractUrls(sampleText)

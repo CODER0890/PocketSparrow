@@ -47,11 +47,12 @@ object NotificationExtractor {
 
         val notification = sbn.notification ?: return true
 
-        // Ignore ongoing / foreground service / playback notifications
+        // Ignore ongoing / foreground service / playback notifications / group summaries
         if (sbn.isOngoing) return true
         val flags = notification.flags
         if ((flags and Notification.FLAG_ONGOING_EVENT) != 0) return true
         if ((flags and Notification.FLAG_FOREGROUND_SERVICE) != 0) return true
+        if ((flags and Notification.FLAG_GROUP_SUMMARY) != 0) return true
         if ((flags and Notification.FLAG_LOCAL_ONLY) != 0 && sbn.packageName.startsWith("com.android.")) return true
 
         // Ignore progress / transport / navigation / call categories
